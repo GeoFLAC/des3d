@@ -20,7 +20,7 @@ const config: Config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'https://github.com/GeoFLAC/', // Usually your GitHub org/user name.
+  organizationName: 'https://geoflac.github.io/', // Usually your GitHub org/user name.
   projectName: 'des3d/', // Usually your repo name.
   deploymentBranch: 'main',
 
