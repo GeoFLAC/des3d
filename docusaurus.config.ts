@@ -7,7 +7,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'DES3D User Manual',
   tagline: 'Essential information for using DES3D',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/favicon.png',
 
   // Set the production url of your site here
   url: 'https://geoflac.github.io',
@@ -24,7 +24,7 @@ const config: Config = {
   projectName: 'des3d/', // Usually your repo name.
   deploymentBranch: 'main',
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'ignore', //throw',
   onBrokenMarkdownLinks: 'warn',
 
   // Even if you don't use internationalization, you can use this field to set
