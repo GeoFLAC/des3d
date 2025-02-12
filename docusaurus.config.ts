@@ -72,9 +72,9 @@ const config: Config = {
     // Replace with your project's social card
     image: 'img/docusaurus-social-card.jpg',
     navbar: {
-      title: 'My Site',
+      title: 'Main',
       logo: {
-        alt: 'My Site Logo',
+        alt: 'GeoFLAC Logo',
         src: 'img/logo.svg',
       },
       items: [
@@ -131,6 +131,10 @@ const config: Config = {
             {
               label: 'DES3D on GitHub',
               href: 'https://github.com/GeoFLAC/DynEarthSol/',
+            },
+            {
+              label: 'LAGHOST on GitHub',
+              href: 'https://github.com/GeoFLAC/Laghost/',
             },
           ],
         },
