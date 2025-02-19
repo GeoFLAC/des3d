@@ -7,11 +7,11 @@ sidebar_position: 2
 ## Coupling strategy
 
 - Build `CHILD` as a shared object
-- Write `childInterface` class with appropriate methods that an external app (i.e., DES3D) can call to get and set the topography data that `CHILD` initializes and manages.
+- Write `childInterface` class with appropriate methods that an external app (i.e., DES3D) can call to have CHILD modify the topography data.
 - In `DES3D`,
   - initialize `CHILD` through `childInterface`
   - prepare an array of pointers to the top boundary node coordinates (i.e., topography).
-  - let CHILD run for `dt` and modify the topography.
+  - call `childInterface` methods to use `CHILD` for modifying the topography for `dt`.
 
 ![flow chart](./img/flowchart_child.png)
 
