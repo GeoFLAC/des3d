@@ -15,9 +15,15 @@ sidebar_position: 2
 
 ![flow chart](./img/flowchart_child.png)
 
-## Prepare `child` and `childInterface`
+## Preliminary results
 
-### Get the codes
+![coupling results](./img/new_coupling_results.png)
+
+## Technical Details
+
+### Prepare `child` and `childInterface`
+
+#### Get the codes
 
 ```SHELL
 git clone https://github.com/GeoFLAC/Coupling_SNAC_CHILD
@@ -26,7 +32,7 @@ cp -r ../Coupling SNAC_CHILD/child .
 cp -r ../Coupling SNAC_CHILD/childInterface .
 ```
 
-### Build
+#### Build
 
 ```SHELL
 cd child/bin
@@ -40,11 +46,11 @@ cd childInterface
 make
 ```
 
-## Prepare `DES3D`
+### Prepare `DES3D`
 
-### Add relevant parameters to `parameters.hpp`
+#### Add relevant parameters to `parameters.hpp`
 
-#### Add `child_input_file_name` to `struct Sim`
+##### Add `child_input_file_name` to `struct Sim`
 
 
 ```C++
@@ -56,7 +62,7 @@ struct Sim {
 };
 ```
 
-#### Add handles for the childInterface object and the arrays for the top boundary nodes and markers to `struct Variables`
+##### Add handles for the childInterface object and the arrays for the top boundary nodes and markers to `struct Variables`
 
 In `struct Variables {}`
 
@@ -67,9 +73,9 @@ In `struct Variables {}`
     std::vector<int> surf_bmarkers;
 ```
 
-### Create and delete `childInterface` object as needed
+#### Create and delete `childInterface` object as needed
 
-#### Create during the initialization
+##### Create during the initialization
 
 In `dynearthsol.cxx:void init(const Param& param, Variables& var)`
 
@@ -100,7 +106,7 @@ In `dynearthsol.cxx:void init(const Param& param, Variables& var)`
 #endif
 ```
 
-#### Create when restarting
+##### Create when restarting
 
 In `dynearthsol.cxx:void restart(const Param& param, Variables& var)`
 
@@ -128,7 +134,7 @@ In `dynearthsol.cxx:void restart(const Param& param, Variables& var)`
 #endif
 ```
 
-#### Recreate during remeshing 
+##### Recreate during remeshing 
 
 At the end of `remeshing.cxx:void remesh()`,
 
@@ -159,7 +165,7 @@ At the end of `remeshing.cxx:void remesh()`,
 #endif
 ```
 
-#### Delete at the end of simulation
+##### Delete at the end of simulation
 
 At the end of `dynearthsol.cxx: int main()`
 
@@ -170,7 +176,7 @@ At the end of `dynearthsol.cxx: int main()`
 #endif
 ```
 
-### Define a custom surface process routine as an option
+#### Define a custom surface process routine as an option
 
 In `bc.cxx`,
 
@@ -209,7 +215,7 @@ And in `void surface_processes()`,
 ...
 ```
 
-### Add CHILD input file name as a new input parameter
+#### Add CHILD input file name as a new input parameter
 
 In `input.cxx:static void declare_parameters()`,
 
@@ -221,7 +227,7 @@ cfg.add_options()
         "child input file name")
 ```
 
-## Build `DES3D`
+### Build `DES3D`
 
 Full listing of `Makefile`. Note the added option, `usechild`.
 
@@ -671,7 +677,7 @@ clean:
 	@rm -f $(OBJS) $(EXE)
 ```
 
-## Prepare input files
+### Prepare input files
 
 1. Have a CHILD input file: e.g., `DynEarthSol/examples/testchild.in`
     - There are more in `child/ChildExercises`
@@ -683,24 +689,24 @@ clean:
     surface_process_option = 103 # use CHILD
     ```
 
-## Run a coupled model
+### Run a coupled model
 
 ```SHELL
 cd DynEarthSol/examples
 ../dynearthsol3d ./core-complex-mmg-coupled.cfg
 ```
 
-## Visualize outputs
+### Visualize outputs
 
 In `DynEarthSol/examples`,
 
-### DES3D outputs
+#### DES3D outputs
 
 ```SHELL
 ../2vty.py ccmmg-coupled
 ```
 
-### CHILD outputs
+#### CHILD outputs
 
 Modified topography is already part of the Lagrangian mesh output from DES3D.
 
