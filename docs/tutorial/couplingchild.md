@@ -681,8 +681,14 @@ clean:
 
 1. Have a CHILD input file: e.g., `DynEarthSol/examples/testchild.in`
     - There are more in `child/ChildExercises`
-2. Choose `103` for `surface_process_option` in a DES3D config file.
-    - e.g., See `DynEarthSol/examples/core-complex-mmg-coupled.cfg`
+2. Specify the CHILD input file in a DES3D's config file: e.g., in `DynEarthSol/examples/core-complex-mmg-coupled.cfg`,
+
+    ```JSON
+    [sim]
+    child_input_file_name = testchild.in
+    ```
+
+3. Choose `103` for `surface_process_option` in the DES3D config file: e.g, in `DynEarthSol/examples/core-complex-mmg-coupled.cfg`,
 
     ```JSON
     [control]
