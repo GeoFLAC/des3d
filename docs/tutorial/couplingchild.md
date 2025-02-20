@@ -679,16 +679,16 @@ clean:
 
 ### Prepare input files
 
-1. Have a CHILD input file: e.g., `DynEarthSol/examples/testchild.in`
+1. Have a CHILD input file: e.g., `DynEarthSol/examples/child_coupling/testchild.in`
     - There are more in `child/ChildExercises`
-2. Specify the CHILD input file in a DES3D's config file: e.g., in `DynEarthSol/examples/core-complex-mmg-coupled.cfg`,
+2. Specify the CHILD input file in a DES3D's config file: e.g., in `DynEarthSol/examples/child_coupling/core-complex-mmg-coupled.cfg`,
 
     ```JSON
     [sim]
     child_input_file_name = testchild.in
     ```
 
-3. Choose `103` for `surface_process_option` in the DES3D config file: e.g, in `DynEarthSol/examples/core-complex-mmg-coupled.cfg`,
+3. Choose `103` for `surface_process_option` in the DES3D config file: e.g, in `DynEarthSol/examples/child_coupling/core-complex-mmg-coupled.cfg`,
 
     ```JSON
     [control]
@@ -698,18 +698,18 @@ clean:
 ### Run a coupled model
 
 ```SHELL
-cd DynEarthSol/examples
-../dynearthsol3d ./core-complex-mmg-coupled.cfg
+cd DynEarthSol/examples/child_coupling
+../../dynearthsol3d ./core-complex-mmg-coupled.cfg
 ```
 
 ### Visualize outputs
 
-In `DynEarthSol/examples`,
+In `DynEarthSol/examples/child_coupling`,
 
 #### DES3D outputs
 
 ```SHELL
-../2vty.py ccmmg-coupled
+../../2vty.py ccmmg-coupled
 ```
 
 #### CHILD outputs
