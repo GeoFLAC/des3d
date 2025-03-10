@@ -22,6 +22,10 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+
+      - name: Clear Docusaurus Cache
+        run: rm -rf .docusaurus/.cache
+      
       - name: Build website
         run: yarn build
 
