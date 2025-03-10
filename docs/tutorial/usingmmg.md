@@ -128,6 +128,7 @@ The option `param.mesh.remeshing_option` determines what to do to the bottom bou
 	- For this purpose, there is a customizable function, `compute_metric_field()` in `remesh.dxx`. More about this function below.
 4. Mesh optimization
 5. Mesh-related data update using the optimized MMG5 mesh
+
 <!-- 
 #### `compute_metric_filed()`
 
