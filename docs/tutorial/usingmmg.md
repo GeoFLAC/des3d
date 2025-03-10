@@ -2,9 +2,27 @@
 sidebar_position: 3
 ---
 
-# Adaptive mesh refinement in DES3D 
+# Adaptive mesh refinement with [MMG](https://mmgtools.org)
 
-## Parameters for [MMG](https://mmgtools.org)
+## In a nutshell,
+
+- `libmmg3d.a` or `libmmg2d.a` is expected to be available.
+	- With minimal required dependencies, it should be straightforward to build MMG.
+- With `use_mmg = 1` in `Makefile`, remeshing will use MMG for adaptive mesh refinement.
+- The following two parameters control the maximum and minimum element size during remeshing. For instance,
+
+	- `mmg_hmax_factor = 10.0`: The largest element will have an edge length 10 times `param.mesh.resolution`
+	- `mmg_hmin_factor = 0.1`: The smallest element will have an edge length 0.1 times `param.mesh.resolution`
+- `compute_metric_field()` in `remesh.cxx` is currently hardwired to use plastic strain ($\varepsilon_{pl}$) to scale element size from $h_{max}$ to $h_{min}$ as 1/($10 \varepsilon_{pl}$).
+	- In the future, users should be able to change the factor 10 or the function form itself.
+- Note that since $\varepsilon_{pl}$ can only increase, the total mesh size will grow with it. 
+	- To maintain a certain mesh size, *mesh optimization* is needed.
+	- DES3D is currently hardwired to provide a 'solution' filed [see below](#workflow-during-remeshing-with-mmg) and thus perform remeshing.
+	- It should be a user option whether to provide a solution field or not.
+
+## Technical details
+
+### Parameters for MMG
 
 - `mmg_debug`: Turn on/off *debug* mode. In debug mode, MMG checks if all structures are allocated.
 - `mmg_verbose`: Level of verbosity, -1 to 10.
@@ -23,8 +41,6 @@ mmg_hmax_factor = 10.0
 mmg_hmin_factor = 1.0
 mmg_hausd_factor = 0.01
 ```
-
-## What happens during remeshing
 
 ### Using MMG for remeshing
 
@@ -118,7 +134,7 @@ The option `param.mesh.remeshing_option` determines what to do to the bottom bou
     }
 ```
 
-#### Workflow
+#### Workflow during remeshing with MMG
 
 1. Initialization
 2. Mesh building in MMG5 format
@@ -149,7 +165,7 @@ For instance, with
 
 we get
 
-- $h = h_{max} = $ 2 km where $\varepsilon_{pl} = 0$.
+- h = h<sub>max</sub> = 2 km where $\varepsilon_{pl} = 0$.
 - $h =$ 2 km / (1+10 $\varepsilon_{pl}$) where $\varepsilon_{pl} \le 1.9$.
 - $h =$ 100 m where $\varepsilon_{pl} > 1.9$.
 
