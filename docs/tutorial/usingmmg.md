@@ -117,7 +117,7 @@ The option `param.mesh.remeshing_option` determines what to do to the bottom bou
         std::exit(1);
     }
 ```
-<!-- 
+
 #### Workflow
 
 1. Initialization
@@ -128,7 +128,7 @@ The option `param.mesh.remeshing_option` determines what to do to the bottom bou
 	- For this purpose, there is a customizable function, `compute_metric_field()` in `remesh.dxx`. More about this function below.
 4. Mesh optimization
 5. Mesh-related data update using the optimized MMG5 mesh
-
+<!-- 
 #### `compute_metric_filed()`
 
 This is a short function that converts one of the data filed to a metric field. Currently, it scales `plastic_strain` to a solution field. A solution, $h$, at a node is directly used for determining an element size. 
