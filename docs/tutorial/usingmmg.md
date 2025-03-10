@@ -2,9 +2,9 @@
 sidebar_position: 3
 ---
 
-# Guide for controlling adaptive mesh refinement 
+# Adaptive mesh refinement in DES3D 
 
-## Parameters for MMG
+## Parameters for [MMG](https://mmgtools.org)
 
 - `mmg_debug`: Turn on/off *debug* mode. In debug mode, MMG checks if all structures are allocated.
 - `mmg_verbose`: Level of verbosity, -1 to 10.
@@ -23,7 +23,7 @@ mmg_hmax_factor = 10.0
 mmg_hmin_factor = 1.0
 mmg_hausd_factor = 0.01
 ```
-<!-- 
+
 ## What happens during remeshing
 
 ### Using MMG for remeshing
@@ -77,7 +77,7 @@ void remesh(const Param &param, Variables &var, int bad_quality)
 #endif
 ...
 ```
-
+<!-- 
 ### `optimize_mesh()`
 
 #### Options for the bottom boundary
