@@ -9,7 +9,7 @@ sidebar_position: 3
 - `mmg_debug`: Turn on/off *debug* mode. In debug mode, MMG checks if all structures are allocated.
 - `mmg_verbose`: Level of verbosity. [-1..10].
 - `mmg_hmax_factor`: Positive number >= 1.0. The maximum possible element size set to be `hmax * param.mesh.resolution`
-- `mmg_hmin_factor`: Positive number <= 1.0. The minimum possible element size set to be `hmin * param.mesh.resolution`
+- `mmg_hmin_factor`: Positive number < 1.0. The minimum possible element size set to be `hmin * param.mesh.resolution`
 - `mmg_hausd_factor`: Global Hausdorff distance (on all boundaries in the mesh). Roughly speaking, allowed difference of the boundary before and after mesh refinement or optimization.
 
 For more MMG parameters, refer to https://mmgtools.github.io/libmmg3d_8h.html#a964a06109019542d04f12263c3fae24d
