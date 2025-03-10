@@ -152,7 +152,7 @@ we get
 - $h =$ 2 km / (1+10 $\varepsilon_{pl}$) where $\varepsilon_{pl} \le 1.9$.
 - $h =$ 100 m where $\varepsilon_{pl} > 1.9$.
 
-Here is the full code listing: -->
+Here is the full code listing:
 
 
 ```C++
@@ -187,3 +187,4 @@ void compute_metric_field(const Variables &var, const Param &param, const conn_t
     }
 }
 ```
+-->
