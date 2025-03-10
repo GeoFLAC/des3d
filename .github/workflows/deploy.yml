@@ -23,6 +23,9 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Install katex
+        run: yarn add remark-math@6 rehype-katex@7
+
       - name: Clear Docusaurus Cache
         run: rm -rf .docusaurus/.cache
       
