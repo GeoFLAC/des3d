@@ -135,7 +135,7 @@ This is a short function that converts one of the data filed to a metric field. 
 
 <!-- $h$ ranges between $h_{min}$ and $h_{max}$. -->
 
-<!-- - $h_{max} =$ `param.mesh.mmg_hmax_factor * param.mesh.resolution`
+- $h_{max} =$ `param.mesh.mmg_hmax_factor * param.mesh.resolution`
 - $h =$ $h_{max}/(1 + 10\varepsilon_{pl})$
 - $h_{min} = \max (h, $`param.mesh.mmg_hmin_factor * param.mesh.resolution`$)$.
 
@@ -187,4 +187,3 @@ void compute_metric_field(const Variables &var, const Param &param, const conn_t
     }
 }
 ```
--->
