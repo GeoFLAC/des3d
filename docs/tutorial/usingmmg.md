@@ -135,7 +135,7 @@ This is a short function that converts one of the data filed to a metric field. 
 
 $h$ ranges between $h_{min}$ and $h_{max}$.
 
-- $h_{max} =$ `param.mesh.mmg_hmax_factor * param.mesh.resolution`
+<!-- - $h_{max} =$ `param.mesh.mmg_hmax_factor * param.mesh.resolution`
 - $h =$ $h_{max}/(1 + 10\varepsilon_{pl})$
 - $h_{min} = \max (h, $`param.mesh.mmg_hmin_factor * param.mesh.resolution`$)$.
 
@@ -152,7 +152,8 @@ we get
 - $h =$ 2 km / (1+10 $\varepsilon_{pl}$) where $\varepsilon_{pl} \le 1.9$.
 - $h =$ 100 m where $\varepsilon_{pl} > 1.9$.
 
-Here is the full code listing:
+Here is the full code listing: -->
+
 
 ```C++
 void compute_metric_field(const Variables &var, const Param &param, const conn_t &connectivity, const double resolution, double_vec &metric, double_vec &tmp_result_sg)
