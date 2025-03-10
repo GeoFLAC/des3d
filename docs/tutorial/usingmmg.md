@@ -77,7 +77,7 @@ void remesh(const Param &param, Variables &var, int bad_quality)
 #endif
 ...
 ```
-<!-- 
+
 ### `optimize_mesh()`
 
 #### Options for the bottom boundary
@@ -117,7 +117,7 @@ The option `param.mesh.remeshing_option` determines what to do to the bottom bou
         std::exit(1);
     }
 ```
-
+<!-- 
 #### Workflow
 
 1. Initialization
