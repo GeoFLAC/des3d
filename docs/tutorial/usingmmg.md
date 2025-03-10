@@ -133,7 +133,7 @@ The option `param.mesh.remeshing_option` determines what to do to the bottom bou
 
 This is a short function that converts one of the data filed to a metric field. Currently, it scales `plastic_strain` to a solution field. A solution, $h$, at a node is directly used for determining an element size. 
 
-$h$ ranges between $h_{min}$ and $h_{max}$.
+<!-- $h$ ranges between $h_{min}$ and $h_{max}$. -->
 
 <!-- - $h_{max} =$ `param.mesh.mmg_hmax_factor * param.mesh.resolution`
 - $h =$ $h_{max}/(1 + 10\varepsilon_{pl})$
