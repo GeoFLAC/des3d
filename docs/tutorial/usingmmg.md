@@ -80,7 +80,7 @@ endif
 
 When `USEMMG` is defined during the build process with `-DUSEMMG`, `remesh()` function calls `optimize_mesh()`, not `new_mesh()`.
 
-```C++
+```C++ {6} showLineNumbers
 void remesh(const Param &param, Variables &var, int bad_quality)
 {
 ...
@@ -173,7 +173,7 @@ we get
 Here is the full code listing: 
 
 
-```C++
+```C++ {19-20} showLineNumbers
 void compute_metric_field(const Variables &var, const Param &param, const conn_t &connectivity, const double resolution, double_vec &metric, double_vec &tmp_result_sg)
 {
     /* dvoldt is the volumetric strain rate, weighted by the element volume,

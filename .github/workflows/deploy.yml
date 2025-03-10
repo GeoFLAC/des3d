@@ -26,6 +26,9 @@ jobs:
       - name: Install katex
         run: yarn add remark-math@6 rehype-katex@7
 
+      - name: Install prism react renderer
+        run: yarn add prism-react-renderer
+
       - name: Clear Docusaurus Cache
         run: rm -rf .docusaurus/.cache
       
