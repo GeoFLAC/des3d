@@ -145,6 +145,7 @@ For instance, with
 - `param.mesh.mmg_hmax_factor = 2.0`
 - `param.mesh.mmg_hmin_factor = 0.1`
 - $\varepsilon_{pl}$ between 0 and 10,
+-->
 
 we get
 
@@ -152,7 +153,7 @@ we get
 - $h =$ 2 km / (1+10 $\varepsilon_{pl}$) where $\varepsilon_{pl} \le 1.9$.
 - $h =$ 100 m where $\varepsilon_{pl} > 1.9$.
 
-Here is the full code listing: -->
+Here is the full code listing: 
 
 
 ```C++
