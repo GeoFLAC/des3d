@@ -21,6 +21,11 @@ sidebar_position: 3
 	- DES3D is currently hardwired to provide a 'solution' filed [see below](#workflow-during-remeshing-with-mmg) and thus perform remeshing.
 	- It should be a user option whether to provide a solution field or not.
 
+## Screenshots
+
+![examples of adaptive meshing for different hmax and hmin values](./img/mmg_results.png)
+
+
 ## Technical details
 
 ### Parameters for MMG
@@ -192,7 +197,7 @@ void compute_metric_field(const Variables &var, const Param &param, const conn_t
         // tmp_result_sg[e] = plstrain * (*var.volume)[e];
         // tmp_result_sg[e] = plstrain * (*var.volume)[e];
         // resolution/(1.0+(*var.plstrain)[e]);
-		 double metric = param.mesh.mmg_hmax_factor*param.mesh.resolution / (1.0 + 10.0*(*var.plstrain)[e]);
+		double metric = param.mesh.mmg_hmax_factor*param.mesh.resolution / (1.0 + 10.0*(*var.plstrain)[e]);
         metric = std::max(metric, param.mesh.mmg_hmin_factor*param.mesh.resolution);
         tmp_result_sg[e] = metric * (*var.volume)[e];
     }
