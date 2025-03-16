@@ -22,7 +22,8 @@ sidebar_position: 3
 	- It should be a user option whether to provide a solution field or not.
 
 ## Screenshots
-
+- `examples/core-complex-mmg.cfg`
+- `param.mesh.resolution`: 1 km
 ![examples of adaptive meshing for different hmax and hmin values](./img/mmg-results.png)
 
 
