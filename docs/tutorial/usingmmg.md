@@ -23,7 +23,7 @@ sidebar_position: 3
 
 ## Screenshots
 
-![examples of adaptive meshing for different hmax and hmin values](./img/mmg_results.png)
+![examples of adaptive meshing for different hmax and hmin values](./img/mmg-results.png)
 
 
 ## Technical details
