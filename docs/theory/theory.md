@@ -9,10 +9,9 @@ sidebar_position: 1
 The equation of motion (linear momentum balance) solved by DES3D
 takes the following full dynamic form:
 
-::: linenomath*
 $$
-\rho\mathbf{\dot{u}}=\nabla\cdot\boldsymbol{\sigma}+\rho\mathbf{g}$$
-:::
+\rho\mathbf{\dot{u}}=\nabla\cdot\boldsymbol{\sigma}+\rho\mathbf{g}
+$$
 
 where $\rho$ is the material density, $\mathbf{u}$ is the velocity
 vector, $\boldsymbol{\sigma}$ is the total (Cauchy) stress tensor, and
@@ -34,8 +33,7 @@ physical quantities (e.g., stress $\boldsymbol{\sigma}$ and strain
 $\boldsymbol{\epsilon}$) and material properties (e.g., density $\rho$
 and viscosity $\eta$) are piecewise constant (P0) over the elements.
 
-Equation [\[eq:motion\]](#eq:motion){reference-type="eqref"
-reference="eq:motion"} is multiplied by a weighting function and the
+Equation XX is multiplied by a weighting function and the
 product is integrated over the domain. After integrating by parts and
 applying Gauss theorem, we obtain the following equation for the
 acceleration $\mathbf{a}_a$ of every node $a$:
