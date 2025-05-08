@@ -1,0 +1,8 @@
+{
+  "label": "Theoretical Background",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Overview of the solution scheme in DES3D"
+  }
+}

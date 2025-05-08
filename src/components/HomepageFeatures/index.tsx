@@ -24,7 +24,7 @@ const FeatureList: FeatureItem[] = [
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
-        Get started with DES3D with a quick read about configuring and building it.
+        Get started with DES3D with [a quick read](https://geoflac.github.io/des3d/docs/category/quickstart) about configuring and building it.
       </>
     ),
   },
@@ -33,7 +33,7 @@ const FeatureList: FeatureItem[] = [
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Detailed description of some non-trivial examples that come with DES3D.
+        Detailed description of [some non-trivial examples](https://geoflac.github.io/des3d/docs/category/tutorial) that come with DES3D.
       </>
     ),
   },

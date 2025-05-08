@@ -5,10 +5,14 @@ sidebar_position: 1
 # What is DES3D?
 
 **DES3D** or **DynEarthSol3D** (Dynamic Earth Solver in 3D) is a finite
-element code that solves the momentum balance and the heat transfer in
-Lagrangian form using unstructured meshes. It can be used for studying
-long-term deformations of the Earth\'s lithosphere but certainly not
-limited to it.
+element code that solves the momentum balance and the heat transfer for 
+elasto-visco-plastic materials in the Lagrangian form using unstructured 
+meshes. It can be used for studying long-term deformations of the Earth\'s 
+lithosphere but certainly not limited to it.
+
+# How to cite
+
+Choi, E., Tan, E., Lavier, L. L., & Calo, V. M. (2013). DynEarthSol2D: An efficient unstructured finite element method to study long-term tectonic deformation. *Journal of Geophysical Research: Solid Earth*, 118(5), 2429–2444. DOI:[10.1002/jgrb.50148](https://doi.org/10.1002/jgrb.50148)
 
 <!-- Check out the `usage`{.interpreted-text role="doc"} section for further
 information, including `installation`{.interpreted-text role="ref"}. -->
