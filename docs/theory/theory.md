@@ -13,7 +13,7 @@ $$
 \tag{1}
 $$
 
-where $\rho$ is the material density, $\mathbf{u}$ is the velocity
+where $\rho$ is the material density, $\bm{u}$ is the velocity
 vector, $\boldsymbol{\sigma}$ is the total (Cauchy) stress tensor, and
 $\mathbf{g}$ is the acceleration of gravity. The dot above $\mathbf{u}$
 indicates total time derivative while bold face indicates a vector or
