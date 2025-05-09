@@ -3,22 +3,8 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-import type {KatexOptions} from 'katex'; // Import KaTeX options type
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
-const katexOptions: KatexOptions = {
-  macros: {
-    "\\RR": "\\mathbb{R}",
-    // Add other custom macros here if needed
-  },
-  // You can add other KaTeX options here:
-  // For example, to output a warning in the console for unsupported commands:
-  // strict: 'warn',
-  // Or to throw an error:
-  // strict: 'error',
-  // Or to render unsupported commands as is (default behavior):
-  // strict: false,
-};
 
 const config: Config = {
   title: 'DES3D User Manual',
@@ -36,8 +22,10 @@ const config: Config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'https://geoflac.github.io/', // Usually your GitHub org/user name.
-  projectName: 'des3d/', // Usually your repo name.
+  // organizationName: 'https://geoflac.github.io/', // Usually your GitHub org/user name.
+  // projectName: 'des3d/', // Usually your repo name.
+  organizationName: 'geoflac', // Usually your GitHub org/user name.
+  projectName: 'des3d', // Usually your repo name.
   deploymentBranch: 'main',
 
   onBrokenLinks: 'ignore', //throw',
@@ -58,7 +46,7 @@ const config: Config = {
         docs: {
           sidebarPath: './sidebars.ts',
           remarkPlugins: [remarkMath],
-          rehypePlugins: [[rehypeKatex, katexOptions]],
+          rehypePlugins: [[rehypeKatex, {output: 'html'}]],
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           // editUrl:
@@ -163,19 +151,13 @@ const config: Config = {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
     },
-    stylesheets: [
-      {
-        href: 'https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css',
-        type: 'text/css',
-        // integrity: 'sha384-odtC+0UGzzFL/6PNoE8rX/SPcQDXBJ+uRepguP4QkPCm2LBxH3FA3y+fKSiJ+AmM',
-        crossorigin: 'anonymous',
-      },
-      //{
-      //  href: 'https://cdn.jsdelivr.net/npm/katex@0.13.24/dist/katex.min.css',
-      //  type: 'text/css',
-      //},
-    ],
-  } satisfies Preset.ThemeConfig,
+    // stylesheets: [
+    //   {
+    //     href: 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css', // Example CDN URL for a recent KaTeX
+    //     type: 'text/css',
+    //   },
+    // ],
+  }, // satisfies Preset.ThemeConfig,
 };
 
 export default config;

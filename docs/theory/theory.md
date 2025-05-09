@@ -2,62 +2,58 @@
 sidebar_position: 1
 ---
 
-# Test
-
-Let $f\colon[a,b]\to\R$ be Riemann integrable. Let $F\colon[a,b]\to\R$ be
-$F(x)=\int_{a}^{x} f(t)\,dt$. Then $F$ is continuous, and at all $x$ such that
-$f$ is continuous at $x$, $F$ is differentiable at $x$ with $F'(x)=f(x)$.
-
 # Solution schemes in DES3D
 
 ## Equation of motion
 
 DES3D solves the equation of motion, i.e., linear momentum balance equation, in the following fully dynamic form:
 
-$$
-\rho\dot{\mathbf{u}}=\nabla\cdot\boldsymbol{\sigma}+\rho\mathbf{g}
-\tag{1}
-$$
+  $$
+  \rho\dot{\mathbf{u}}=\nabla\cdot\boldsymbol{\sigma}+\rho\mathbf{g}
+  \tag{1}
+  $$
 
-where $\rho$ is the material density, $\bm{u}$ is the velocity
-vector, $\boldsymbol{\sigma}$ is the total (Cauchy) stress tensor, and
-$\mathbf{g}$ is the acceleration of gravity. The dot above $\mathbf{u}$
-indicates total time derivative while bold face indicates a vector or
-tensor. The spatial gradient is denoted by $\nabla$, the inner product
-between vectors is denoted by $\cdot$, while $\nabla\cdot$ represents
-the divergence operator. 
+  where $\rho$ is the material density, $\bm{u}$ is the velocity
+  vector, $\boldsymbol{\sigma}$ is the total (Cauchy) stress tensor, and
+  $\mathbf{g}$ is the acceleration of gravity. The dot above $\mathbf{u}$
+  indicates total time derivative while bold face indicates a vector or
+  tensor. The spatial gradient is denoted by $\nabla$, the inner product
+  between vectors is denoted by $\cdot$, while $\nabla\cdot$ represents
+  the divergence operator. 
 
-This equation must be complemented with
-appropriate initial and boundary conditions. The motion is described using a **Lagrangian
-formulation**.
+  This equation must be complemented with
+  appropriate initial and boundary conditions. The motion is described using a **Lagrangian
+  formulation**.
 
-## Discretization
+  ## Discretization
 
-The momentum equation is discretized using a two- or three-dimensional (2D or 3D),
-unstructured mesh. The displacement $\mathbf{x}$,
-velocity $\mathbf{u}$, acceleration $\mathbf{a}$, force $\mathbf{f}$,
-and temperature $T$ are nodal values on linear (P1) elements while other
-physical quantities (e.g., stress $\boldsymbol{\sigma}$ and strain
-$\boldsymbol{\epsilon}$) and material properties (e.g., density $\rho$
-and viscosity $\eta$) are evaluated on the one-point quadrature in the elements; 
-and thus are piecewise constant (P0).
+  The momentum equation is discretized using a two- or three-dimensional (2D or 3D),
+  unstructured mesh. The displacement $\mathbf{x}$,
+  velocity $\mathbf{u}$, acceleration $\mathbf{a}$, force $\mathbf{f}$,
+  and temperature $T$ are nodal values on linear (P1) elements while other
+  physical quantities (e.g., stress $\boldsymbol{\sigma}$ and strain
+  $\boldsymbol{\epsilon}$) and material properties (e.g., density $\rho$
+  and viscosity $\eta$) are evaluated on the one-point quadrature in the elements; 
+  and thus are piecewise constant (P0).
 
-A weak form of the momentum balance equation is constructed by the standard finite element method: 
-A weighting function is multipled on both sides and the
-product is integrated over the domain. After integrating by parts and
-applying Gauss theorem, we obtain the following equation for the
-acceleration $\mathbf{a}_a$ of every node $a$:
+  A weak form of the momentum balance equation is constructed by the standard finite element method: 
+  A weighting function is multipled on both sides and the
+  product is integrated over the domain. After integrating by parts and
+  applying Gauss theorem, we obtain the following equation for the
+  acceleration $\mathbf{a}_a$ of every node $a$:
 
-$$
-m_{a}\mathbf{a}_{a}=\mathbf{f}_{a}=\mathbf{f}_{a}^{int}+\mathbf{f}_{a}^{bc}+\mathbf{f}_{a}^{ext},
-$$
+  $$
+  m_{a}\mathbf{a}_{a}=\mathbf{f}_{a}=\mathbf{f}_{a}^{int}+\mathbf{f}_{a}^{bc}+\mathbf{f}_{a}^{ext},
+  $$
 
-where $m_{a}$ is the nodal mass given by
+  where $m_{a}$ is the nodal mass given by
 
-$$m_{a}=\sum_{e}\left(\int_{\Omega_{e}}N_{e}^{a}\rho_{f}d\Omega\right)
-  =\sum_{e}\left(\rho_f\int_{\Omega_{e}}N_{e}^{a}d\Omega\right)
-  =\sum_{e}^{a\in e}\left(\frac{1}{M}\rho_{f}\Omega_{e}\right),
-$$
+  $$
+  m_{a}=\sum_{e}\left(\int_{\Omega_{e}}N_{e}^{a}\rho_{f}d\Omega\right)
+    =\sum_{e}\left(\rho_f\int_{\Omega_{e}}N_{e}^{a}d\Omega\right)
+    =\sum_{e}^{a\in e}\left(\frac{1}{M}\rho_{f}\Omega_{e}\right),
+  $$
+  
 <!--
 $\Omega_e$ is the area (volume in 3D) of the element $e$, $N_{a}^{e}$ is
 the linear shape function associated with the node $a$ in the element

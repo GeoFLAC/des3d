@@ -1,3 +1,5 @@
+@import 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css'; /* Or your specific version */
+
 /**
  * Any CSS included here will be global. The classic template
  * bundles Infima by default. Infima is a CSS framework designed to
