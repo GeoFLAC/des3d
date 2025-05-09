@@ -59,8 +59,6 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           remarkPlugins: [remarkMath],
           rehypePlugins: [[rehypeKatex, katexOptions]],
-          // remarkPlugins: [require('remark-math')],
-          // rehypePlugins: [require('rehype-katex')],
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           // editUrl:
@@ -72,8 +70,6 @@ const config: Config = {
             type: ['rss', 'atom'],
             xslt: true,
           },
-          remarkPlugins: [remarkMath],
-          rehypePlugins: [[rehypeKatex, katexOptions]],
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           // editUrl:
