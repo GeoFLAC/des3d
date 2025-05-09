@@ -36,25 +36,23 @@ $\boldsymbol{\epsilon}$) and material properties (e.g., density $\rho$
 and viscosity $\eta$) are evaluated on the one-point quadrature in the elements; 
 and thus are piecewise constant (P0).
 
-Equation \@ref(1) is multiplied by a weighting function and the
+A weak form of the momentum balance equation is constructed by the standard finite element method: 
+A weighting function is multipled on both sides and the
 product is integrated over the domain. After integrating by parts and
 applying Gauss theorem, we obtain the following equation for the
 acceleration $\mathbf{a}_a$ of every node $a$:
-<!-- 
-::: linenomath*
+
 $$
-m_{a}\mathbf{a}_{a}=\mathbf{f}_{a}=\mathbf{f}_{a}^{int}+\mathbf{f}_{a}^{bc}+\mathbf{f}_{a}^{ext},$$
-:::
+m_{a}\mathbf{a}_{a}=\mathbf{f}_{a}=\mathbf{f}_{a}^{int}+\mathbf{f}_{a}^{bc}+\mathbf{f}_{a}^{ext},
+$$
 
 where $m_{a}$ is the nodal mass given by
 
-::: linenomath*
 $$m_{a}=\sum_{e}\left(\int_{\Omega_{e}}N_{e}^{a}\rho_{f}d\Omega\right)
   =\sum_{e}\left(\rho_f\int_{\Omega_{e}}N_{e}^{a}d\Omega\right)
   =\sum_{e}^{a\in e}\left(\frac{1}{M}\rho_{f}\Omega_{e}\right),
 $$
-:::
-
+<!--
 $\Omega_e$ is the area (volume in 3D) of the element $e$, $N_{a}^{e}$ is
 the linear shape function associated with the node $a$ in the element
 $e$, and $M$ is the number of apexes of an element ($M=3$ for 2D
