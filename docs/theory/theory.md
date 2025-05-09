@@ -6,11 +6,11 @@ sidebar_position: 1
 
 ## Equation of motion
 
-The equation of motion (linear momentum balance) solved by DES3D
-takes the following full dynamic form:
+DES3D solves the equation of motion, i.e., linear momentum balance equation, in the following fully dynamic form:
 
 $$
-\rho\mathbf{\dot{u}}=\nabla\cdot\boldsymbol{\sigma}+\rho\mathbf{g}
+\rho\dot{\mathbf{u}}=\nabla\cdot\boldsymbol{\sigma}+\rho\mathbf{g}
+\tag{1}
 $$
 
 where $\rho$ is the material density, $\mathbf{u}$ is the velocity
@@ -19,7 +19,9 @@ $\mathbf{g}$ is the acceleration of gravity. The dot above $\mathbf{u}$
 indicates total time derivative while bold face indicates a vector or
 tensor. The spatial gradient is denoted by $\nabla$, the inner product
 between vectors is denoted by $\cdot$, while $\nabla\cdot$ represents
-the divergence operator. This equation must be complemented with
+the divergence operator. 
+
+This equation must be complemented with
 appropriate initial and boundary conditions. The motion is described using a **Lagrangian
 formulation**.
 
@@ -28,12 +30,13 @@ formulation**.
 The momentum equation is discretized using a two- or three-dimensional (2D or 3D),
 unstructured mesh. The displacement $\mathbf{x}$,
 velocity $\mathbf{u}$, acceleration $\mathbf{a}$, force $\mathbf{f}$,
-and temperature $T$ are defined on linear (P1) elements while other
+and temperature $T$ are nodal values on linear (P1) elements while other
 physical quantities (e.g., stress $\boldsymbol{\sigma}$ and strain
 $\boldsymbol{\epsilon}$) and material properties (e.g., density $\rho$
-and viscosity $\eta$) are piecewise constant (P0) over the elements.
+and viscosity $\eta$) are evaluated on the one-point quadrature in the elements; 
+and thus are piecewise constant (P0).
 
-Equation XX is multiplied by a weighting function and the
+Equation \@ref(1) is multiplied by a weighting function and the
 product is integrated over the domain. After integrating by parts and
 applying Gauss theorem, we obtain the following equation for the
 acceleration $\mathbf{a}_a$ of every node $a$:
