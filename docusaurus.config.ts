@@ -3,6 +3,7 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import type {KatexOptions} from 'katex'; // Import KaTeX options type
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -43,8 +44,10 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-	        remarkPlugins: [require('remark-math')],
-          rehypePlugins: [require('rehype-katex')],
+          remarkPlugins: [remarkMath],
+          rehypePlugins: [[rehypeKatex, katexOptions]],
+          // remarkPlugins: [require('remark-math')],
+          // rehypePlugins: [require('rehype-katex')],
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           // editUrl:
@@ -56,6 +59,8 @@ const config: Config = {
             type: ['rss', 'atom'],
             xslt: true,
           },
+          remarkPlugins: [remarkMath],
+          rehypePlugins: [[rehypeKatex, katexOptions]],
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           // editUrl:
