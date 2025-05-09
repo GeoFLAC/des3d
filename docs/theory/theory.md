@@ -10,10 +10,9 @@ DES3D solves the equation of motion, i.e., linear momentum balance equation, in 
 
   $$
   \rho\dot{\mathbf{u}}=\nabla\cdot\boldsymbol{\sigma}+\rho\mathbf{g}
-  \tag{1}
   $$
 
-  where $\rho$ is the material density, $\bm{u}$ is the velocity
+  where $\rho$ is the material density, $\mathbf{u}$ is the velocity
   vector, $\boldsymbol{\sigma}$ is the total (Cauchy) stress tensor, and
   $\mathbf{g}$ is the acceleration of gravity. The dot above $\mathbf{u}$
   indicates total time derivative while bold face indicates a vector or
@@ -36,11 +35,25 @@ DES3D solves the equation of motion, i.e., linear momentum balance equation, in 
   and viscosity $\eta$) are evaluated on the one-point quadrature in the elements; 
   and thus are piecewise constant (P0).
 
-  A weak form of the momentum balance equation is constructed by the standard finite element method: 
-  A weighting function is multipled on both sides and the
-  product is integrated over the domain. After integrating by parts and
-  applying Gauss theorem, we obtain the following equation for the
-  acceleration $\mathbf{a}_a$ of every node $a$:
+  A weak form of the momentum balance equation is constructed by the standard finite element method.
+  The velocity function $\mathbf{u}$ is expanded with piecewise linear basis functions:
+
+  $$
+  \mathbf{u}(\mathbf{x}) = \sum_{a} \mathbf{u}_{a} \phi_{a}(\mathbf{x}),
+  $$
+  
+  where $\phi_{a}(\mathbf{x})$ is the basis function associated with node $a$ in the mesh with the property, $\phi_{i}(\mathbf{x}_{j})=\delta_{ij}$.
+  
+  $\phi_{a}(\mathbf{x})$'s are also used as weighting functions and multipled to both sides of the equation, and the product is integrated over the domain:
+  
+  $$
+  \int_{\Omega} \phi_{a} \rho\dot{\mathbf{u}}\,d\Omega =\int_{\Omega} \phi_{a} \nabla\cdot\boldsymbol{\sigma}+\rho\mathbf{g}\,d\Omega, \quad a=0,\ldots,N,
+  $$
+  
+  where $N$ is the total number of nodes in a mesh.
+  
+  Plugging in the finite dimensional representation of $\mathbf{u}$ in terms of the piecewise linear basis function and rearranging terms, 
+  we obtain the following equation for theacceleration $\mathbf{a}_a$ of every node $a$:
 
   $$
   m_{a}\mathbf{a}_{a}=\mathbf{f}_{a}=\mathbf{f}_{a}^{int}+\mathbf{f}_{a}^{bc}+\mathbf{f}_{a}^{ext},
