@@ -78,6 +78,8 @@ used in the definition of $m_a$.
 - Additionally, row-sum mass lumping is applied to obtain a diagonal mass
 matrix.
 
+
+<!--
 The total force $\mathbf{f}_{a}$ is
 composed of three parts: the internal, boundary, and external forces.
 The internal force, $\mathbf{f}_{a}^{int}$, is defined as:
@@ -129,6 +131,7 @@ That is, using the resulting "scaled" acceleration and velocity, we
 compute an instantaneous velocity and position of each node in the mesh,
 which updates the model geometry at each time step. Each of these
 modifications is detailed in the following sections.
+-->
 
 <!--
 ### Dynamic relaxation
