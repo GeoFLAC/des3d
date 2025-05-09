@@ -6,6 +6,19 @@ import rehypeKatex from 'rehype-katex';
 import type {KatexOptions} from 'katex'; // Import KaTeX options type
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
+const katexOptions: KatexOptions = {
+  macros: {
+    "\\RR": "\\mathbb{R}",
+    // Add other custom macros here if needed
+  },
+  // You can add other KaTeX options here:
+  // For example, to output a warning in the console for unsupported commands:
+  // strict: 'warn',
+  // Or to throw an error:
+  // strict: 'error',
+  // Or to render unsupported commands as is (default behavior):
+  // strict: false,
+};
 
 const config: Config = {
   title: 'DES3D User Manual',
