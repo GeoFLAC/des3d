@@ -57,8 +57,10 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          remarkPlugins: [remarkMath],
-          rehypePlugins: [[rehypeKatex, katexOptions]],
+          remarkPlugins: [math,{strict:false}],
+          rehypePlugins: [[katex, {strict: false}]],
+          // remarkPlugins: [remarkMath],
+          // rehypePlugins: [[rehypeKatex, katexOptions]],
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           // editUrl:
