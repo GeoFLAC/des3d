@@ -81,14 +81,16 @@ The total force $\mathbf{f}_{a}$ is
 composed of three parts: the internal, boundary, and external forces.
 The internal force, $\mathbf{f}_{a}^{int}$, is defined as:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
   \mathbf{f}_{a}^{int}&=\sum_{e}\left(\int_{\Omega_{e}}\frac{\partial
       N_{a}^{e}}{\partial\mathbf{x}}\cdot\boldsymbol{\sigma}d\Omega\right)
   =\sum_{e}\left(\frac{\partial N_{a}^{e}}{\partial\mathbf{x}}
   \cdot\boldsymbol{\sigma}\int_{\Omega_{e}}d\Omega\right) \nonumber \\
   &=\sum_{e}^{a\in e}\left(\frac{\partial
       N_{a}^{e}}{\partial\mathbf{x}}\cdot\boldsymbol{\sigma}\Omega_{e}\right).
-\end{aligned}$$
+\end{aligned}
+$$
 
 Neumann boundary conditions are tractions prescribed on the surface of
 the body. These tractions yield a boundary force denoted
@@ -96,7 +98,8 @@ $\mathbf{f}_{a}^{bc}$:
 
 $$
 \mathbf{f}_{a}^{bc}=\sum_{e}\left(\oint_{\partial\Omega_{e}}-N_{a}^{e}\boldsymbol{\sigma}\cdot\mathbf{n}dL \right)
-=-\sum_{e}^{a\in s,\: s\in\partial\Omega_{e}}\left(\frac{1}{M-1}\boldsymbol{\sigma}_{s}\cdot\mathbf{n}_{s}L_{s}\right).$$
+=-\sum_{e}^{a\in s,\: s\in\partial\Omega_{e}}\left(\frac{1}{M-1}\boldsymbol{\sigma}_{s}\cdot\mathbf{n}_{s}L_{s}\right).
+$$
 
 The summation is over the boundary segment $s$, which has a length
 $L_{s}$ (surface area in 3D), the outward, unit normal vector
@@ -104,18 +107,22 @@ $\mathbf{n}$, and a prescribed (constant) stress
 $\boldsymbol{\sigma}_{s}$ on the Neumann boundary. The external force,
 $\mathbf{f}_{a}^{ext}$, is given by:
 
-$$\mathbf{f}_{a}^{ext}=\sum_{e}\left(\int_{\Omega_{e}}N_{a}^{e}\rho\mathbf{g}d\Omega\right)
+$$
+\mathbf{f}_{a}^{ext}=\sum_{e}\left(\int_{\Omega_{e}}N_{a}^{e}\rho\mathbf{g}d\Omega\right)
 =\sum_{e}\left(\rho\mathbf{g}\int_{\Omega_{e}}N_{a}^{e}d\Omega\right)
-=\sum_{e}^{a\in e}\left(\frac{1}{M}\rho\mathbf{g}\Omega_{e}\right).$$
+=\sum_{e}^{a\in e}\left(\frac{1}{M}\rho\mathbf{g}\Omega_{e}\right).
+$$
 
 When deriving the equations above, we utilize the fact that $\rho_f$,
 $\rho$, $\frac{\partial N_{a}^{e}}{\partial\mathbf{x}}$,
 $\boldsymbol{\sigma}$, and $\mathbf{g}$ are constants on each element,
 and these identities:
 
-$$\int_{\Omega_e}d\Omega=\Omega_{e}, \quad
+$$
+\int_{\Omega_e}d\Omega=\Omega_{e}, \quad
 \int_{\Omega_e}N_{a}^{e}d\Omega=\frac{1}{M}\Omega_{e}, \quad
-\oint_{\partial\Omega_{e}}N_{a}^{e}dL=\frac{1}{M-1}L_s.$$
+\oint_{\partial\Omega_{e}}N_{a}^{e}dL=\frac{1}{M-1}L_s.
+$$
 
 ## The Rest of the solution scheme
 

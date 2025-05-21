@@ -30,7 +30,7 @@ u_{\text{elastic}}=\sqrt{K_{s}/\rho_{f}}=c_{1}u_{\text{tectonic}},
 $$
 
 where $K_{s}$ is the bulk modulus of the material, $\rho_{f}$ is a
-fictitious scaled density and $c_{1}$ is a constant. 
+fictitious scaled density and $c_{1}$ is a constant.
 
 ## Range of $c_{1}$ values
 
