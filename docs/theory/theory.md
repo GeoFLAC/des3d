@@ -42,7 +42,7 @@ DES3D solves the equation of motion, i.e., linear momentum balance equation, in 
   \mathbf{u}(\mathbf{x}) = \sum_{a} \mathbf{u}_{a} \N_{a}(\mathbf{x}),
   $$
   
-  where $\N_{a}(\mathbf{x})$ is the basis function associated with global node number $a$ in the mesh with the property, $\N_{i}(\mathbf{x}_{j})=\delta_{ij}$.
+  where $\N_{a}(\mathbf{x})$ is the basis function associated with global node number $a$ in the mesh with the property, $\N_{i}(\mathbf{x}_{j})=\delta_{ij}$ for the coordinates of $j$-th node, $\mathbf{x}_{j}$.
   
   $\N_{a}(\mathbf{x})$'s are also used as weighting functions and multipled to both sides of the equation, and the product is integrated over the domain:
   
@@ -53,7 +53,7 @@ DES3D solves the equation of motion, i.e., linear momentum balance equation, in 
   where $N+1$ is the total number of nodes in a mesh.
   
   Plugging in the finite dimensional representation of $\mathbf{u}$ and carrying out the element-to-global assemablage, 
-  we obtain the following equation for theacceleration $\mathbf{a}_a$ of every node $a$:
+  we obtain the following equation for the acceleration $\mathbf{a}_a$ of every node $a$:
 
   $$
   m_{a}\mathbf{a}_{a}=\mathbf{f}_{a}=\mathbf{f}_{a}^{int}+\mathbf{f}_{a}^{bc}+\mathbf{f}_{a}^{ext}.
@@ -72,11 +72,11 @@ and $M$ is the number of apexes of an element (i.e., $M=3$ for 2D
 triangles and $M=4$ for 3D tetrahedra.) The summation should be
 understood as done for all the elements having node $a$ as an apex. 
 
-Two features to note are 
-- fictitious density, $\rho_f$, instead of the true density, $\rho$, is
-used in the definition of $m_a$.
-- Additionally, row-sum mass lumping is applied to obtain a diagonal mass
-matrix.
+| :point_up: Two features to note |
+|:----------------------------|
+| Fictitious density, $\rho_f$, instead of the true density, $\rho$, is used in the definition of $m_a$. |
+| Row-sum mass lumping is applied to obtain a diagonal mass matrix. |
+
 
 
 <!--
