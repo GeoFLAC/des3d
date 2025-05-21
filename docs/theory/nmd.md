@@ -5,8 +5,8 @@ sidebar_position: 4
 # Nodal Mixed Discretization
 
 The linear triangular elements used in DynEarthSol2D are known to suffer
-volumetric locking when subject to incompressible deformations [e.g.,
-@Hughes2000]. Since incompressible plastic or viscous flow are often
+volumetric locking when subject to incompressible deformations. 
+Since incompressible plastic or viscous flow are often
 needed in LTM, we adopt an anti-volumetric locking correction based on
 the nodal mixed discretization (NMD)
 methodology (e.g., [De Micheli and Mocellin, 2009](https://dx.doi.org/10.1002/nme.2539)).

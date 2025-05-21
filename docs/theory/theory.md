@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# Solution schemes in DES3D
+# Solution scheme in DES3D
 
 ## Equation of motion
 

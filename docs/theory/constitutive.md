@@ -32,7 +32,7 @@ $\boldsymbol{\sigma}_{ve}$ with $(\boldsymbol{\sigma}_{ve}^{t+\Delta
   t}+\boldsymbol{\sigma}^{t})/2$, the equation above is reduced to:
 
 $$
-\textrm{dev}(\boldsymbol{\sigma}_{ve}^{t+\Delta t})=\dfrac{\left(1-\frac{G\Delta t}{2\eta}\right)\textrm{dev}(\boldsymbol{\sigma}^{t})+2G\textrm{\ensuremath{\cdot}dev}(\boldsymbol{\epsilon}^{t+\Delta t}-\boldsymbol{\epsilon}^{t})}{1+\frac{G\Delta t}{2\eta}}
+\textrm{dev}(\boldsymbol{\sigma}_{ve}^{t+\Delta t})=\dfrac{\left(1-\frac{G\Delta t}{2\eta}\right)\textrm{dev}(\boldsymbol{\sigma}^{t})+2G\textrm{dev}(\boldsymbol{\epsilon}^{t+\Delta t}-\boldsymbol{\epsilon}^{t})}{1+\frac{G\Delta t}{2\eta}}
 $$
 
 The isotropic stress components are updated based on the volume change.
@@ -142,14 +142,16 @@ $\Delta\boldsymbol{\epsilon}_{\text{pl}}$ are the elastic and plastic
 strain increments, respectively. The plastic strain increment is normal
 to the flow potential surface and can be written as
 
-$$\Delta\boldsymbol{\epsilon}_{\text{pl}}=\beta\frac{\partial
+$$
+\Delta\boldsymbol{\epsilon}_{\text{pl}}=\beta\frac{\partial
   g}{\partial\boldsymbol{\sigma}},
 $$
 
 where $\beta\,$ is the plastic flow magnitude. $\beta\,$ is computed by
 requiring that the updated stress state lies on the yield surface,
 
-$$f\left(\boldsymbol{\sigma}_{ep}^{t+\Delta t}\right)=f\left(\boldsymbol{\sigma}^{t}+\Delta\boldsymbol{\sigma}_{ep}\right)=0.
+$$
+f\left(\boldsymbol{\sigma}_{ep}^{t+\Delta t}\right)=f\left(\boldsymbol{\sigma}^{t}+\Delta\boldsymbol{\sigma}_{ep}\right)=0.
 $$
 
 In the principal component representation,
@@ -186,22 +188,24 @@ $$
 Likewise, $\partial g/\partial \boldsymbol{\sigma}$ takes different
 forms according to the failure mode:
 
-$$\begin{split}
+$$
+\begin{split}
     \partial g/\partial \sigma_{1} & = 1 \\
     \partial g/\partial \sigma_{2} & = 0 \\
     \partial g/\partial \sigma_{3} & = -\frac{1+\sin\psi}{1-\sin\psi}
-  \end{split}
-  \qquad\text{(for shear failure,)}
+\end{split}
+\qquad\text{(for shear failure,)}
 $$
 
 and
 
-$$\begin{split}
+$$
+\begin{split}
     \partial g/\partial \sigma_{1} & = 0 \\
     \partial g/\partial \sigma_{2} & = 0 \\
     \partial g/\partial \sigma_{3} & = 1
-  \end{split}
-  \qquad\text{(for tensile failure.)}
+\end{split}
+\qquad\text{(for tensile failure.)}
 $$
 
 Once $\Delta\boldsymbol{\epsilon}_{pl}$ is computed, $\boldsymbol{\sigma}_{ep}$ is updated
