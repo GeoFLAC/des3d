@@ -174,14 +174,14 @@ formulae for $\beta$
 
 $$
 \beta\,=\frac{\sigma_{\text{el},1}^{t+\Delta t}-N_{\phi}\sigma_{\text{el},3}^{t+\Delta t}+2C\sqrt{N_{\phi}}}{\sum_B\left(E_{1B}\frac{\partial g_{s}}{\partial\sigma_{B}}-N_{\phi}E_{3B}\frac{\partial g_{s}}{\partial\sigma_{B}}\right)}
-  \qquad\text{(for shear failure,)}
+  \qquad\text{for shear failure,}
 $$
 
 and
 
 $$
 \beta\,=\frac{\sigma_{\text{el},3}^{t+\Delta t}-\sigma_{t}}{\frac{\partial g_{t}}{\partial\sigma_{3}}}
-  \qquad\text{(for tensile failure.)}
+  \qquad\text{for tensile failure.}
 $$
 
 Likewise, $\partial g/\partial \boldsymbol{\sigma}$ takes different
@@ -205,20 +205,7 @@ $$\begin{split}
   \qquad\text{(for tensile failure.)}
 $$
 
-Once $\Delta\boldsymbol{\epsilon}_{pl}$ is computed as in
-[\[eq:plastic strain increment\]](#eq:plastic strain increment){reference-type="eqref"
-reference="eq:plastic strain increment"} using [\[eq:flow parameter for
-  shear failure\]](#eq:flow parameter for
-  shear failure){reference-type="eqref" reference="eq:flow parameter for
-  shear failure"} and
-[\[eq:flow direction for shear failure\]](#eq:flow direction for shear failure){reference-type="eqref"
-reference="eq:flow direction for shear failure"} or
-[\[eq:flow parameter for tensile failure\]](#eq:flow parameter for tensile failure){reference-type="eqref"
-reference="eq:flow parameter for tensile failure"} and [\[eq:flow
-  direction for tensile failure\]](#eq:flow
-  direction for tensile failure){reference-type="eqref"
-reference="eq:flow
-  direction for tensile failure"}, $\boldsymbol{\sigma}_{ep}$ is updated
+Once $\Delta\boldsymbol{\epsilon}_{pl}$ is computed, $\boldsymbol{\sigma}_{ep}$ is updated
 as
 
 $$
