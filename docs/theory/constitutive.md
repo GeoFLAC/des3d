@@ -165,8 +165,7 @@ E_{AB}&=\left(K_s+\frac{4}{3}G\right) &&\text{otherwise.}
 $$
 
 By applying the consistency
-condition [\[eq:consistency condition\]](#eq:consistency condition){reference-type="eqref"
-reference="eq:consistency condition"} and using
+condition and using
 $\boldsymbol{\sigma}_{\text{el}}^{t+\Delta
   t}=\boldsymbol{\sigma}^{t}+\boldsymbol{E}\cdot\Delta\boldsymbol{\epsilon}$
 (in the principal component representation), we obtain the following
@@ -222,13 +221,13 @@ the visco-elastic stress has a smaller second invariant ($J_2$),
 $\boldsymbol{\sigma}_{ve}$ is be used as the updated stress; otherwise,
 $\boldsymbol{\sigma}_{ep}$ is used.
 
-The fundamental deformation measures in DynEarthSol2D are strain rates.
+The fundamental deformation measures in DynEarthSol are strain rates.
 Thus, the stress update by rate-independent constitutive models like
 elasto-plastic stresses need to be considered as the time-integration of
 the rate form of the corresponding stresses. Since a stress rate is not
 frame-indifferent in general, an objective (or co-rotational) stress
 rate needs to be constructed and integrated instead. The Jaumann stress
-rate is our choice for DynEarthSol2D among the possible objective rates
+rate is our choice for DynEarthSol among the possible objective rates
 because of its simplicity.
 
 The Jaumann stress rate ($\check{\dot{\sigma}}$) is defined as
