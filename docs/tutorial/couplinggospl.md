@@ -26,7 +26,7 @@ Before starting, ensure you have:
 - ✅ `gospl_extensions`
 - ✅ DynEarthSol compiled with GoSPL support
 
-### Install GoSPL
+### Install GoSPL through conda
 Recommended by GoSPL users. Refer to https://gospl.readthedocs.io/en/latest/getting_started/installConda.html.
 
 ### Install gospl_extensions
@@ -87,10 +87,10 @@ For models with slow erosion rates, you can set `gospl_coupling_frequency = 100`
 [control]
 surface_process_option = 11
 surface_process_gospl_config_file = gospl_config.yml
-gospl_coupling_frequency = 100 # Run GoSPL every 100th DynEarthSol time step
-gospl_mesh_resolution = 500 # in meters
+gospl_coupling_frequency = 100      # Run GoSPL every 100th DynEarthSol time step
+gospl_mesh_resolution = 500         # in meters
 gospl_initial_topo_amplitude = 0.0  # in meters. 0.0: initially flat
-gospl_mesh_perturbation = 0.3       # Perturbation amount: 30 % of +/-0.5 times the grid spacing
+gospl_mesh_perturbation = 0.3       # 30 % of random perturbations, +0.5/-0.5 x h
 ```
 
 ### Step 2: Create a GoSPL configuration file
@@ -116,13 +116,13 @@ time:
   dt: 1000.0       # 1 kyr time step (to be overwritten by DynEarthSol)
 
 spl:
-    K: 4.e-7
+    K: 4.e-6
     d: 0.
     m: 0.4
 
 diffusion:
-    hillslopeKa: 0.02
-    hillslopeKm: 0.1
+    hillslopeKa: 0.2
+    hillslopeKm: 1.0
 
 sea:
     position: -10.
@@ -148,59 +148,10 @@ In this example,
 - DynEarthSol outputs will be saved in the working directory.
 - GoSPL outputs will be saved in the `coupling_test` directory. 
 
-
 ## Example: Extensional Basin with Erosion
 
-Here's a complete example for modeling extension with surface processes:
+TBA.
 
-```cfg title="extension_with_erosion.cfg"
-[sim]
-modelname = extension_erosion
-max_time_in_yr = 500000
-output_time_interval_in_yr = 10000
-
-[mesh]
-xlength = 100e3
-ylength = 50e3
-zlength = 30e3
-resolution = 2e3
-
-[control]
-# Enable GoSPL coupling
-surface_process_option = 11
-surface_process_gospl_config_file = gospl_config.yml
-gospl_coupling_frequency = 100
-gospl_mesh_resolution = 1000
-
-[bc]
-vbc_x0 = 1
-vbc_x1 = 1
-vbc_val_x0 = -5e-10   # Extension
-vbc_val_x1 = 5e-10
-
-[mat]
-rheology_type = elasto-plastic
-rho0 = [2700]
-# ... other material properties
-```
-
-<!-- ## How the Coupling Works
-
-The coupling follows a **two-way exchange** pattern:
-
-```mermaid
-graph LR
-    A[DynEarthSol] -->|Surface elevations| B[GoSPL]
-    B -->|Erosion/deposition| A
-```
-
-1. **DynEarthSol** computes mechanical deformation (stresses, velocities, displacements)
-2. **GoSPL** receives current surface elevations and computes erosion/deposition
-3. **Elevation changes** are applied back to DynEarthSol surface nodes
-
-:::note Mesh generation
-At startup, DynEarthSol automatically creates a triangular mesh for GoSPL based on your model domain. The mesh is saved as `gospl_mesh.npz` in your working directory.
-::: -->
 
 ## Troubleshooting
 
