@@ -4,6 +4,8 @@ import type * as Preset from '@docusaurus/preset-classic';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
+
+
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
@@ -155,13 +157,25 @@ const config: Config = {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
     },
+    mermaid: {
+      theme: {light: 'neutral', dark: 'forest'},
+      options: {
+        maxTextSize: 50000,
+      },
+    },
     // stylesheets: [
     //   {
     //     href: 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css', // Example CDN URL for a recent KaTeX
     //     type: 'text/css',
     //   },
     // ],
-  }, // satisfies Preset.ThemeConfig,
+  } satisfies Preset.ThemeConfig,
+
+  markdown: {
+    mermaid: true,
+  },
+
+  themes: ['@docusaurus/theme-mermaid'],
 };
 
 export default config;
