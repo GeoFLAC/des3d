@@ -28,7 +28,7 @@ num_materials = 4
     rho0 = [ 2800, 2900, 3210, 3300 ]
     ```
     - We recommend you draw a schematic such as the one in `rifting-2d.poly` to illustrate your layers with labeled nodal points (shown below):
-    <img src="./img/rifting_poly_schema.png" alt="Rifting Poly Schema" width="25%">
+    <img src="./img/rifting_poly_schema.png" alt="Rifting Poly Schema" width="25%"/>
     <!--![Rifting Poly Schema|25%](./img/rifting_poly_schema.png)-->
 
 ## In .poly file
