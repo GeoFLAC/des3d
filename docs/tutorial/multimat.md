@@ -4,13 +4,14 @@ sidebar_position: 1
 
 # Multi-Material Model
 
-Currently, DES is only set-up to run one rheology at a time, so all
-layers in a model must have the same rheology time (e.g.
-elasto-visco-plastic or elasto-plastic). A multilayer example is
-available in the folder `DynEarthSol/examples/` ; look at files
-`rifting-2d.cfg` and `rifting-2d.poly`. The .poly file holds
-information about the layer geometry and the configuration file tells
-DES where to look for that information.
+To have multiple material types, "regions" in a mesh and material properties 
+in an input file must correspond to each other in terms of the **number** of material kinds
+and the **order** by which the materials and parameters are listed. 
+
+This technical requirement is illustrated by a multi-material 2D rifting example.
+A pair of input parameter files are provided:
+1. `DynEarthSol/examples/rifting-2d.cfg`: input file for `DynEarthSol`.
+2. `DynEarthSol/examples/rifting-2d.poly`: input file for the mesh generator, `triangle`.
 
 ## In .cfg file
 
