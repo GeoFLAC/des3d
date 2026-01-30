@@ -157,12 +157,7 @@ const config: Config = {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
     },
-    mermaid: {
-      theme: {light: 'neutral', dark: 'forest'},
-      options: {
-        maxTextSize: 50000,
-      },
-    },
+
     // stylesheets: [
     //   {
     //     href: 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css', // Example CDN URL for a recent KaTeX
@@ -171,11 +166,7 @@ const config: Config = {
     // ],
   } satisfies Preset.ThemeConfig,
 
-  markdown: {
-    mermaid: true,
-  },
 
-  themes: ['@docusaurus/theme-mermaid'],
 };
 
 export default config;
