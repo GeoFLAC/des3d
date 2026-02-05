@@ -24,7 +24,7 @@ Once all criteria are enforced, a final list of nodes is collected and used for 
 mesh. During the process, new nodes might be inserted into the mesh or the mesh topology changed 
 through edge-flipping (see the figure below) during the triangulation.
 
-<img alt="edge flipping during remeshing" src="./img/edgeflipping.png" width=640/>
+<img alt="edge flipping during remeshing" src="./img/edgeflipping.png" width="640"/>
 <em>(above) Plastic strain distribution on a mesh before and after remeshing. Solid and dashed white lines are new and old element edges. 
 Pink circles are newly added nodes.</em>
 
