@@ -52,7 +52,9 @@
   "resolutions": {
     "webpack": "^5.104.1",
     "webpack-dev-server": "^5.2.1",
-    "minimatch": "^10.2.1",
-    "qs": "^6.14.2"
+    "minimatch": "^10.2.3",
+    "qs": "^6.14.2",
+    "serialize-javascript": "^7.0.3",
+    "svgo": "^3.3.3"
   }
 }
