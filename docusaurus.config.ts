@@ -5,7 +5,6 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
 
-
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
@@ -147,10 +146,10 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Team GeoFLAC. Built with Docusaurus. Supported by the National Science Foundation Award 2104002.
+      copyright: `Copyright © 2026 Team GeoFLAC. Built with Docusaurus. Supported by the National Science Foundation Award 2104002.
   <br/>
-  <a href="https://www.nsf.gov/" target="_blank" rel="noopener noreferrer">
-    <img src="img/nsf-logo.png" alt="NSF Logo" style="height:40px; margin-top:8px;"/>
+  <a href=\"https://www.nsf.gov/\" target=\"_blank\" rel=\"noopener noreferrer\">
+    <img src=\"img/nsf-logo.png\" alt=\"NSF Logo\" style=\"height:40px; margin-top:8px;\"/>
   </a>`,
     },
     prism: {
@@ -165,7 +164,6 @@ const config: Config = {
     //   },
     // ],
   } satisfies Preset.ThemeConfig,
-
 
 };
 
