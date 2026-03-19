@@ -55,7 +55,6 @@
     "minimatch": "^10.2.3",
     "qs": "^6.14.2",
     "serialize-javascript": "^7.0.3",
-    "svgo": "^3.3.3",
-    "ajv": "^8.18.0"
+    "svgo": "^3.3.3"
   }
 }
