@@ -185,5 +185,5 @@ gospl_coupling_frequency = 200
 ## Next Steps
 
 - Learn about [GoSPL configuration options](https://gospl.readthedocs.io/)
-- See the [example configurations](https://github.com/echoi/DynEarthSol/tree/master/gospl_driver/examples)
-- Read the technical details in [`GOSPL_COUPLING.md`](../GOSPL_COUPLING.md)
+- See the [example configurations](https://github.com/GeoFLAC/DynEarthSol/tree/master/gospl_driver/examples)
+- Read the technical details in [`GOSPL_COUPLING.md`](https://github.com/GeoFLAC/DynEarthSol/tree/master/gospl_driver/GOSPL_COUPLING.md)
