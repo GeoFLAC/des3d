@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# Multi-Material Model
+# Complex mesh Multi-Material Model
 
 Currently, DES is only set-up to run one rheology at a time, so all
 layers in a model must have the same rheology time (e.g.
@@ -14,8 +14,9 @@ DES where to look for that information.
 
 ## In .cfg file
 
-1.  In `[mesh]` section, specify `poly_filename`: e.g.,
+1.  In `[mesh]` section, set `meshing_option` to `90` and specify `poly_filename`: e.g.,
 ```SHELL
+meshing_option = 90
 poly_filename = rifting-2d.poly
 ```
 2.  In `[mat]` section, specify `num_materials`: e.g.,
