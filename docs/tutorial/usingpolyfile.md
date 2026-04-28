@@ -2,11 +2,11 @@
 sidebar_position: 1
 ---
 
-# Complex mesh Multi-Material Model
+# Making a complex mesh with `.poly` file
 
-To have multiple material types, "regions" in a mesh and material properties 
-in an input file must correspond to each other in terms of the **number** of material kinds
-and the **order** by which the materials and parameters are listed. 
+To have multiple material types, `regions` can be defined in a poly file for `triangle` or `tetgen`. 
+In this case, material properties in a config file (`.cfg`) must correspond to the regions defined in the poly file
+in terms of the **number** of materials and the **order** by which the materials and parameters are listed. 
 
 This technical requirement is illustrated by a multi-material 2D rifting example.
 A pair of input parameter files are provided:
