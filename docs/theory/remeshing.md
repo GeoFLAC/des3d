@@ -9,21 +9,34 @@ quality measures to decide whether to keep using the present mesh or
 remesh. For example, if the smallest angle of an element is less than a
 certain prescribed value, we remesh. 
 
-A group of nodes in the deformed
-mesh is removed from the mesh if any of the following criteria is met.
-For instance, if the deformed or displaced boundary is restored to the
-initial configuration, some nodes may be left outside of the boundaries
-of the new domain. Internal nodes, if surrounded only by small elements,
-may be removed from the point set to be remeshed. 
+## New mesh creation
 
-Once all criteria are
-enforced, a final list of nodes is collected. These nodes are provided
-to the *Triangle* library to construct a new
-triangulation of the domain. At this stage, new nodes might be inserted
-into the mesh or the mesh topology changed through edge-flipping during
-the triangulation.
+The default mode of remeshing is to create a new mesh preserving the old mesh's boundaries.
+The meshing libraries linked during the build are resued: `triangle` for 2D and `tetgen` for 3D.
+To assist the meshing process, DES provides a point set for the meshing libraries to start with.
+However, a group of nodes in the deformed mesh may be removed from the point set if any of the following criteria is met:
 
-![edge flipping during remeshing](./img/edgeflipping.png)
+- Left outside of the new boundaries when a deformed or displaced boundary is restored to the
+initial configuration
+- Surrounded only by small elements 
+
+Once all criteria are enforced, a final list of nodes is collected and used for constructing a new
+mesh. During the process, new nodes might be inserted into the mesh or the mesh topology changed 
+through edge-flipping (see the figure below) during the triangulation.
+
+<img alt="edge flipping during remeshing" src="./img/edgeflipping.png" width="640"/>
+
+<em>(above) Plastic strain distribution on a mesh before and after remeshing. Solid and dashed white lines are new and old element edges. 
+Pink circles are newly added nodes.</em>
+
+## Mesh optimization
+
+As described in https://geoflac.github.io/des3d/docs/tutorial/usingmmg, a user can choose link 
+[MMG](https://mmgtools.org) when building DES. MMG performs mesh optimization allowing a metric-based 
+element size variation and the metric itself can be defined in terms of one of the physical variables 
+like accumulated plastic strain.
+
+## Variable mapping from old to new mesh
 
 After the new mesh is created, the boundary
 conditions, derivatives of shape function, and mass matrix have to be

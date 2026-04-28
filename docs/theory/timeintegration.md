@@ -2,7 +2,7 @@
 sidebar_position: 6
 ---
 
-# Velocity and displacement update
+# Velocity and node position update
 
 The velocity is updated with the damped acceleration, but subject to the
 prescribed velocity boundary conditions, that is:
