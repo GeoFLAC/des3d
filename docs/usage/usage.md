@@ -31,6 +31,19 @@ Docker image coming soon!
     2. `Exodus`: For importing a mesh in the *ExodusII* format. Available as a part of
     SEACAS project [https://github.com/gsjaardema/seacas/]
 
+### Initializing submodules
+
+DES3D uses git submodules for several optional dependencies (`mmg`,
+`nanoflann`, `knn-bvh`). After cloning, initialize them with:
+
+```console
+git submodule update --init --recursive
+```
+
+The build system will also attempt to initialize stale submodules
+automatically when you run `make`, but running the command above
+explicitly is recommended to avoid surprises.
+
 ## Configuration
 
 ### Required dependencies
@@ -54,6 +67,8 @@ boost directory.
 | `gprof`       | `0`, `1`        | Disable (`0`) or enable (`1`) profiling with gprof. |
 | `usemmg`       | `0`, `1`        | Disable (`0`) or enable (`1`) mesh optimization during remeshing with mmg. |
 | `useexo`       | `0`, `1`        | Disable (`0`) or enable (`1`) import of an .exo mesh, usually created with the meshing software, CUBIT. Note: Only a 3D mesh can be imported currently.|
+| `use_gpu_knn`  | `0`, `1`        | Enable GPU-accelerated k-nearest-neighbour search via BVH (requires `openacc = 1`). Reduces remeshing time by ~61 % on GPU. Requires the `knn-bvh` submodule. |
+| `SOA`          | `0`, `1`        | Enable Structure-of-Arrays memory layout for `Array2D`. Improves remeshing speed by >2× on CPU and is beneficial on GPU (H100). Default off. |
 
 ### Optional external libraries
 
@@ -83,3 +98,23 @@ Build options can be set on the command line without editing `Makefile`: e.g.,
 -   To build a debugging executable: `make opt=0` 
 -   To build the executable without `OpenMP`: `make openmp=0` 
     - This build is necessary to debug the code under `valgrind`.
+
+### macOS (Apple Silicon)
+
+Building on macOS requires LLVM OpenMP (Apple's built-in Clang does not
+ship with `libomp`). Install it with Homebrew:
+
+```console
+brew install llvm
+```
+
+Then point the build at LLVM's OpenMP:
+
+```console
+make LLVM_DIR=$(brew --prefix llvm)
+```
+
+At startup, DES3D automatically sets `OMP_WAIT_POLICY=active` on macOS
+to avoid a performance regression caused by `libomp`'s default
+zero-blocktime on Apple Silicon. You can override this by setting the
+variable in your environment before running the executable.

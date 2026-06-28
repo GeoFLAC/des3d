@@ -45,8 +45,27 @@ re-calculated.
 Also, an inter-mesh mapping of variables is performed. 
 For data associated to nodes (e.g., velocity and
 temperature), we use linear interpolation of the data from the old mesh
-to evaluate the field at the new nodal location. For data associated to
-elements (e.g., strain and stress), we use a nearest-neighbor mapping.
+to evaluate the field at the new nodal location.
+
+For data associated to elements (e.g., stress and strain), DES3D uses
+**Superconvergent Patch Recovery (SPR)** (Zienkiewicz & Zhu, 1992).
+SPR first projects each element's centroid value onto the nodes of its
+patch by fitting a linear polynomial in patch-relative coordinates, then
+evaluates that polynomial at each new nodal position. This produces a
+smooth, higher-order-accurate nodal field that is subsequently
+re-sampled back to the new element centroids. The approach eliminates
+the spurious velocity spikes and checkerboard stress patterns that
+appeared with the earlier nearest-neighbor scheme.
+
+If a node's patch is geometrically degenerate (e.g., a boundary node
+with fewer neighbours than degrees of freedom), SPR falls back to a
+simple weighted average of the surrounding element centroid values.
+
+> Zienkiewicz, O. C., & Zhu, J. Z. (1992). The superconvergent patch
+> recovery and a posteriori error estimates. Part 1: The recovery
+> technique. *International Journal for Numerical Methods in
+> Engineering*, 33(7), 1331–1364.
+> https://doi.org/10.1002/nme.1620330702
 
 <!-- When most of the deformation is focused in and around a few deformation
 zones like shear bands, most of the elements outside of the zones deform
