@@ -27,22 +27,22 @@ Docker image coming soon!
 3.  Python 3.2+
 4.  Numpy for post-processing
 5.  Optional: 
-    1. [MMG3D](https://www.mmgtools.org/mmg-remesher-downloads): An optional mesh adaptation library. Used for remeshing in DES3D.
+    1. [MMG](https://github.com/MmgTools/mmg): mesh adaptation library for adaptive remeshing. Bundled as a git submodule — no separate installation required (see below).
     2. `Exodus`: For importing a mesh in the *ExodusII* format. Available as a part of
     SEACAS project [https://github.com/gsjaardema/seacas/]
 
-### Initializing submodules
+### Submodules (mmg, nanoflann, knn-bvh)
 
-DES3D uses git submodules for several optional dependencies (`mmg`,
-`nanoflann`, `knn-bvh`). After cloning, initialize them with:
+`mmg`, `nanoflann`, and `knn-bvh` are bundled as git submodules and
+built automatically by `make` — no separate installation or path
+configuration is required. After cloning, initialize them once:
 
 ```console
 git submodule update --init --recursive
 ```
 
-The build system will also attempt to initialize stale submodules
-automatically when you run `make`, but running the command above
-explicitly is recommended to avoid surprises.
+`make` will also auto-initialize stale submodules, but running the
+command above explicitly after cloning is recommended.
 
 ## Configuration
 
@@ -79,12 +79,12 @@ If you want to import an `ExodusII` mesh (.exo),
 - set `EXO_INCLUDE` and `EXO_LIB_DIR` in `Makefile` based on the SEACAS installation path.
 
 #### `MMG`
-Install this library if adaptive mesh optimization is desired: e.g., finer elements where plastic strain is localized.
+MMG is bundled as a git submodule and built automatically — no manual
+installation or path configuration is needed. To enable it:
 
-- install [MMG](https://github.com/MmgTools/mmg)
-- set `usemmg = 1`. Both `dims=2` and `3` are supported.
-- set `MMG_INCLUDE` and `MMG_LIB_DIR` based on the MMG installation paths.
-- For further information, see [Adaptive mesh refinement with MMG](https://geoflac.github.io/des3d/docs/tutorial/usingmmg)
+- set `usemmg = 1` (both `ndims=2` and `ndims=3` are supported).
+
+For further information, see [Adaptive mesh refinement with MMG](https://geoflac.github.io/des3d/docs/tutorial/usingmmg).
 
 ## Building
 
