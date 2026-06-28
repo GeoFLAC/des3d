@@ -1,48 +1,12 @@
 ---
-sidebar_position: 4
-title: Weak zones and velocity boundary conditions
+sidebar_position: 5
+title: Weak zones
 ---
 
-# Weak zones and velocity boundary conditions (3D)
+# Weak zones
 
-DES3D supports several ways to prescribe velocity boundary conditions
-(VBCs) on the lateral faces of a 3D model and to define fault-like weak
-zones that focus deformation. This page documents the features added in 2026.
-
-## Lateral-face VBC cases
-
-Each lateral face (`x0`, `x1`, `y0`, `y1`) can be assigned an
-independent VBC case. The case number is set via `bc.vbc_x0`, `bc.vbc_x1`,
-`bc.vbc_y0`, `bc.vbc_y1`.
-
-| Case | Normal component | Lateral-shear component | Vertical |
-|------|-----------------|------------------------|---------|
-| 0 | Free | Free | Free |
-| 1 | Fixed (`vbc_val_*`) | Free | Free |
-| 2 | Free | Fixed (0) | Free |
-| 3 | Fixed | Fixed (0) | Free |
-| 4 | Free | Free | Fixed (0) |
-| 5 | Fixed | Fixed | Free |
-| **6** | **Fixed (`vbc_val_*`)** | **Fixed (`vbc_val_*_l`)** | **Free** |
-
-**Case 6** is new and allows setting both the normal and lateral-shear
-velocities to independent non-zero values. It is useful for
-transtensional or transpressional boundary conditions.
-
-### New parameters for case 6
-
-```cfg
-bc.vbc_x0 = 6
-bc.vbc_val_x0   = -0.01   # normal velocity (m/yr)
-bc.vbc_val_x0_l =  0.005  # lateral-shear velocity (m/yr)
-
-bc.vbc_x1 = 6
-bc.vbc_val_x1   =  0.01
-bc.vbc_val_x1_l = -0.005
-```
-
-See `examples/oblique-rift-3d.cfg` for a complete transtensional rifting
-example using case 6.
+DES3D supports several ways to define fault-like weak zones that focus
+deformation in a model.
 
 ## Multi-segment weak zones (`weakzone_option = 4`)
 
