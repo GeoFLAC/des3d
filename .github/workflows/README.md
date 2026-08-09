@@ -18,3 +18,10 @@ On receipt, this workflow fetches the PR's changed files from the DynEarthSol AP
 See [`CLAUDE.md`](../../CLAUDE.md) for the doc-sync procedure a triage issue is meant to kick off, and for the `workflow_dispatch` testing gotcha (a workflow must be merged to the default branch before it can be dispatched manually, on either side of the pipeline).
 
 Can be run manually for testing: `gh workflow run dynearthsol-pr-notify.yml --repo GeoFLAC/des3d -f number=<PR>`.
+
+## `dependabot-auto-merge.yml`
+Auto-approves and enables auto-merge for Dependabot PRs that are patch or minor version bumps (major bumps are left for manual review, since they're more likely to need judgment). Uses `dependabot/fetch-metadata` to read the update type, then `gh pr merge --auto`.
+
+This only *enables* auto-merge — the actual merge is still gated by branch protection on `main`, which requires the `Test deployment` check (the same build `test-deploy.yml` runs) to pass first. A dependency bump that breaks the build (e.g. the js-yaml/gray-matter conflict documented in the `Patch nanoid, undici, and js-yaml security advisories` commit) just sits open instead of merging.
+
+Depends on repo settings that aren't in this file: Dependabot security updates enabled, "Allow auto-merge" enabled, and a branch protection ruleset on `main` requiring the `Test deployment` check (only that — not "require a pull request before merging", so direct pushes to `main` still work).
