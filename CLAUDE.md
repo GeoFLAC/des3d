@@ -6,7 +6,7 @@ Docusaurus site for [GeoFLAC/DynEarthSol](https://github.com/GeoFLAC/DynEarthSol
 
 When asked to catch up the docs with recent DynEarthSol changes ("what's new", "sync the docs", "catch up with recent PRs"), run this procedure without being walked through it step by step:
 
-1. **Find the last sync point.** Check `themeConfig.announcementBar` in `docusaurus.config.ts` for the PR number/date it references, and/or `git log --oneline -- docs/` for the last "docs: update ..." commit date.
+1. **Find the last sync point.** Check `themeConfig.announcementBar` in `docusaurus.config.ts` for the PR number/date it references, and/or `git log --oneline -- docs/` for the last "docs: update ..." commit date. If you're here because an automated triage issue (see below) already named a specific PR, skip straight to step 4 with that PR number instead of re-scanning.
 2. **List what's merged since then:**
    ```
    gh pr list --repo GeoFLAC/DynEarthSol --state merged --limit 100 \
@@ -42,3 +42,12 @@ export PATH="$(pwd)/node20/bin:$PATH"
 ## Doc scope discipline
 
 Only document changes with a visible parameter, flag, workflow, or breaking-change surface. Skip internal-only correctness/perf fixes, refactors, and CI changes that don't change what a user of the engine sees or configures.
+
+## Automated notification pipeline
+
+Merges to DynEarthSol no longer require manually running the `gh pr list` scan above to notice them — a cross-repo GitHub Actions pipeline does it automatically:
+
+1. **`GeoFLAC/DynEarthSol/.github/workflows/notify-des3d.yml`** (a different repo, not checked out here) fires on every PR merged to `master`/`main`. It mints a token from the org's `notify-des-inputgen` GitHub App (scoped via `repositories: des3d`; this app's installation was extended to include `des3d` alongside its original `des-inputgen` target) and sends a `repository_dispatch` event (`dynearthsol-pr-merged`) carrying the PR number.
+2. **`.github/workflows/dynearthsol-pr-notify.yml`** (in this repo) receives it, fetches the PR's changed files from the DynEarthSol API, and skips it if every changed file is under `.github/` (CI-only, no doc surface) — note this checks files, not the title, so a `ci:`-titled PR that also touches non-workflow files (e.g. `docker/Dockerfile.cuda`) still gets flagged. Otherwise it opens a GitHub issue here titled `Review DynEarthSol #<N> for doc updates: <title>`.
+3. When one of those issues shows up, that's the trigger to run the sync procedure above for that specific PR — start at step 4 with the PR number the issue already gives you.
+4. Both workflows can also be run manually via `workflow_dispatch` (`gh workflow run <file> --repo <owner/repo> -f number=<N>` / `-f pr_number=<N>`) for testing. **Gotcha:** `workflow_dispatch` can't be fired on a workflow that exists only on a non-default branch — GitHub only indexes dispatchable workflows from the default branch, so a newly-added or newly-edited workflow must be merged before it can be triggered this way, even with `--ref <branch>` pointing at where the code actually lives.
