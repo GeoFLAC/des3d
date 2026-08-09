@@ -1,0 +1,67 @@
+name: Triage merged DynEarthSol PR
+
+# Receives a repository_dispatch from GeoFLAC/DynEarthSol (sent by its
+# notify-des3d.yml workflow whenever a PR merges to master/main) and opens a
+# triage issue here, unless the PR only touched .github/ (CI-only changes
+# have no doc surface). See CLAUDE.md for the doc-sync procedure this feeds.
+
+on:
+  repository_dispatch:
+    types: [dynearthsol-pr-merged]
+  workflow_dispatch:
+    inputs:
+      number:
+        description: 'DynEarthSol PR number to triage'
+        required: true
+
+permissions:
+  issues: write
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open triage issue if not CI-only
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ github.event.client_payload.number || github.event.inputs.number }}
+        with:
+          script: |
+            const prNumber = Number(process.env.PR_NUMBER);
+
+            const { data: pr } = await github.rest.pulls.get({
+              owner: 'GeoFLAC', repo: 'DynEarthSol', pull_number: prNumber,
+            });
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: 'GeoFLAC', repo: 'DynEarthSol', pull_number: prNumber,
+              per_page: 100,
+            });
+
+            const paths = files.map(f => f.filename);
+            const ciOnly = paths.length > 0 && paths.every(p => p.startsWith('.github/'));
+
+            if (ciOnly) {
+              core.notice(`Skipping DynEarthSol #${prNumber} ("${pr.title}") — touches only .github/, looks CI-only.`);
+              return;
+            }
+
+            const fileList = paths.slice(0, 40).map(p => `- \`${p}\``).join('\n')
+              + (paths.length > 40 ? `\n- _...and ${paths.length - 40} more_` : '');
+            const summary = (pr.body || '').split('\n').slice(0, 8).join('\n');
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Review DynEarthSol #${prNumber} for doc updates: ${pr.title}`,
+              body: [
+                `[GeoFLAC/DynEarthSol#${prNumber}](${pr.html_url}) merged — **${pr.title}**`,
+                '',
+                summary ? `> ${summary.replace(/\n/g, '\n> ')}` : '',
+                '',
+                '### Files changed',
+                fileList,
+                '',
+                '### Next step',
+                'Ask Claude Code to run the doc-sync procedure from `CLAUDE.md` against this PR.',
+              ].join('\n'),
+            });
