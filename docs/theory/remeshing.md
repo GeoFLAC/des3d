@@ -29,6 +29,14 @@ through edge-flipping (see the figure below) during the triangulation.
 <em>(above) Plastic strain distribution on a mesh before and after remeshing. Solid and dashed white lines are new and old element edges. 
 Pink circles are newly added nodes.</em>
 
+At extreme strain, a highly distorted mesh can have two boundary segments
+meeting at a tiny angle, which sends `triangle`'s Steiner-point insertion
+into a non-terminating splitting loop. The 2D-only parameter
+`mesh.max_steiner_factor` (default `30`) caps the number of Steiner points
+`triangle` may insert during remeshing at `factor × npoints`, bounding this
+runaway; set it `<= 0` to restore the old unlimited behavior. It only
+applies when no area constraint is active, so initial meshing is unaffected.
+
 ## Mesh optimization
 
 As described in https://geoflac.github.io/des3d/docs/tutorial/usingmmg, a user can choose link 

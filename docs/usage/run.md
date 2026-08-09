@@ -50,9 +50,27 @@ the checkpoint:
 - `info_display_next_step`
 - `dhacc` (surface marker correction)
 - `strain_rate`, `viscosity`, `volume_old`
+- `plastic strain-rate` (`delta_plstrain`), so a restarted run's diagnostic
+  output matches a continuous one
 
 To restart from a checkpoint, run the executable with the same config
 file. DES3D detects the most recent checkpoint automatically.
+
+:::danger Checkpoint/output format revision 4
+The checkpoint and frame file format was bumped from revision 3 to 4.
+A revision (or dimensionality) mismatch between the file and the running
+binary is now a **hard error** with a diagnostic naming the expected and
+actual values — previously it was accepted silently and could be misread.
+This means **checkpoint and frame files written before this change cannot
+be restarted or read by a newer DES3D binary.** Finish or discard runs on
+the old binary before upgrading.
+:::
+
+Frame files (HDF5 and plain binary) now also embed the full `.info` row
+(steps, time, dt, walltime, node/element/segment counts). If a run's
+`.info` file is lost, `utils/recreate_info.py` rebuilds it from the frame
+files alone; `restart()` also falls back to this embedded metadata
+automatically when `.info` is missing.
 
 ## Run-time warnings
 
