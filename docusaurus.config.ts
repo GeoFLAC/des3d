@@ -96,6 +96,14 @@ const config: Config = {
   themeConfig: {
     // Replace with your project's social card
     image: 'img/docusaurus-social-card.jpg',
+    announcementBar: {
+      id: 'dynearthsol-sync-status',
+      content:
+        'These docs are synced with <a href="https://github.com/GeoFLAC/DynEarthSol" target="_blank" rel="noopener noreferrer">DynEarthSol</a> through <a href="https://github.com/GeoFLAC/DynEarthSol/pull/81" target="_blank" rel="noopener noreferrer">PR&nbsp;#81</a> (2026-08-08).',
+      backgroundColor: 'var(--ifm-color-primary)',
+      textColor: '#fff',
+      isCloseable: true,
+    },
     navbar: {
       title: 'Main',
       logo: {
