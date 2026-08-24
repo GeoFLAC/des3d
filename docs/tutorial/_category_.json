@@ -3,6 +3,6 @@
   "position": 3,
   "link": {
     "type": "generated-index",
-    "description": "How to build models with DES3D"
+    "description": "How to build a complex mesh with tetgen/triangle"
   }
 }

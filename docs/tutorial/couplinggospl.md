@@ -66,6 +66,41 @@ Or set PYTHONPATH manually and use the regular executable:
 ```
 :::
 
+## How coupling works
+
+DES3D and GoSPL exchange data following the **ASPECT-FastScape simple
+coupling scheme**:
+
+1. **DES → GoSPL:** At each coupling event, DES passes time-averaged
+   surface velocities (Δcoord/Δt over the coupling interval) to GoSPL.
+   Time-averaging filters out quasi-dynamic inertial oscillations that
+   would otherwise perturb GoSPL's drainage network.
+2. **GoSPL → DES:** GoSPL runs its landscape evolution (river incision,
+   hillslope diffusion, marine deposition) and returns elevation
+   increments Δh at every surface node.
+3. **Tectonic uplift accounting:** DES strips its own Lagrangian
+   vertical displacement from Δh before applying it, preventing
+   double-counting with GoSPL's erosion signal.
+4. **Persistent drainage state:** GoSPL's river network state is
+   preserved across DES remeshing events so that drainage divides are
+   not reset after mesh adaptation.
+5. **Padded GoSPL mesh:** The GoSPL mesh extends beyond the DES domain
+   by a configurable padding fraction (`gospl_mesh_padding`, default
+   0.1) to avoid edge artifacts during extension.
+
+```
+DES3D ──── surface velocities (Δcoord/Δt) ────► GoSPL
+  ▲                                                │
+  └────── elevation increments (Δh − uplift) ─────┘
+```
+
+### Coupling modes
+
+| `gospl_coupling_mode` | Trigger parameter | Meaning |
+|-----------------------|-------------------|---------|
+| `steps` (default) | `gospl_coupling_frequency` | GoSPL runs every N DES steps |
+| `time` | `gospl_coupling_interval_in_yr` | GoSPL runs every T model years |
+
 ## Quick Start
 
 ### Step 1: Enable GoSPL in your configuration
@@ -74,21 +109,28 @@ Or set PYTHONPATH manually and use the regular executable:
 |-----------|---------|-------------|
 | `surface_process_option` | 0 | Set to **11** to enable GoSPL |
 | `surface_process_gospl_config_file` | — | Path to your GoSPL YAML file |
-| `gospl_coupling_frequency` | 1 | How often to run GoSPL (every N steps) |
-| `gospl_mesh_resolution` | -1 | Grid spacing in meters (-1 = automatic) |
+| `gospl_coupling_mode` | `steps` | `steps` or `time` — controls what the coupling interval means |
+| `gospl_coupling_frequency` | 1 | GoSPL runs every N DES steps (used when `gospl_coupling_mode = steps`) |
+| `gospl_coupling_interval_in_yr` | — | GoSPL runs every T model years (used when `gospl_coupling_mode = time`) |
+| `gospl_velocity_coupling` | `true` | Pass surface velocities to GoSPL for smoother drainage-network evolution |
+| `gospl_mesh_resolution` | -1 | GoSPL grid spacing in meters (-1 = automatic) |
+| `gospl_mesh_padding` | 0.1 | Fractional domain padding for GoSPL mesh (avoids boundary artifacts) |
 | `gospl_initial_topo_amplitude` | 0.0 | Initial random topography (m) |
 | `gospl_mesh_perturbation` | 0.3 | Grid randomization (0–1) |
 
 :::info Coupling frequency tip
-For models with slow erosion rates, you can set `gospl_coupling_frequency = 100` or higher to speed up computation. GoSPL will run less often but with accumulated time.
+For models with slow erosion rates, you can set `gospl_coupling_frequency = 100` or higher to speed up computation. GoSPL will run less often but with accumulated time. Alternatively, use `gospl_coupling_mode = time` to couple at fixed model-time intervals regardless of step size.
 :::
 
 ```cfg title="my_simulation.cfg"
 [control]
 surface_process_option = 11
 surface_process_gospl_config_file = gospl_config.yml
+gospl_coupling_mode = steps
 gospl_coupling_frequency = 100      # Run GoSPL every 100th DynEarthSol time step
+gospl_velocity_coupling = true      # Pass surface velocities to GoSPL
 gospl_mesh_resolution = 500         # in meters
+gospl_mesh_padding = 0.1            # extend GoSPL mesh 10 % beyond DES domain
 gospl_initial_topo_amplitude = 0.0  # in meters. 0.0: initially flat
 gospl_mesh_perturbation = 0.3       # 30 % of random perturbations, +0.5/-0.5 x h
 ```

@@ -29,6 +29,16 @@ const FeatureList: FeatureItem[] = [
     ),
   },
   {
+    title: 'Theory',
+    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    description: (
+      <>
+        Theoretical and numerical foundations: time integration, remeshing,
+        constitutive laws, and more.
+      </>
+    ),
+  },
+  {
     title: 'Tutorials',
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
@@ -41,7 +51,7 @@ const FeatureList: FeatureItem[] = [
 
 function Feature({title, Svg, description}: FeatureItem) {
   return (
-    <div className={clsx('col col--4')}>
+    <div className={clsx('col col--3')}>
       <div className="text--center">
         <Svg className={styles.featureSvg} role="img" />
       </div>

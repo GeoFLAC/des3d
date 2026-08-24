@@ -80,9 +80,30 @@ const config: Config = {
     ],
   ],
 
+  themes: [
+    [
+      require.resolve('@easyops-cn/docusaurus-search-local'),
+      {
+        hashed: true,
+        language: ['en'],
+        indexDocs: true,
+        indexPages: false,
+        docsRouteBasePath: '/docs',
+      },
+    ],
+  ],
+
   themeConfig: {
     // Replace with your project's social card
     image: 'img/docusaurus-social-card.jpg',
+    announcementBar: {
+      id: 'dynearthsol-sync-status',
+      content:
+        'These docs are synced with <a href="https://github.com/GeoFLAC/DynEarthSol" target="_blank" rel="noopener noreferrer">DynEarthSol</a> through <a href="https://github.com/GeoFLAC/DynEarthSol/pull/81" target="_blank" rel="noopener noreferrer">PR&nbsp;#81</a> (2026-08-08).',
+      backgroundColor: 'var(--ifm-color-primary)',
+      textColor: '#fff',
+      isCloseable: true,
+    },
     navbar: {
       title: 'Main',
       logo: {
@@ -154,7 +175,7 @@ const config: Config = {
       copyright: `Copyright © ${new Date().getFullYear()} Team GeoFLAC. Built with Docusaurus. Supported by the National Science Foundation Award 2104002.
   <br/>
   <a href="https://www.nsf.gov/" target="_blank" rel="noopener noreferrer">
-    <img src="img/nsf-logo.png" alt="NSF Logo" style="height:40px; margin-top:8px;"/>
+    <img src="/des3d/img/nsf-logo.png" alt="NSF Logo" style="height:40px; margin-top:8px;"/>
   </a>`,
     },
     prism: {

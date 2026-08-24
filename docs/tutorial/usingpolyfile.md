@@ -2,11 +2,11 @@
 sidebar_position: 1
 ---
 
-# Multi-Material Model
+# Making a complex mesh with `.poly` file
 
-To have multiple material types, "regions" in a mesh and material properties 
-in an input file must correspond to each other in terms of the **number** of material kinds
-and the **order** by which the materials and parameters are listed. 
+To have multiple material types, `regions` can be defined in a poly file for `triangle` or `tetgen`. 
+In this case, material properties in a config file (`.cfg`) must correspond to the regions defined in the poly file
+in terms of the **number** of materials and the **order** by which the materials and parameters are listed. 
 
 This technical requirement is illustrated by a multi-material 2D rifting example.
 A pair of input parameter files are provided:
@@ -15,8 +15,9 @@ A pair of input parameter files are provided:
 
 ## In .cfg file
 
-1.  In `[mesh]` section, specify `poly_filename`: e.g.,
+1.  In `[mesh]` section, set `meshing_option` to `90` and specify `poly_filename`: e.g.,
 ```SHELL
+meshing_option = 90
 poly_filename = rifting-2d.poly
 ```
 2.  In `[mat]` section, specify `num_materials`: e.g.,
@@ -28,7 +29,8 @@ num_materials = 4
     rho0 = [ 2800, 2900, 3210, 3300 ]
     ```
     - We recommend you draw a schematic such as the one in `rifting-2d.poly` to illustrate your layers with labeled nodal points (shown below):
-    <img src="./img/rifting_poly_schema.png" alt="Rifting Poly Schema" width="25%"/>
+
+    <img src={require('./img/rifting_poly_schema.png').default} alt="Rifting Poly Schema" width="25%"/>
     <!--![Rifting Poly Schema|25%](./img/rifting_poly_schema.png)-->
 
 ## In .poly file

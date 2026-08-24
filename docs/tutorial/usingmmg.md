@@ -152,62 +152,58 @@ The option `param.mesh.remeshing_option` determines what to do to the bottom bou
 4. Mesh optimization
 5. Mesh-related data update using the optimized MMG5 mesh
 
-#### `compute_metric_filed()`
+#### `compute_metric_field()`
 
-This is a short function that converts one of the data filed to a metric field. Currently, it scales `plastic_strain` to a solution field. A solution, *h*, at a node is directly used for determining an element size. 
+This function converts accumulated plastic strain into a per-node metric
+(target edge length) that MMG uses to resize elements. The metric for
+each element is computed from that element's own current size scaled by
+a `sizefactor`, then clipped to the user-specified bounds:
 
-*h* ranges between *h*<sub>min</sub> and *h*<sub>max</sub>.
+$$h_e = \frac{h_e^{\text{orig}}}{1 + 10\,\varepsilon_{pl,e}}$$
+$$h_e = \text{clamp}(h_e,\; h_{\min},\; h_{\max})$$
 
-<!-- - $h_{max} =$ `param.mesh.mmg_hmax_factor * param.mesh.resolution`
-- $h =$ $h_{max}/(1 + 10\varepsilon_{pl})$
-- $h_{min} = \max (h, $`param.mesh.mmg_hmin_factor * param.mesh.resolution`$)$.
+where
+- $h_e^{\text{orig}}$ is the element's own current edge length (not the global `resolution`), ensuring the metric is spatially adaptive from the start
+- $h_{\max} =$ `mmg_hmax_factor × resolution`
+- $h_{\min} =$ `mmg_hmin_factor × resolution`
 
-For instance, with
+Element metrics are then volume-averaged onto the nodes to produce the
+nodal solution field that MMG consumes.
 
-- `param.mesh.resolution = 1e3` (i.e., 1 km)
-- `param.mesh.mmg_hmax_factor = 2.0`
-- `param.mesh.mmg_hmin_factor = 0.1`
-- $\varepsilon_{pl}$ between 0 and 10,
--->
+For example, with `resolution = 1e3` m, `mmg_hmax_factor = 2.0`,
+`mmg_hmin_factor = 0.1`:
 
-we get
+- $h = 2\,\text{km}$ where $\varepsilon_{pl} = 0$
+- $h = 2\,\text{km} / (1 + 10\,\varepsilon_{pl})$ while $h > 100\,\text{m}$
+- $h = 100\,\text{m}$ once $\varepsilon_{pl} > 1.9$
 
-- h = h<sub>max</sub> = 2 km where $\varepsilon_{pl} = 0$.
-- $h =$ 2 km / (1+10 $\varepsilon_{pl}$) where $\varepsilon_{pl} \le 1.9$.
-- $h =$ 100 m where $\varepsilon_{pl} > 1.9$.
+---
 
-Here is the full code listing: 
+## Using MMG for initial mesh generation
 
+For large 3D models (roughly >5 million elements), TetGen can be slow or
+crash during the initial mesh generation step. DES3D supports an
+optional two-stage initialization that uses TetGen to create a coarse
+seed mesh and then refines it with MMG to the target resolution.
 
-```C++ {19-20} showLineNumbers
-void compute_metric_field(const Variables &var, const Param &param, const conn_t &connectivity, const double resolution, double_vec &metric, double_vec &tmp_result_sg)
-{
-    /* dvoldt is the volumetric strain rate, weighted by the element volume,
-     * lumped onto the nodes.
-     */
-    std::fill_n(metric.begin(), var.nnode, 0);
+Enable it in your config file:
 
-#ifdef GPP1X
-    #pragma omp parallel for default(none) shared(var,param,connectivity,tmp_result_sg,resolution)
-#else
-    #pragma omp parallel for default(none) shared(var,param,connectivity,tmp_result_sg)
-#endif
-    for (int e=0;e<var.nelem;e++) {
-        // const int *conn = connectivity[e];
-        // double plstrain = resolution/(1.0+5.0*(*var.plstrain)[e]);
-        // tmp_result_sg[e] = plstrain * (*var.volume)[e];
-        // tmp_result_sg[e] = plstrain * (*var.volume)[e];
-        // resolution/(1.0+(*var.plstrain)[e]);
-		double metric = param.mesh.mmg_hmax_factor*param.mesh.resolution / (1.0 + 10.0*(*var.plstrain)[e]);
-        metric = std::max(metric, param.mesh.mmg_hmin_factor*param.mesh.resolution);
-        tmp_result_sg[e] = metric * (*var.volume)[e];
-    }
-
-    #pragma omp parallel for default(none) shared(var,metric,tmp_result_sg)
-    for (int n=0;n<var.nnode;n++) {
-        for( auto e = (*var.support)[n].begin(); e < (*var.support)[n].end(); ++e)
-            metric[n] += tmp_result_sg[*e];
-        metric[n] /= (*var.volume_n)[n];
-    }
-}
+```cfg
+use_mmg_init = 1
+mmg_init_coarsening_factor = 4.0   # TetGen seed is 4× coarser than target resolution
 ```
+
+`use_mmg_init` is only effective when DES3D is compiled with `usemmg = 1`.
+If MMG support is absent, the parameter is silently ignored and the standard
+TetGen path is used.
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `use_mmg_init` | `0` | Set to `1` to enable two-stage MMG initialization (requires `usemmg = 1`) |
+| `mmg_init_coarsening_factor` | `4.0` | TetGen generates a mesh `N×` coarser than the target; MMG then refines it |
+
+:::tip When to use
+Enable `use_mmg_init` when your 3D model has more than ~2 million target
+elements and TetGen initialization takes more than a few minutes or
+produces memory errors.
+:::
