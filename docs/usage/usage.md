@@ -49,6 +49,7 @@ boost directory.
 | `ndims`        | `2`, `3`        | Choose `2` for two-dimensional models (`dynearthsol2d`) or `3` for three-dimensional models (`dynearthsol3d`). |
 | `opt`          | `0`, `1`, `2`, `3` | Integer value for optimization level. |
 | `openacc`      | `0`, `1`        | Disable (`0`) or enable (`1`) OpenACC build. |
+| `GPU_CC`       | compute capability, e.g. `80`, `90` | GPU compute capability to target when `openacc=1`. Defaults to the capability of the GPU detected on the host (via `nvidia-smi`), or `80` if none is detected. `make config` prints the value in use. |
 | `openmp`       | `0`, `1`        | Disable (`0`) or enable (`1`) OpenMP build. |
 | `nprof`       | `0`, `1`        | Disable (`0`) or enable (`1`) profiling with nprof. |
 | `gprof`       | `0`, `1`        | Disable (`0`) or enable (`1`) profiling with gprof. |
