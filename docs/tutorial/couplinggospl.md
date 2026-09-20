@@ -22,17 +22,31 @@ When coupled with DynEarthSol, you can study how tectonic processes (uplift, ext
 
 Before starting, ensure you have:
 
-- ✅ GoSPL installed through conda. 
+- ✅ GoSPL installed through conda, with Python 3.11 in the environment
+  (by default at `~/miniconda3/envs/gospl`)
 - ✅ `gospl_extensions`
-- ✅ DynEarthSol compiled with GoSPL support
+- ✅ DynEarthSol compiled with GoSPL support (the source tree must include the
+  `gospl_driver` directory), which needs a C++ toolchain and `make`
 
 ### Install GoSPL through conda
 Recommended by GoSPL users. Refer to https://gospl.readthedocs.io/en/latest/getting_started/installConda.html.
 
 ### Install gospl_extensions
+
+GoSPL is written in Python and DynEarthSol in C++. `gospl_extensions` is the
+bridge between them. It provides:
+
+- a **C++ entry point**: `libgospl_extensions.so` and a header, so DynEarthSol
+  can drive a Python model from compiled code;
+- **`EnhancedModel`**: a GoSPL subclass that can be stepped externally, take
+  imposed velocities and hand back an elevation change;
+- **interpolation** between the DES mesh and the GoSPL mesh, which are built
+  independently and at different resolutions.
+
 ```
 git clone https://github.com/GeoFLAC/gospl_extensions.git
 cd gospl_extensions/cpp_interface
+conda activate gospl
 make install-local
 ```
 :::tip Check your build
@@ -47,7 +61,13 @@ Installing locally for DynEarthSol integration...
 
 1. Set `use_gospl = 1` in Makefile.
 2. Set `GOSPL_EXT_DIR`: e.g., `GOSPL_EXT_DIR = $(HOME)/opt/gospl_extensions`
-3. Run `make`.
+3. Build **outside** the gospl environment, which keeps the compiler off
+   conda's libraries:
+   ```bash
+   conda deactivate   # if any environment is active
+   make clean
+   make -j4
+   ```
 
 :::tip Check your build
 When the build is successful, you should see the following message:
@@ -65,6 +85,21 @@ Or set PYTHONPATH manually and use the regular executable:
 ==============================================
 ```
 :::
+
+### Verify the build
+
+Run these four checks before moving on:
+
+```bash
+./dynearthsol3d --help | grep gospl                # options registered?
+conda activate gospl && python -c "import gospl"   # GoSPL importable?
+ldd dynearthsol3d | grep python                    # linked to Python?
+cat dynearthsol-gospl                              # wrapper script written?
+```
+
+The build also writes `dynearthsol-gospl`, a wrapper script that sets
+`PYTHONPATH` for you. If it is missing, the build did not complete with
+`use_gospl = 1`.
 
 ## How coupling works
 
@@ -93,6 +128,29 @@ DES3D ──── surface velocities (Δcoord/Δt) ────► GoSPL
   ▲                                                │
   └────── elevation increments (Δh − uplift) ─────┘
 ```
+
+Two details matter for interpreting results:
+
+- **Velocity is averaged, not instantaneous.** DynEarthSol's quasi-dynamic
+  formulation leaves damped-wave components in the instantaneous velocity;
+  averaging over the coupling interval filters them out. The first coupling
+  event falls back to the instantaneous value.
+- **Uplift is subtracted before returning.** GoSPL applies uplift internally,
+  but DynEarthSol has already moved the same material through its mechanical
+  solver. Only the erosion and diffusion part of Δh comes back; otherwise the
+  tectonic uplift would be counted twice.
+
+### What crosses the interface
+
+| Direction | What is passed | Driver call |
+|-----------|----------------|-------------|
+| DES → GoSPL, once | Initial surface elevation, seeding GoSPL's `hGlobal` | `apply_elevation_data()` |
+| DES → GoSPL, each event | Time-averaged surface velocity (vx, vy, vz) | `set_surface_velocity()` |
+| GoSPL → DES, each event | Elevation change from erosion and diffusion only | `run_and_get_erosion()` |
+| GoSPL → DES, on demand | Current elevation at any query point | `interpolate_elevation_to_points()` |
+
+You never call these directly, but knowing the names makes the log output
+readable.
 
 ### Coupling modes
 
@@ -162,7 +220,11 @@ gospl_mesh_perturbation = 0.3       # 30 % of random perturbations, +0.5/-0.5 x 
 
 ### Step 2: Create a GoSPL configuration file
 
-Create a YAML file for GoSPL settings:
+Create a YAML file for GoSPL settings. The coupling uses the `EnhancedModel`
+from `gospl_extensions`, not stock GoSPL, so a standard GoSPL configuration may
+not work. Start from the template below or from the
+[bundled example](#worked-example-a-gaussian-weak-zone-rift), and keep these
+five sections: `domain`, `time`, `spl`, `diffusion` and `output`.
 
 ```yaml title="gospl_config.yml"
 name: coupled_simulation
@@ -199,7 +261,23 @@ climate:
     uniform: 1
 ```
 
+The keys you will change most often:
+
+| Key in the YAML | What it sets |
+|-----------------|--------------|
+| `spl: K` | Bedrock river incision rate (erodibility) |
+| `spl: m`, `spl: n` | Drainage-area and slope exponents of the stream power law |
+| `diffusion: hillslopeKa` | Hillslope diffusivity, m²/yr |
+| `domain: flowdir` | Flow routing (`6` is multi-direction) |
+| `domain: bc` | Boundaries, in the order S, E, N, W: `0` open, `1` closed. `'1010'` opens east and west |
+| `domain: seadepo` | Marine deposition on or off |
+| `sea: position` | Sea level in metres relative to the initial surface |
+
 ### Step 3: Run your simulation
+
+Run from the directory that holds the GoSPL YAML: the path in
+`surface_process_gospl_config_file` is resolved relative to the working
+directory, not to the `.cfg` file.
 
 ```bash
 ./dynearthsol-gospl my_simulation.cfg
@@ -215,30 +293,111 @@ In this example,
 - DynEarthSol outputs will be saved in the working directory.
 - GoSPL outputs will be saved in the `coupling_test` directory. 
 
-## Example: Extensional Basin with Erosion
+## Worked example: a Gaussian weak zone rift
 
-TBA.
+The [`gospl_driver/examples`](https://github.com/GeoFLAC/DynEarthSol/tree/master/gospl_driver/examples)
+directory holds a ready-to-run pair of files: a DES config,
+`gaussian-weakzone-3d-with-gospl.cfg`, and its GoSPL YAML,
+`gospl_config_gaussian_weakzone_3D.yml`. The parameters were chosen to match
+an ASPECT + FastScape reference model, so the results are comparable to
+published work.
+
+| | Setting |
+|---|---|
+| Domain | 100 × 80 × 10 km, 1 km base mesh resolution, GoSPL mesh at 500 m |
+| Forcing | ±1.5 cm/yr extension in x; a Gaussian weak zone seeds the rift |
+| Duration | 1 Myr, output every 20 kyr, coupling every 200 steps |
+| Surface law | `K = 1e-5`, `m = 0.4`, `n = 1`, hillslope `Ka = 1e-2` m²/yr |
+| Boundaries | East and west open, north and south closed (`bc: '1010'`) |
+| Sea level | −2000 m, so marine processes stay inactive |
+
+### Exercise 1: run the reference case
+
+```bash
+conda activate gospl
+cd DynEarthSol/gospl_driver/examples   # the YAML path resolves from here
+../../dynearthsol-gospl ./gaussian-weakzone-3d-with-gospl.cfg
+```
+
+If you prefer to manage the environment yourself, set `PYTHONPATH` and use the
+same command:
+
+```bash
+conda activate gospl
+export PYTHONPATH="$HOME/opt/gospl_extensions/cpp_interface:${PYTHONPATH}"
+cd DynEarthSol/gospl_driver/examples
+../../dynearthsol-gospl ./gaussian-weakzone-3d-with-gospl.cfg
+```
+
+Watch for the coupling messages in the log. Output is written to
+`output_gaussian_weakzone_3D/` every 20 kyr.
+
+![Plastic strain in DynEarthSol (left) and topography with flow accumulation in GoSPL (right) at 0.12, 0.24, 0.36 and 0.48 Myr](./img/DES-goSPL.png)
+
+Things to look for as the run proceeds:
+
+- a rift valley opening above the weak zone, with uplifted flanks;
+- channels organizing down those flanks as the relief grows;
+- sediment accumulating in the axial low.
+
+### Exercise 2: vary the erodibility
+
+Change one line in the YAML, `spl: K`, and rerun. Nothing needs rebuilding.
+
+| Run | `spl: K` | What you should see |
+|-----|----------|---------------------|
+| Reference | `1.0e-5` | Rivers keep pace with uplift; moderate flank relief |
+| Weak erosion | `1.0e-6` | Tectonics dominates: higher, sharper flanks, little sediment |
+| Strong erosion | `1.0e-4` | Flanks worn down as they rise; the valley fills faster |
+
+As an optional second experiment, set `gospl_coupling_frequency = 50` in the
+`.cfg` and check whether the result changes. If it does, the coupling interval
+was too coarse.
+
+Change one parameter at a time, and keep a log of what you changed.
 
 
 ## Troubleshooting
 
-### "GoSPL not initialized" error
+### Build errors
 
-**Cause:** GoSPL Python package not found.
+| Message | Cause and fix |
+|---------|---------------|
+| `cannot find -lpython3.11` | Wrong conda path. Make sure the `gospl` environment exists at `~/miniconda3/envs/gospl` with Python 3.11, or update `CONDA_ENV_PATH` in the Makefile |
+| `cannot find -lgospl_extensions` | Extensions built elsewhere. Update `GOSPL_EXT_DIR` in the Makefile |
+| `gospl-driver.hpp: No such file` | `gospl_driver` is not in the DynEarthSol source directory |
 
-**Solution:** Ensure GoSPL is installed:
-```bash
-pip install gospl
-```
+### Runtime errors
 
-### "Cannot find gospl_config.yml"
+| Message | Cause and fix |
+|---------|---------------|
+| `GoSPL not initialized`, or an `ImportError` for `gospl` | The GoSPL Python package was not found. Activate the environment: `conda activate gospl` |
+| `No module named 'gospl_python_interface'` | Add the `gospl_extensions/cpp_interface` directory to `PYTHONPATH`, or use the `dynearthsol-gospl` wrapper |
+| `The input file is not found`, or `Cannot find gospl_config.yml` | Run from the directory that holds the YAML, or use an absolute path |
 
-**Cause:** Configuration file path is incorrect.
-
-**Solution:** Use an absolute path or ensure the file is in your working directory:
+Most of these come from a path assumption. Nearly all are fixed by editing a
+directory variable in the Makefile or by changing directory before running. To
+avoid depending on the working directory, use an absolute path:
 ```cfg
 surface_process_gospl_config_file = /full/path/to/gospl_config.yml
 ```
+
+### Intermittent PETSc error
+
+```
+Error in run_and_get_erosion: error code 77
+[0] Unexpected state: bad hmax in TSAdaptChoose()
+Error: GoSPL run_and_get_erosion failed
+```
+
+**Cause:** a floating-point edge case in PETSc's adaptive time stepper inside
+GoSPL's marine deposition solver. The run recovers: DynEarthSol skips applying
+erosion for that one step.
+
+**Avoiding it:** if sea level is well below the model surface, marine
+deposition is inactive anyway. Set `seadepo: false` in the GoSPL YAML to skip
+that code path entirely. Do this only when sea level is far below the surface,
+as it is in the worked example.
 
 ### Simulation runs slowly
 
@@ -251,6 +410,8 @@ gospl_coupling_frequency = 200
 
 ## Next Steps
 
+- Copy the example pair to start your own model, rather than writing configs from scratch
 - Learn about [GoSPL configuration options](https://gospl.readthedocs.io/)
-- See the [example configurations](https://github.com/GeoFLAC/DynEarthSol/tree/master/gospl_driver/examples)
+- See the [example configurations](https://github.com/GeoFLAC/DynEarthSol/tree/master/gospl_driver/examples) and their README for the parameter rationale
+- Read [`gospl_driver/README.md`](https://github.com/GeoFLAC/DynEarthSol/tree/master/gospl_driver/README.md) for the coupling in detail
 - Read the technical details in [`GOSPL_COUPLING.md`](https://github.com/GeoFLAC/DynEarthSol/tree/master/gospl_driver/GOSPL_COUPLING.md)
