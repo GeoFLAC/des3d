@@ -61,7 +61,10 @@ Installing locally for DynEarthSol integration...
 
 1. Set `use_gospl = 1` in Makefile.
 2. Set `GOSPL_EXT_DIR`: e.g., `GOSPL_EXT_DIR = $(HOME)/opt/gospl_extensions`
-3. Build **outside** the gospl environment, which keeps the compiler off
+3. Set `ndims = 3`, which is **required** for the GoSPL coupling.
+4. Set `usemmg = 1`, which is **recommended**: MMG mesh optimization during
+   remeshing (see [Adaptive mesh refinement with MMG](./usingmmg)).
+5. Build **outside** the gospl environment, which keeps the compiler off
    conda's libraries:
    ```bash
    conda deactivate   # if any environment is active
