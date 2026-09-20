@@ -87,3 +87,38 @@ automatically when `.info` is missing.
 ```
 
 -   Please do pay attention and follow given suggestions if any.
+
+## Exit codes
+
+DES3D exits with a two-digit code that is printed together with its category.
+The first digit is the category (`1x` is yours to fix, `2x` the environment,
+`3x`–`6x` the code itself) and the second the specific cause:
+
+| Code | Meaning |
+|------|---------|
+| `0` | Normal exit |
+| `10` / `11` | Config error / bad value or unknown option |
+| `12` | Malformed `.poly` or `.exo` file |
+| `20` / `21` / `22` | Cannot open file / read or write failed (HDF5) / restart mismatch |
+| `30` / `31` | Unsupported in this `NDIMS` / library not built in |
+| `40` / `41` / `42` | Triangle or TetGen / MMG / mesh quality or topology |
+| `50` / `51` / `52` | NaN or non-finite value / marker or geometry lookup / resource exhausted |
+| `60` / `61` | Assertion violated / unreachable branch |
+
+Errors in the configuration file stop the run with `10` or `11` and a message
+naming the problem. Scripts that test for specific exit statuses need
+updating: earlier builds used `1`, `2`, `10`, `11` and `12` with different
+meanings.
+
+## Initial stress
+
+By default (`initial_stress_option = 0`) the historical initialization is used.
+For zero-gravity models, set `initial_stress_option = 1` in the `[ic]` section
+to prescribe a homogeneous absolute stress tensor with `initial_stress`:
+
+```cfg
+[ic]
+initial_stress_option = 1
+# 2-D: [sxx, szz, sxz]    3-D: [sxx, syy, szz, sxy, sxz, syz]
+initial_stress = [sxx, szz, sxz]   # replace with your values (Pa)
+```
