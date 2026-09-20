@@ -110,15 +110,26 @@ DES3D and GoSPL exchange data following the **ASPECT-FastScape simple
 coupling scheme**:
 
 1. **DES → GoSPL:** At each coupling event, DES passes time-averaged
-   surface velocities (Δcoord/Δt over the coupling interval) to GoSPL.
-   Time-averaging filters out quasi-dynamic inertial oscillations that
-   would otherwise perturb GoSPL's drainage network.
-2. **GoSPL → DES:** GoSPL runs its landscape evolution (river incision,
-   hillslope diffusion, marine deposition) and returns elevation
-   increments Δh at every surface node.
-3. **Tectonic uplift accounting:** DES strips its own Lagrangian
-   vertical displacement from Δh before applying it, preventing
-   double-counting with GoSPL's erosion signal.
+   surface velocities to GoSPL. The velocity is $\overline{v} = \Delta
+   \mathrm{coord} / \Delta t$, where $\Delta\mathrm{coord}$ is the
+   displacement of each surface node since the *previous* coupling event and
+   $\Delta t$ is the model time elapsed since then. Time-averaging filters
+   out quasi-dynamic inertial oscillations that would otherwise perturb
+   GoSPL's drainage network. The first event has no previous event, so it
+   uses the instantaneous velocity.
+2. **GoSPL → DES:** GoSPL advances by $\Delta t$: it applies the
+   velocities (horizontal advection and vertical uplift), river incision and
+   hillslope diffusion, and returns an elevation change $\Delta h$ at
+   every surface node.
+3. **Tectonic uplift accounting:** $\Delta h$ contains *only* the erosion
+   and diffusion component. GoSPL subtracts the uplift
+   ($v_z \Delta t$) before returning it, because DES already applied the
+   same displacement through its Lagrangian mechanical solver; returning
+   the full change would count the tectonic uplift twice. DES adds
+   $\Delta h$ to the z-coordinates of its surface nodes. Note that
+   $\Delta h$ is not $\Delta\mathrm{coord}_z$: $\Delta\mathrm{coord}_z$
+   is DES's tectonic displacement, while $\Delta h$ is the surface-process
+   change added on top of it.
 4. **Persistent drainage state:** GoSPL's river network state is
    preserved across DES remeshing events so that drainage divides are
    not reset after mesh adaptation.
@@ -126,22 +137,28 @@ coupling scheme**:
    by a configurable padding fraction (`gospl_mesh_padding`, default
    0.1) to avoid edge artifacts during extension.
 
-```
-DES3D ──── surface velocities (Δcoord/Δt) ────► GoSPL
-  ▲                                                │
-  └────── elevation increments (Δh − uplift) ─────┘
-```
+One coupling event, between the previous event at $t_\mathrm{prev}$ and the
+current one at $t_\mathrm{now}$ (`gospl_coupling_frequency` DES steps apart in
+`steps` mode):
 
-Two details matter for interpreting results:
+```
+ DES time    t_prev   ────────── DES steps ──────────    t_now
+               │                                           │
+               │◄────────── Δt = t_now − t_prev ──────────►│
+               │                                           │
+          coord_prev                                   coord_now
+               └───── Δcoord = coord_now − coord_prev ─────┘
 
-- **Velocity is averaged, not instantaneous.** DynEarthSol's quasi-dynamic
-  formulation leaves damped-wave components in the instantaneous velocity;
-  averaging over the coupling interval filters them out. The first coupling
-  event falls back to the instantaneous value.
-- **Uplift is subtracted before returning.** GoSPL applies uplift internally,
-  but DynEarthSol has already moved the same material through its mechanical
-  solver. Only the erosion and diffusion part of Δh comes back; otherwise the
-  tectonic uplift would be counted twice.
+ At t_now:
+
+   DES ───────── v̄ = Δcoord / Δt  (vx, vy, vz) ─────────►  GoSPL
+                                                             │  advances Δt:
+                                                             │  advection, uplift,
+                                                             │  incision, diffusion
+   DES ◄──── Δh (erosion + diffusion, uplift removed) ───────┘
+
+   DES then sets   z_surface ← z_surface + Δh
+```
 
 ### What crosses the interface
 
