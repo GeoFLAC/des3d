@@ -55,6 +55,11 @@ exits if the target file does not look like a valid VTKHDF file.
 :::caution HDF5 file locking
 On some parallel or network filesystems, HDF5 file locking can cause a
 `BlockingIOError`. DES3D disables HDF5 locking automatically when
-writing VTKHDF output. If you encounter this error when running `2vtk.py`
+writing VTKHDF output, so ParaView can open a frame while a run is still
+writing it. If you encounter this error when running `2vtk.py`
 externally, set `HDF5_USE_FILE_LOCKING=FALSE` in your environment.
+
+The trade-off: with locking off, two runs that share a `modelname` are no
+longer refused, and will corrupt each other's file. Give every run its own
+`modelname`.
 :::

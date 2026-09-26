@@ -106,7 +106,13 @@ The first digit is the category (`1x` is yours to fix, `2x` the environment,
 | `60` / `61` | Assertion violated / unreachable branch |
 
 Errors in the configuration file stop the run with `10` or `11` and a message
-naming the problem. Scripts that test for specific exit statuses need
+naming the problem. For example, every `mattype_*` index is checked against
+`num_materials` at startup, and an out-of-range one exits with `11` naming the
+parameter.
+
+A NaN velocity stops the run with `50` instead of continuing to write frames.
+The run prints a single line summarizing the affected fields, their counts and
+the first bad element and node. Scripts that test for specific exit statuses need
 updating: earlier builds used `1`, `2`, `10`, `11` and `12` with different
 meanings.
 

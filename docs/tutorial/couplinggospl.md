@@ -28,6 +28,12 @@ Before starting, ensure you have:
 - ✅ DynEarthSol compiled with GoSPL support (the source tree must include the
   `gospl_driver` directory), which needs a C++ toolchain and `make`
 
+:::tip Skip the setup with Docker
+`GOSPL=1 ./build.sh` builds an image with the conda environment,
+`gospl_extensions` and a 3D executable already inside. If you use it, jump to
+[Run with Docker](#run-with-docker).
+:::
+
 ### Install GoSPL through conda
 Recommended by GoSPL users. Refer to https://gospl.readthedocs.io/en/latest/getting_started/installConda.html.
 
@@ -312,6 +318,19 @@ In this example,
 - the mesh is generated automatically and saved as `gospl_mesh.npz` in your working directory.
 - DynEarthSol outputs will be saved in the working directory.
 - GoSPL outputs will be saved in the `coupling_test` directory. 
+
+### Run with Docker
+
+`GOSPL=1 ./build.sh` in the DynEarthSol repository root builds the image
+`dynearthsol/gcc-11-gospl`. It has the `gospl` conda environment (activated in
+every login shell), `gospl_extensions` and a 3D `dynearthsol3d` already inside,
+so none of the setup above is needed on the host. Mount the directory holding
+your `.cfg` and GoSPL YAML and run from it:
+
+```bash
+docker run --rm -it -v /path/to/case:/home/human/case dynearthsol/gcc-11-gospl \
+  bash -lc 'cd ~/case && ~/DynEarthSol/dynearthsol-gospl your_input.cfg'
+```
 
 ## Worked example: a Gaussian weak zone rift
 

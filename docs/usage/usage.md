@@ -4,7 +4,24 @@ sidebar_position: 1
 
 # Manual installation of DES3D
 
-Docker image coming soon!
+## Docker
+
+If you would rather not install the dependencies yourself, build a Docker
+image from the repository root. `build.sh` sets the dimension (`NDIMS=2`) and
+the compiler (`gcc-11`; also `gcc-8` and `clang-14`) at its top: edit them
+there or pass them in the environment.
+
+```console
+./build.sh
+docker run --rm -it dynearthsol/gcc-11
+```
+
+`GOSPL=1 ./build.sh` builds `dynearthsol/gcc-11-gospl` instead: a 3D executable
+with GoSPL coupling, the `gospl` conda environment and `gospl_extensions`
+included, so no conda setup is needed on the host. See
+[Coupling with GoSPL](../tutorial/couplinggospl.md#run-with-docker) for how to run it.
+
+The rest of this page covers building from source.
 
 ## Requirements
 
