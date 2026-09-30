@@ -1,5 +1,6 @@
 import type {ReactNode} from 'react';
 import clsx from 'clsx';
+import Link from '@docusaurus/Link';
 import Heading from '@theme/Heading';
 import styles from './styles.module.css';
 
@@ -7,6 +8,7 @@ type FeatureItem = {
   title: string;
   Svg: React.ComponentType<React.ComponentProps<'svg'>>;
   description: ReactNode;
+  link: string;
 };
 
 const FeatureList: FeatureItem[] = [
@@ -18,6 +20,7 @@ const FeatureList: FeatureItem[] = [
         Lagrangian finite element code for tectonic modeling.
       </>
     ),
+    link: '/docs/intro',
   },
   {
     title: 'Quickstart',
@@ -27,6 +30,17 @@ const FeatureList: FeatureItem[] = [
         Get started with DES3D with a quick read about configuring and building it.
       </>
     ),
+    link: '/docs/usage',
+  },
+  {
+    title: 'Tutorials',
+    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    description: (
+      <>
+        Detailed description of some non-trivial examples that come with DES3D.
+      </>
+    ),
+    link: '/docs/category/tutorial',
   },
   {
     title: 'Theory',
@@ -37,28 +51,22 @@ const FeatureList: FeatureItem[] = [
         constitutive laws, and more.
       </>
     ),
-  },
-  {
-    title: 'Tutorials',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
-    description: (
-      <>
-        Detailed description of some non-trivial examples that come with DES3D.
-      </>
-    ),
+    link: '/docs/category/theory',
   },
 ];
 
-function Feature({title, Svg, description}: FeatureItem) {
+function Feature({title, Svg, description, link}: FeatureItem) {
   return (
     <div className={clsx('col col--3')}>
-      <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
-      </div>
-      <div className="text--center padding-horiz--md">
-        <Heading as="h3">{title}</Heading>
-        <p>{description}</p>
-      </div>
+      <Link to={link} className={styles.featureLink}>
+        <div className="text--center">
+          <Svg className={styles.featureSvg} role="img" />
+        </div>
+        <div className="text--center padding-horiz--md">
+          <Heading as="h3">{title}</Heading>
+          <p>{description}</p>
+        </div>
+      </Link>
     </div>
   );
 }
