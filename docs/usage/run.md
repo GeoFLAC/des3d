@@ -72,6 +72,45 @@ Frame files (HDF5 and plain binary) now also embed the full `.info` row
 files alone; `restart()` also falls back to this embedded metadata
 automatically when `.info` is missing.
 
+## Provenance
+
+Every build, run and frame records where it came from:
+
+| What | Where |
+|---|---|
+| The build | in the executable, as a `build.snapshot` block: `strings <exe> \| grep '^build\.snapshot\.'` |
+| The run | in `<modelname>.manifest`, beside the model's output |
+| Each frame or checkpoint | a `/provenance` group (HDF5) or a `provenance` record (des-binary) in the file itself |
+
+The manifest uses the cfg format: `[runtime.model]`, `[runtime.host]`, `[runtime.device]`,
+`[runtime.threads]` and `[runtime.env]` first, then the build's own `[build.*]` sections, closed
+by `[runtime.end]` once the time loop ends (a record without it died, was killed, or is still
+running). Its first fields, `end_time`, `stopped_by` and `wall_time`, are enough to see how every
+run of a sweep ended:
+
+```console
+grep -A3 '^[runtime.end]' */*.manifest
+```
+
+A restart appends its record rather than starting the file over. The same sections print to the
+screen once at run start, one line each as `[build][...]` then `[runtime][...]`; set
+`sim.has_runtime_info_display = no` to silence them:
+
+```cfg
+[sim]
+has_runtime_info_display = no
+```
+
+`make snapshot_diff=1` (off by default) also embeds the working-tree diff in the executable, so
+`build.code-changes` in the manifest is more than a note that it wasn't captured.
+
+A GPU build that finds no device exits `52` (see [Exit codes](#exit-codes)) after appending its
+manifest record, so the attempt is on record even though the run never started.
+
+The full field-by-field reference is
+[`doc/provenance.md`](https://github.com/GeoFLAC/DynEarthSol/blob/master/doc/provenance.md) in
+the DynEarthSol repository.
+
 ## Run-time warnings
 
 -   While running, DES3D might print warnings on screen. An example is
@@ -112,9 +151,10 @@ parameter.
 
 A NaN velocity stops the run with `50` instead of continuing to write frames.
 The run prints a single line summarizing the affected fields, their counts and
-the first bad element and node. Scripts that test for specific exit statuses need
-updating: earlier builds used `1`, `2`, `10`, `11` and `12` with different
-meanings.
+the first bad element and node. A GPU build that finds no device at startup
+exits `52`, after appending its manifest record — see [Provenance](#provenance).
+Scripts that test for specific exit statuses need updating: earlier builds used
+`1`, `2`, `10`, `11` and `12` with different meanings.
 
 ## Initial stress
 
