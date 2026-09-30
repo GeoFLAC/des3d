@@ -14,7 +14,7 @@ type FeatureItem = {
 const FeatureList: FeatureItem[] = [
   {
     title: 'What is DES3D?',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    Svg: require('@site/static/img/card-intro-mesh.svg').default,
     description: (
       <>
         Lagrangian finite element code for tectonic modeling.
@@ -24,7 +24,7 @@ const FeatureList: FeatureItem[] = [
   },
   {
     title: 'Quickstart',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    Svg: require('@site/static/img/card-quickstart-terminal.svg').default,
     description: (
       <>
         Get started with DES3D with a quick read about configuring and building it.
@@ -34,7 +34,7 @@ const FeatureList: FeatureItem[] = [
   },
   {
     title: 'Tutorials',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    Svg: require('@site/static/img/card-tutorials-book.svg').default,
     description: (
       <>
         Detailed description of some non-trivial examples that come with DES3D.
@@ -44,7 +44,7 @@ const FeatureList: FeatureItem[] = [
   },
   {
     title: 'Theory',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    Svg: require('@site/static/img/card-theory-atom.svg').default,
     description: (
       <>
         Theoretical and numerical foundations: time integration, remeshing,
