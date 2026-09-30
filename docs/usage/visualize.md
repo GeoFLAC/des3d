@@ -26,6 +26,25 @@ be visualized with [ParaView](https://paraview.org) or
 
 Some outputs can be disabled by editing `2vtk.py` and `output.cxx`.
 
+### Restarted models
+
+`2vtk.py` follows a restarted model's `.manifest` back to its parent, so the
+whole series converts as one:
+
+```console
+2vtk.py modelname-r
+```
+
+Without `-g`, frames from the parent that were already converted are linked
+in under the restarted name (`modelname-r.000000.vtu -> modelname.000000.vtu`,
+and so on); any parent frame with no `.vtu` yet prints a warning naming it,
+instead of being silently skipped. `2vtk.py -g modelname-r` converts the
+parent's frames first, so the series runs from frame 0.
+
+Each frame also carries its own origin — which model and machine wrote it,
+and, on a restart, what it restarted from — as described in
+[Provenance](./run#provenance).
+
 ## VTKHDF output format
 
 DES3D can write output in the **VTKHDF** format (`.vtkhdf`), a
@@ -44,6 +63,11 @@ completed run.
 ```console
 2vtk.py --update-vtkhdf modelname.vtkhdf
 ```
+
+Combined with `-g` on a restarted model, `2vtk.py -u -g modelname-r.vtkhdf`
+writes a `.vtkhdf.series` file in place alongside it, one entry per frame
+across the whole restart chain, so ParaView opens the run as a single series
+instead of one file per restart leg.
 
 **Requirements:** `h5py` must be installed (`pip install h5py` or
 `conda install h5py`).
