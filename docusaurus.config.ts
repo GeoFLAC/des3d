@@ -112,10 +112,19 @@ const config: Config = {
       },
       items: [
         {
-          type: 'docSidebar',
-          sidebarId: 'usermanualSidebar',
+          to: '/docs/intro',
           position: 'left',
-          label: 'User Manual',
+          label: 'Introduction',
+        },
+        {
+          to: '/docs/usage',
+          position: 'left',
+          label: 'Usage',
+        },
+        {
+          to: '/docs/tutorial',
+          position: 'left',
+          label: 'Tutorial',
         },
         // {to: '/blog', label: 'Blog', position: 'left'},
         // {
