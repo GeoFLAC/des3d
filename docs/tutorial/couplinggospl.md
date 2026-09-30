@@ -371,7 +371,7 @@ cd DynEarthSol/gospl_driver/examples
 Watch for the coupling messages in the log. Output is written to
 `output_gaussian_weakzone_3D/` every 20 kyr.
 
-![Plastic strain in DynEarthSol (left) and topography with flow accumulation in GoSPL (right) at 0.12, 0.24, 0.36 and 0.48 Myr](./img/DES-goSPL.png)
+![Plastic strain in standalone DynEarthSol (left), coupled DynEarthSol (middle) and topography with flow accumulation in GoSPL (right) at 0.12, 0.24, 0.36 and 0.48 Myr](./img/DES_standalone_coupled_comparison.png)
 
 Things to look for as the run proceeds:
 
