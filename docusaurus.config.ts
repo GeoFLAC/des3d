@@ -126,6 +126,11 @@ const config: Config = {
           position: 'left',
           label: 'Tutorial',
         },
+        {
+          to: '/docs/category/theory',
+          position: 'left',
+          label: 'Theory',
+        },
         // {to: '/blog', label: 'Blog', position: 'left'},
         // {
         //   href: 'https://github.com/facebook/docusaurus',
@@ -151,6 +156,10 @@ const config: Config = {
             {
               label: 'Tutorial',
               to: '/docs/category/tutorial',
+            },
+            {
+              label: 'Theory',
+              to: '/docs/category/theory',
             },
           ],
         },
