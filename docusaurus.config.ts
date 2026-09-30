@@ -122,7 +122,7 @@ const config: Config = {
           label: 'Usage',
         },
         {
-          to: '/docs/tutorial',
+          to: '/docs/category/tutorial',
           position: 'left',
           label: 'Tutorial',
         },
@@ -150,7 +150,7 @@ const config: Config = {
             },
             {
               label: 'Tutorial',
-              to: '/docs/tutorial',
+              to: '/docs/category/tutorial',
             },
           ],
         },

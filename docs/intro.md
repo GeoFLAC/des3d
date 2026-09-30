@@ -14,6 +14,8 @@ lithosphere but certainly not limited to it.
 
 Choi, E., Tan, E., Lavier, L. L., & Calo, V. M. (2013). DynEarthSol2D: An efficient unstructured finite element method to study long-term tectonic deformation. *Journal of Geophysical Research: Solid Earth*, 118(5), 2429–2444. DOI:[10.1002/jgrb.50148](https://doi.org/10.1002/jgrb.50148)
 
+Shyu, C. J., Lee, S., Ding, X., Keum, J., Tan, E., Lavier, L. L., & Choi, E. (2026). DynEarthSol v2.0: An efficient explicit Lagrangian solver for geodynamics, surface processes, and earthquake-cycle dynamics. *EGUsphere* [preprint, in review for *Solid Earth*]. DOI:[10.5194/egusphere-2026-2922](https://doi.org/10.5194/egusphere-2026-2922)
+
 <!-- Check out the `usage`{.interpreted-text role="doc"} section for further
 information, including `installation`{.interpreted-text role="ref"}. -->
 
