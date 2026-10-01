@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 340" role="img">
+  <title>Cross-section of a two-segment conjugate normal fault system (weakzone_option = 5)</title>
+  <rect x="0" y="0" width="760" height="340" fill="#ffffff"/>
+
+  <!-- domain box: x 0-200 km, depth 0-50 km, scale 3 px/km, origin (60,60) -->
+  <rect x="60" y="60" width="600" height="150" fill="#f3f2f1" stroke="#2d2b2b" stroke-width="2"/>
+
+  <!-- segment domain divider at x = 100 km -->
+  <line x1="360" y1="60" x2="360" y2="210" stroke="#2d2b2b" stroke-width="1.5" stroke-dasharray="6 5" opacity="0.6"/>
+
+  <!-- width dimension: 200 km -->
+  <line x1="60" y1="38" x2="660" y2="38" stroke="#2d2b2b" stroke-width="1.5"/>
+  <path d="M60,38 l10,-4 M60,38 l10,4" stroke="#2d2b2b" stroke-width="1.5" fill="none"/>
+  <path d="M660,38 l-10,-4 M660,38 l-10,4" stroke="#2d2b2b" stroke-width="1.5" fill="none"/>
+  <text x="360" y="28" text-anchor="middle" font-size="15" font-family="sans-serif" fill="#2d2b2b">200 km</text>
+
+  <!-- depth dimension: 50 km -->
+  <line x1="34" y1="60" x2="34" y2="210" stroke="#2d2b2b" stroke-width="1.5"/>
+  <path d="M34,60 l-4,10 M34,60 l4,10" stroke="#2d2b2b" stroke-width="1.5" fill="none"/>
+  <path d="M34,210 l-4,-10 M34,210 l4,-10" stroke="#2d2b2b" stroke-width="1.5" fill="none"/>
+  <text x="34" y="135" text-anchor="middle" font-size="15" font-family="sans-serif" fill="#2d2b2b"
+        transform="rotate(-90 34 135)">50 km</text>
+
+  <!-- fault 1: azimuth 0, inclination 60, x0 = 70 km -->
+  <line x1="313.3" y1="60" x2="226.7" y2="210" stroke="#e2533d" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="313.3" cy="60" r="4.5" fill="#2d2b2b"/>
+  <circle cx="226.7" cy="210" r="4.5" fill="#2d2b2b"/>
+
+  <!-- fault 2: azimuth 180, inclination 60, x0 = 130 km -->
+  <line x1="406.7" y1="60" x2="493.3" y2="210" stroke="#e2533d" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="406.7" cy="60" r="4.5" fill="#2d2b2b"/>
+  <circle cx="493.3" cy="210" r="4.5" fill="#2d2b2b"/>
+
+  <!-- x0 tick marks and labels at the surface -->
+  <line x1="313.3" y1="50" x2="313.3" y2="60" stroke="#2d2b2b" stroke-width="1.5"/>
+  <text x="313.3" y="46" text-anchor="middle" font-size="12" font-family="sans-serif" fill="#2d2b2b">x&#8320;=70 km</text>
+  <line x1="406.7" y1="50" x2="406.7" y2="60" stroke="#2d2b2b" stroke-width="1.5"/>
+  <text x="406.7" y="46" text-anchor="middle" font-size="12" font-family="sans-serif" fill="#2d2b2b">x&#8320;=130 km</text>
+
+  <!-- per-segment labels -->
+  <text x="75" y="100" font-size="13" font-family="sans-serif" fill="#2d2b2b">Segment 1</text>
+  <text x="75" y="116" font-size="12" font-family="sans-serif" fill="#555">azimuth 0&#176;</text>
+  <text x="75" y="131" font-size="12" font-family="sans-serif" fill="#555">incl. 60&#176;</text>
+
+  <text x="500" y="165" font-size="13" font-family="sans-serif" fill="#2d2b2b">Segment 2</text>
+  <text x="500" y="181" font-size="12" font-family="sans-serif" fill="#555">azimuth 180&#176;</text>
+  <text x="500" y="196" font-size="12" font-family="sans-serif" fill="#555">incl. 60&#176;</text>
+
+  <!-- per-half domain bounds -->
+  <text x="210" y="227" text-anchor="middle" font-size="12" font-family="sans-serif" fill="#555">segment 1: x &#8712; [0, 100] km</text>
+  <text x="510" y="227" text-anchor="middle" font-size="12" font-family="sans-serif" fill="#555">segment 2: x &#8712; [100, 200] km</text>
+
+  <!-- legend -->
+  <text x="60" y="255" font-size="14" font-family="sans-serif" font-weight="bold" fill="#2d2b2b">Multi-segment weak zone (weakzone_option = 5)</text>
+  <text x="60" y="275" font-size="13" font-family="sans-serif" fill="#2d2b2b">&#8226; two independently-bounded planar segments, dipping opposite ways</text>
+  <text x="60" y="293" font-size="13" font-family="sans-serif" fill="#2d2b2b">&#8226; half-width: 7.5 km (true perpendicular distance)</text>
+  <text x="60" y="311" font-size="13" font-family="sans-serif" fill="#2d2b2b">&#8226; depth range: the full column, 0&#8211;50 km</text>
+</svg>

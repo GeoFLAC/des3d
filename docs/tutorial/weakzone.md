@@ -64,6 +64,8 @@ weakzone_segments_depth_min = [0.0, 0.0]
 weakzone_segments_depth_max = [1.0, 1.0]
 ```
 
+![Cross-section of the two-segment conjugate normal fault system above: Segment 1 dips at 60° toward -x and Segment 2 at 60° toward +x, the two converging near the surface and diverging with depth, each confined to its own half of the domain](./img/multisegment_weakzone_crosssection.svg)
+
 See `examples/conjugate-faults-3d.cfg` for this two-segment conjugate
 normal-fault setup in full.
 
@@ -107,8 +109,8 @@ weakzone_gaussian_amplitude = -4000  # x-shift at peak (m)
 weakzone_standard_deviation = 1e4    # sigma along y (m)
 ```
 
-![A Gaussian along-strike weak zone in a 100 km × 80 km × 10 km domain: a 45°-dipping fault centered at x = 50 km, bulging along strike with a 4 km amplitude and a 10 km standard deviation](./img/gaussian_initial_weakzone.png)
-
 See [`gospl_driver/examples/gaussian-weakzone-3d-with-gospl.cfg`](https://github.com/GeoFLAC/DynEarthSol/blob/master/gospl_driver/examples/gaussian-weakzone-3d-with-gospl.cfg)
 for this exact configuration, combined with GoSPL surface-process
 coupling — see [Coupling with GoSPL](./couplinggospl).
+
+![A Gaussian along-strike weak zone in a 100 km × 80 km × 10 km domain: a 45°-dipping fault centered at x = 50 km, bulging along strike with a 4 km amplitude and a 10 km standard deviation](./img/gaussian_initial_weakzone.png)
