@@ -1,0 +1,433 @@
+---
+sidebar_position: 6
+title: Rate-and-state friction (2D)
+description: Run and interpret slow loading, rapid slip and VS–VW–VS creep in a finite-width shear band.
+---
+
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+# Rate-and-state friction in a finite-width shear band
+
+This tutorial uses two small 2D DynEarthSol models to follow slow loading,
+rapid slip and recovery. You will run a uniform velocity-weakening (VW) band,
+then compare it with a VW patch between velocity-strengthening (VS) flanks.
+Five figures connect the model inputs to its time histories and spatial response.
+
+## What is rate-and-state friction?
+
+Rate-and-state friction describes resistance that depends on sliding rate and
+a state variable, θ, which evolves with the deformation history. The parameters
+`a` and `b` control the frictional response: at steady sliding, `a−b > 0` is
+velocity strengthening and `a−b < 0` is velocity weakening. Velocity weakening
+can promote instability; the surrounding stiffness, loading and state evolution
+also matter.
+
+Here frictional deformation occupies a **2 km thick band**, rather than an
+infinitely thin fault. Our displacement measure is the horizontal displacement
+of the upper band interface minus that of the lower interface. It includes
+elastic deformation as well as localized inelastic deformation.
+
+By the end, you should be able to connect a slip-speed peak to displacement
+accumulation, stress release and a reduction in the solver time step, and explain
+why the VS flanks creep while the central VW patch accumulates a displacement
+deficit and then catches up.
+
+## Prerequisites
+
+Download and extract the <a href={useBaseUrl('/downloads/des-rsf/DES-RSF-Tutorial.zip')}>workshop files</a>. They contain
+`Tutorial.ipynb`, a browser-readable `Tutorial.html`, model inputs, reference
+outputs and the data behind the five figures.
+
+Use Linux, macOS or Windows Subsystem for Linux (WSL). On Windows, run both DES
+and Jupyter inside WSL. You need a C++ compiler, Make, Boost.Program_options,
+HDF5 and Python 3.10 or later. The commands below use the Debian/Ubuntu HDF5
+paths; adjust them for another installation.
+
+### Build and check DES
+
+This exercise was checked against the public DES revision
+[`1b4e94f1c333fdade9dc512cf9cb20e10e8e9aad`](https://github.com/GeoFLAC/DynEarthSol/tree/1b4e94f1c333fdade9dc512cf9cb20e10e8e9aad).
+Use a separate checkout so an existing working copy is preserved.
+
+```bash
+git clone --recursive https://github.com/GeoFLAC/DynEarthSol.git DynEarthSol-tutorial
+cd DynEarthSol-tutorial
+git checkout 1b4e94f1c333fdade9dc512cf9cb20e10e8e9aad
+git submodule update --init --recursive
+make -j2 ndims=2 opt=2 openmp=1 hdf5=1 \
+  HDF5_INCLUDE_DIR=/usr/include/hdf5/serial \
+  HDF5_LIB_DIR=/usr/lib/x86_64-linux-gnu/hdf5/serial
+export DYNEXE="$PWD/dynearthsol2d"
+export OMP_NUM_THREADS=1
+export OMP_DYNAMIC=FALSE
+"$DYNEXE" --help
+```
+
+Check that the help lists `rsf_slip_rate_projection_option`, `rsf_dtheta_max`
+and `use_global_velocity_scaling`. The executable must be a 2D HDF5 build.
+Keep this terminal open so `DYNEXE` remains defined. The mesh is small enough
+that one OpenMP thread is appropriate.
+
+### Prepare Python
+
+Change to the extracted `DES-RSF-Tutorial` directory, then run:
+
+```bash
+export TUTORIAL_DIR="$PWD"
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r resources/requirements.txt
+python -m jupyterlab
+```
+
+Open `Tutorial.ipynb`. Run the shell commands below in a JupyterLab terminal;
+the Python blocks are notebook cells for analysis. If opening a separate shell,
+set `DYNEXE` again to the absolute path of the executable you built, and set
+`OMP_NUM_THREADS=1` and `OMP_DYNAMIC=FALSE` there as well.
+
+To study the results without running DES, use the supplied reference paths in
+the notebook's setup cell. The reference figures and numerical data are included
+in the download; no solver is needed for that route.
+
+## How the model works
+
+The model is 100 km wide and 10 km deep. A horizontal band lies between depths
+of 4 and 6 km. The upper boundary moves in the positive x direction at
+10⁻⁹ m/s and has zero vertical velocity; the bottom is fixed. The side boundaries
+do not impose a velocity. Both examples use the same geometry and loading.
+
+![Figure 1: model geometry, monitor positions and the friction contrast in both examples.](./img/des-rsf/01_model_and_friction.png)
+
+*Figure 1.* P0 and P1 sample opposite faces of the band near x = 50 km; P2
+samples its interior. The upper geometry panel exaggerates depth by 2.5×.
+The lower panels show the frictional contrast in the two examples.
+
+| Setting | Value |
+| --- | --- |
+| Domain / band thickness | 100 × 10 km / 2 km |
+| Central patch | x = 45–55 km |
+| Density / bulk modulus / shear modulus | 2700 kg/m³ / 50 GPa / 30 GPa |
+| Band cohesion / characteristic distance | 4 MPa / 0.005 m |
+| Reference and loading velocity | 10⁻⁹ m/s |
+| Nominal mesh resolution | 400 m |
+| Model duration | 850 years |
+
+### Geometry, material IDs and friction
+
+`decollement.poly` defines 14 vertices, 18 segments and five material regions.
+The band order from left to right is **3–2–1**, while arrays in `[mat]` are
+indexed by material ID **0,1,2,3,4**. The lower and upper hosts are IDs 0 and 4.
+Their very large cohesion keeps them elastic in this exercise.
+
+| Case / region | Material ID | a | b | a−b |
+| --- | --- | ---: | ---: | ---: |
+| Example 1: entire band | 1, 2, 3 | 0.003 | 0.015 | −0.012 |
+| Example 2: left VS | 3 | 0.011 | 0.001 | +0.010 |
+| Example 2: central VW | 2 | 0.011 | 0.017 | −0.006 |
+| Example 2: right VS | 1 | 0.011 | 0.001 | +0.010 |
+
+Both examples use `state_var_model=1` and the same characteristic distance.
+The two cfg files already contain these assignments. The `.poly` vertices at
+(50, −4) and (50, −6) km let P0/P1 match the interface at x = 50 km; they do
+not introduce another material division. The annotated `resources/POLY_GUIDE.md`
+in the download explains the point, segment and region blocks.
+
+### What is measured?
+
+P0/P1 provide the signed across-band speed `vx(P0) − vx(P1)` and the change
+in their relative horizontal position. Figures 2–3 show the absolute speed,
+but displacement is calculated from coordinates, not by integrating absolute
+speed. P2 provides local shear stress and θ.
+
+Figure 5 instead interpolates displacement along both band interfaces at the
+same initial x positions. This lets the spatial profiles and the VS/VW time
+histories use exactly the same quantity.
+
+## Quick start: run Example 1
+
+### Step 1: prepare and inspect the inputs
+
+Start in the extracted tutorial directory. Use a fresh run-directory name when
+repeating a calculation; `mkdir` below deliberately stops if it already exists.
+
+```bash
+export TUTORIAL_DIR="$PWD"
+export OMP_NUM_THREADS=1
+export OMP_DYNAMIC=FALSE
+mkdir -p "$TUTORIAL_DIR/results"
+export RUN_DIR="$TUTORIAL_DIR/results/example1"
+mkdir "$RUN_DIR" && mkdir "$RUN_DIR/output" && \
+  cp resources/models/example1_uniform_vw.cfg resources/models/decollement.poly "$RUN_DIR/"
+sed -n '/^\[mat\]/,/^\[monitor\]/p' "$RUN_DIR/example1_uniform_vw.cfg"
+```
+
+In `[sim]`, `max_time_in_yr=850` is physical model time. The normal field-save
+interval is 25 model years; `earthquake_output_step_interval=1000` requests
+more frequent fields during a detected rapid episode. Monitor points are
+saved every ten solver steps. These are output intervals, not the solver's
+physical time step.
+
+### Step 2: run DES and inspect its output
+
+```bash
+cd "$RUN_DIR"
+"$DYNEXE" example1_uniform_vw.cfg
+```
+
+Wait for the solver to finish successfully. Confirm the startup log reports
+one OpenMP thread. Then inspect the files:
+
+```bash
+head -n 2 output/monitor_point_0.csv
+head -n 2 output/monitor_point_1.csv
+head -n 2 output/monitor_point_2.csv
+ls output/model.save.*.vtkhdf | head
+printf 'Example 1 output: %s\n' "$RUN_DIR"
+```
+
+CSV coordinates and displacement use metres, velocities m/s, times seconds
+and stresses Pa. Compare the requested `query_x/query_z` with the selected
+`coord_x/coord_z`: P0/P1 should match x = 50000 m exactly, while P2 can use a
+nearby interior mesh node. VTKHDF `save` files contain spatial fields;
+`chkpt` files are restart checkpoints.
+
+### Step 3: load the results in the notebook
+
+The notebook starts in the tutorial directory, independently of the terminal's
+current directory. Set `RUN` to your Example 1 output and `SECOND` to the
+Example 2 directory you will create below. For the no-solver route, uncomment
+the two reference assignments.
+
+```python
+from pathlib import Path
+import sys
+import numpy as np
+import h5py
+
+ROOT = Path.cwd().resolve()
+assert (ROOT / "resources/tutorial_tools.py").is_file(), "Open the notebook in the tutorial directory."
+sys.path.insert(0, str(ROOT / "resources"))
+import tutorial_tools as tt
+
+RUN = ROOT / "results/example1"
+SECOND = ROOT / "results/example2"
+# RUN = ROOT / "resources/reference/example1_uniform_vw"
+# SECOND = ROOT / "resources/reference/example2_vs_vw_vs"
+FIGURES = ROOT / "resources/figures"
+```
+
+```python
+history = tt.band_history(RUN)
+events = tt.find_events(history)
+for number, event in enumerate(events, start=1):
+    print(f"Event {number}: {event['start_yr']:.3f} yr; "
+          f"peak speed {event['peak_relative_speed']:.3f} m/s")
+```
+
+The supplied Example 1 has two detected episodes, near 648.255 and 836.241
+years. Here an episode groups crossings of an across-band speed of 10⁻³ m/s;
+this analysis threshold is distinct from DES's automatic output trigger.
+
+## Worked example 1: from loading to rapid slip
+
+### Read the full history
+
+![Figure 2: speed, solver time step, displacement, shear stress and state over 850 model years.](./img/des-rsf/02_full_history.png)
+
+*Figure 2.* Read vertically at each event: speed rises, the physical time step
+shrinks, displacement increases abruptly, and shear stress drops. Stress then
+reloads. The time-step curve uses `dt_sec` saved by the solver, rather than
+the interval between field files.
+
+Saved time-step samples in this figure range from about 1.65 × 10⁶ s during
+slow loading to 4.0 × 10⁻⁴ s during rapid motion. They sample the solver history;
+the connecting lines do not resolve every intervening step. The time-step
+presentation follows the idea in [Lapusta et al. (2000), Figure 9](https://www.its.caltech.edu/~lapusta/Lapusta_et_al_JGR2000.pdf#page=18).
+
+Read actual solver steps from your own field files:
+
+```python
+dt_rows = []
+for row in tt.field_catalog(RUN):
+    with h5py.File(row["path"], "r") as field:
+        dt_rows.append((float(field["time_sec"][0]), float(field["dt_sec"][0])))
+dt_rows = np.asarray(dt_rows)
+print(f"Saved dt range: {dt_rows[:, 1].min():.3e} to {dt_rows[:, 1].max():.3e} s")
+```
+
+The published figures use denser field saves than the basic workshop cfg,
+so your saved extrema and available snapshot times may differ.
+
+### Follow one complete event
+
+![Figure 3: the first uniform-VW event from slow loading through rapid slip to recovery.](./img/des-rsf/03_event_mechanics.png)
+
+*Figure 3.* Time is measured from the sampled speed peak. The continuous
+symlog axis is linear within ±10 s and logarithmic outside, so both slow tails
+and the rapid interval remain visible. Shading spans the first to last
+10⁻³ m/s threshold exceedance in this episode.
+
+The sampled peak reaches approximately 1.92 m/s. Most displacement accumulates
+while the band moves rapidly and stress is released; the recovery continues
+well beyond the rapid interval. Equal distances along this time axis are not
+equal durations.
+
+```python
+event = events[0]
+time_from_peak = history["time_s"] - event["peak_time_s"]
+print(f"Sampled peak speed: {event['peak_relative_speed']:.3f} m/s")
+print(f"Threshold-crossing envelope: {event['span_s']:.3f} s")
+print(f"Local stress drop to the low-rate recovery sample: "
+      f"{event['local_shear_stress_drop_mpa']:.2f} MPa")
+```
+
+**Exercise 1.** Identify the loading, rapid-slip and recovery intervals in
+Figures 2–3. Then use `events[1]` to compare the second episode. Two episodes
+give one observed interval, not a recurrence distribution.
+
+## Worked example 2: a VW patch between VS flanks
+
+### Change the frictional contrast
+
+The second cfg changes the band friction values while preserving geometry,
+loading, cohesion and characteristic distance. The relevant arrays are:
+
+```ini
+direct_a = [0.003, 0.011, 0.011, 0.011, 0.003]
+evolution_b = [0.015, 0.001, 0.017, 0.001, 0.015]
+```
+
+The centre is VW and the flanks are VS. Do not overwrite Example 1's cfg.
+Return to the tutorial directory in the same terminal and run the second case:
+
+```bash
+cd "$TUTORIAL_DIR"
+export SECOND_DIR="$TUTORIAL_DIR/results/example2"
+mkdir "$SECOND_DIR" && mkdir "$SECOND_DIR/output" && \
+  cp resources/models/example2_vs_vw_vs.cfg resources/models/decollement.poly "$SECOND_DIR/"
+cd "$SECOND_DIR"
+"$DYNEXE" example2_vs_vw_vs.cfg
+```
+
+After successful completion, return to the notebook:
+
+```python
+second_history = tt.band_history(SECOND)
+second_events = tt.find_events(second_history)
+for number, event in enumerate(second_events, start=1):
+    print(f"Event {number}: {event['start_yr']:.3f} yr; "
+          f"peak speed {event['peak_relative_speed']:.3f} m/s")
+```
+
+### Inspect the spatial response during rapid slip
+
+![Figure 4: divergence and out-of-plane curl of velocity during the first VS–VW–VS event.](./img/des-rsf/04_divergence_curl.png)
+
+*Figure 4.* Top: divergence of velocity. Bottom: its out-of-plane curl. Times
+are seconds after the first event's analysis threshold crossing. The bracket
+marks the central VW interval. The full band is visible, with values beyond
+each fixed colour range saturated.
+
+In the 2D x–z plane, these scalar diagnostics are
+`div v = ∂vx/∂x + ∂vz/∂z` and `curl_y v = ∂vx/∂z − ∂vz/∂x`, both in s⁻¹.
+They highlight dilatational and rotational motion around the slipping band.
+Derivatives are calculated directly within each linear triangular element on
+the current mesh, without smoothing.
+
+[View the velocity-gradient animation](./img/des-rsf/04_divergence_curl.gif).
+Its frames have nonuniform physical time intervals; read their timestamps
+rather than interpreting playback speed as physical time.
+
+This calculation retains adaptive mass scaling and damping. The gradients
+show the spatial mechanical response, but do not by themselves establish
+physical P/S wave speeds or isolate pure wave amplitudes. Large gradients
+inside the band also include its localized deformation.
+
+```python
+with np.load(FIGURES / "04_wavefield_data.npz") as data:
+    offsets = data["time_after_detection_s"].copy()
+    divergence = data["divergence"].copy()
+    curl_y = data["curl_y"].copy()
+index = int(np.argmin(abs(offsets - 5.8)))
+print(f"Field time after detection: {offsets[index]:.3f} s")
+print(f"Maximum absolute divergence: {np.max(abs(divergence[index])):.3e} 1/s")
+print(f"Maximum absolute curl_y: {np.max(abs(curl_y[index])):.3e} 1/s")
+```
+
+**Exercise 2.** Compare the four snapshots and the animation. Where are the
+largest gradients? How does the host response change as the slip accelerates
+and decays? Distinguish evidence for spatial motion from a measurement of a
+wave's propagation speed.
+
+### Compare creep and sudden displacement
+
+![Figure 5: successive displacement profiles and displacement histories at the VS flanks and VW centre.](./img/des-rsf/05_vs_vw_comparison.png)
+
+*Figure 5.* The upper panel plots cumulative relative displacement against
+position at successive times. Blue curves show interseismic accumulation;
+warm colours resolve the second rapid episode. The lower panel samples the
+same quantity at x = 25, 50 and 75 km. Circles and dotted lines identify the
+interseismic snapshots shown above.
+
+All curves use the same zero at 674.465 years, after the first event. VS
+flanks accumulate displacement steadily while the VW centre falls behind.
+Near 743.974 years, the centre makes a rapid displacement jump and catches up.
+The finite band still deforms between events: “locked” here means a relative
+displacement deficit, not exactly zero motion.
+
+Explore the supplied data behind this figure. These arrays belong to the
+illustrated reference run, regardless of the paths selected for your own runs.
+
+```python
+with np.load(FIGURES / "05_displacement_histories.npz") as data:
+    positions = data["x_km"].copy()
+    sample_times = data["time_s"].copy()
+    displacements = data["displacement_m"].copy()
+index = int(np.argmin(abs(sample_times / tt.YEAR - 740.8)))
+print(f"At {sample_times[index] / tt.YEAR:.3f} yr:")
+for x, displacement in zip(positions, displacements[index]):
+    print(f"  x = {x:.0f} km: {displacement:.3f} m")
+```
+
+**Exercise 3.** Explain how the central displacement deficit in the upper
+panel corresponds to the lower panel's slowly rising VW curve. Compare the
+VW jump with the VS increments across the same event. Why would three curves
+with separate arbitrary displacement offsets obscure this comparison?
+
+## Try a controlled variation
+
+Copy Example 2 into a new run directory and change only the central material's
+`evolution_b` entry. Keep track of its `a−b` value and compare displacement
+histories, maximum speed and local stress release. Do not assume that every
+VW configuration must produce an earthquake, or that changing friction leaves
+the event timing unchanged.
+
+For denser observations with unchanged physical parameters, the download also
+includes `figure2_dense.cfg`, `figure5_dense.cfg` and `figure4_wave.cfg`. Copy
+one together with `decollement.poly` into a fresh directory containing `output/`
+and pass its filename to DES, just as above. The first two run for 850 years;
+the wavefield case stops at 700 years and saves fields every ten steps. It can
+produce hundreds of megabytes of output. These are the observation settings
+used to prepare the figures; data and figures are already supplied for the
+workshop.
+
+## Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| Executable not found | Set `DYNEXE` to the absolute path of the compatible 2D executable, then check `test -x "$DYNEXE"`. |
+| Unknown RSF option | Check the solver revision and `--help`; an older generic DES build may lack these controls. |
+| `.poly` file not found | Run inside the case directory containing both the cfg and `decollement.poly`. |
+| No VTKHDF fields | Confirm an HDF5-enabled build and successful completion; look under the run's `output/`. |
+| Missing results in a notebook cell | Correct `RUN`/`SECOND`, or deliberately select the supplied reference paths. |
+| Very slow execution on a small mesh | Set `OMP_NUM_THREADS=1` and `OMP_DYNAMIC=FALSE` before starting DES. |
+| Event snapshots differ from a published figure | Check the cfg's output cadence and actual stored times; the basic workshop uses fewer field saves. |
+
+## Next steps
+
+Use the supplied `.poly` guide to change the central patch width, or compare
+both detected events without changing the inputs. Keep each run separate and
+record one change at a time.
+
+For the broader context, see the [DES documentation](https://geoflac.github.io/des3d/)
+and [Lapusta et al. (2000)](https://doi.org/10.1029/2000JB900250).
