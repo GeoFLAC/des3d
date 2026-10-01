@@ -339,7 +339,8 @@ directory holds a ready-to-run pair of files: a DES config,
 `gaussian-weakzone-3d-with-gospl.cfg`, and its GoSPL YAML,
 `gospl_config_gaussian_weakzone_3D.yml`. The parameters were chosen to match
 an ASPECT + FastScape reference model, so the results are comparable to
-published work.
+published work. The weak zone's Gaussian along-strike shift (`weakzone_option
+= 4`) is explained in [Weak zones](./weakzone#gaussian-along-strike-shift-weakzone_option--4).
 
 | | Setting |
 |---|---|
