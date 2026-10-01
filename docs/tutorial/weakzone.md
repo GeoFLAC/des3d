@@ -107,6 +107,8 @@ weakzone_gaussian_amplitude = -4000  # x-shift at peak (m)
 weakzone_standard_deviation = 1e4    # sigma along y (m)
 ```
 
+![A Gaussian along-strike weak zone in a 100 km × 80 km × 10 km domain: a 45°-dipping fault centered at x = 50 km, bulging along strike with a 4 km amplitude and a 10 km standard deviation](./img/gaussian_initial_weakzone.png)
+
 See [`gospl_driver/examples/gaussian-weakzone-3d-with-gospl.cfg`](https://github.com/GeoFLAC/DynEarthSol/blob/master/gospl_driver/examples/gaussian-weakzone-3d-with-gospl.cfg)
 for this exact configuration, combined with GoSPL surface-process
 coupling — see [Coupling with GoSPL](./couplinggospl).
