@@ -54,7 +54,7 @@ session usually isn't enough.
 :::
 
 ### Install GoSPL
-Recommended by GoSPL users. Refer to https://gospl.readthedocs.io/en/latest/getting_started/installConda.html.
+Refer to https://gospl.readthedocs.io/en/latest/getting_started/installConda.html.
 
 To recap the quickest way,
 
@@ -96,10 +96,13 @@ Installing locally for DynEarthSol integration...
 
 1. Set `use_gospl = 1` in Makefile.
 2. Set `GOSPL_EXT_DIR`: e.g., `GOSPL_EXT_DIR = $(HOME)/opt/gospl_extensions`
-3. Set `ndims = 3`, which is **required** for the GoSPL coupling.
-4. Set `usemmg = 1`, which is **recommended**: MMG mesh optimization during
+3. Check `CONDA_ENV_PATH`, the gospl environment. It defaults to
+   `$(HOME)/miniforge3/envs/gospl`, where the Miniforge install above puts it;
+   set it only if your environment is elsewhere.
+4. Set `ndims = 3`, which is **required** for the GoSPL coupling.
+5. Set `usemmg = 1`, which is **recommended**: MMG mesh optimization during
    remeshing (see [Adaptive mesh refinement with MMG](./usingmmg)).
-5. Build **outside** the gospl environment, which keeps the compiler off
+6. Build **outside** the gospl environment, which keeps the compiler off
    conda's libraries:
    ```bash
    conda deactivate   # if any environment is active
@@ -223,13 +226,15 @@ readable.
   step and GoSPL's step silently becomes DES's `dt`. There is no
   sub-stepping or truncation back to the nominal interval.
 - **Remeshing between coupling events.** The coupling clock is unaffected
-  by remeshing, and GoSPL's elevation state is not re-seeded from DES
-  afterwards (GoSPL owns the topography). However, the time-averaged
-  velocity only guards against a change in the *number* of surface nodes
-  across a remesh. If a remesh leaves that count unchanged (common when
-  only the interior remeshes), node identity is not verified and the
-  velocity for the next coupling event can difference unrelated nodes.
-  Treat the first coupling event after a remesh with caution.
+  by remeshing: Coupling occurs at the set schedule whether remeshing occurrs
+  during a coupled interval or not. GoSPL's elevation state is not re-seeded 
+  from DES afterwards: i.e., GoSPL owns thetopography. When remeshing occurs
+  and changes the surface node number, the average velocity cannot be computed 
+  and the instantaneous velocity is used instead. If a remesh leaves that count 
+  unchanged (uncommon but possible when only the interior remeshes), node 
+  identity is not verified and the velocity for the next coupling event can 
+  difference unrelated nodes. So, treat the first coupling event after a remesh 
+  with caution. 
 - **The GoSPL mesh is fixed at startup.** It is generated once, sized to the
   DES model's *initial* top surface plus `gospl_mesh_padding` on each side,
   and never regenerated (on restart an existing mesh file is reused as is).
@@ -246,14 +251,13 @@ readable.
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `surface_process_option` | 0 | Set to **11** to enable GoSPL |
-| `surface_process_gospl_config_file` | — | Path to your GoSPL YAML file |
+| `surface_process_gospl_config_file` | (empty) | Path to your GoSPL YAML file |
 | `gospl_coupling_mode` | `steps` | `steps` or `time` — controls what the coupling interval means |
 | `gospl_coupling_frequency` | 1 | GoSPL runs every N DES steps (used when `gospl_coupling_mode = steps`) |
-| `gospl_coupling_interval_in_yr` | — | GoSPL runs every T model years (used when `gospl_coupling_mode = time`) |
+| `gospl_coupling_interval_in_yr` | 1000 | GoSPL runs every T model years (used when `gospl_coupling_mode = time`) |
 | `gospl_velocity_coupling` | `true` | Pass surface velocities to GoSPL for smoother drainage-network evolution |
-| `gospl_mesh_resolution` | -1 | GoSPL grid spacing in meters (-1 = automatic) |
+| `gospl_mesh_resolution` | -1 | GoSPL grid spacing in meters (-1 = automatic: nx = ny = floor(√n_top) + 1) |
 | `gospl_mesh_padding` | 0.1 | Fractional domain padding for GoSPL mesh (avoids boundary artifacts) |
-| `gospl_initial_topo_amplitude` | 0.0 | Initial random topography (m) |
 | `gospl_mesh_perturbation` | 0.3 | Grid randomization (0–1) |
 
 :::info Coupling frequency tip
@@ -269,7 +273,6 @@ gospl_coupling_frequency = 100      # Run GoSPL every 100th DynEarthSol time ste
 gospl_velocity_coupling = true      # Pass surface velocities to GoSPL
 gospl_mesh_resolution = 500         # in meters
 gospl_mesh_padding = 0.1            # extend GoSPL mesh 10 % beyond DES domain
-gospl_initial_topo_amplitude = 0.0  # in meters. 0.0: initially flat
 gospl_mesh_perturbation = 0.3       # 30 % of random perturbations, +0.5/-0.5 x h
 ```
 
@@ -288,7 +291,7 @@ domain:
     npdata: ['./gospl_mesh','v','c','z']
     flowdir: 1
     seadepo: False
-    bc: '1000'
+    bc: 'oooo'   # boundary conditions per edge N,E,S,W (o=open, f=fixed, w=wall)
 
 output:
     dir: 'coupling_test' # Output directory
@@ -324,9 +327,37 @@ The keys you will change most often:
 | `spl: m`, `spl: n` | Drainage-area and slope exponents of the stream power law |
 | `diffusion: hillslopeKa` | Hillslope diffusivity, m²/yr |
 | `domain: flowdir` | Flow routing (`6` is multi-direction) |
-| `domain: bc` | Boundaries, in the order S, E, N, W: `0` open, `1` closed. `'1010'` opens east and west |
+| `domain: bc` | Boundaries, in the order N,E,S,W (o=open, f=fixed, w=wall): e.g., `'wowo'` opens east and west closing north and south |
 | `domain: seadepo` | Marine deposition on or off |
 | `sea: position` | Sea level in metres relative to the initial surface |
+
+### Output timing
+
+GoSPL writes output on its own clock, every `time: tout` years, but only at a
+coupling event. Each event runs GoSPL for one step, and GoSPL checks for output
+at that step's start and end. Its clock starts at `time: start` and advances by
+the coupling interval, so it trails DES time by whatever has accumulated since
+the last event. Three consequences:
+
+- **Outputs snap to coupling events.** A file is written at the first coupling
+  event at or after each multiple of `tout`. If the coupling interval divides
+  `tout`, as `gospl_coupling_mode = time` makes easy, outputs are exactly `tout`
+  apart; otherwise the spacing is uneven.
+- **A coupling interval longer than `tout` mislabels outputs.** Every event then
+  writes, but the time stamped in the output is the nominal one,
+  `start + k·tout`, which falls further behind the model time with each write.
+  In `steps` mode the interval in years varies with DES's adaptive time step, so
+  this can happen without you noticing.
+- **`dt` and `end` still matter.** DES overrides them for stepping, but when
+  GoSPL reads the YAML it raises `tout` to `dt` if smaller, and lowers it to
+  `end − start` if `start + tout > end`. Keep `dt ≤ tout` and `end` at least
+  the DES run length, `max_time_in_yr`.
+
+:::tip Align GoSPL and DES frames
+Set `tout` equal to DES's `output_time_interval_in_yr` and couple at a divisor
+of it. GoSPL frames still fall on coupling events, so they can sit up to one
+coupling interval from the matching DES frame.
+:::
 
 ### Step 3: Run your simulation
 
@@ -390,7 +421,7 @@ published work. The weak zone's Gaussian along-strike shift (`weakzone_option
 | Forcing | ±1.5 cm/yr extension in x; a Gaussian weak zone seeds the rift |
 | Duration | 1 Myr, output every 20 kyr, coupling every 200 steps |
 | Surface law | `K = 1e-5`, `m = 0.4`, `n = 1`, hillslope `Ka = 1e-2` m²/yr |
-| Boundaries | East and west open, north and south closed (`bc: '1010'`) |
+| Boundaries | East and west open, north and south fixed base-level outlets (`bc: 'fofo'`) |
 | Sea level | −2000 m, so marine processes stay inactive |
 
 ### Exercise 1: run the reference case
@@ -401,14 +432,14 @@ cd DynEarthSol/gospl_driver/examples   # the YAML path resolves from here
 ../../dynearthsol-gospl ./gaussian-weakzone-3d-with-gospl.cfg
 ```
 
-If you prefer to manage the environment yourself, set `PYTHONPATH` and use the
-same command:
+If you prefer to manage the environment yourself, set `PYTHONPATH` and run the
+executable directly:
 
 ```bash
 conda activate gospl
 export PYTHONPATH="$HOME/opt/gospl_extensions/cpp_interface:${PYTHONPATH}"
 cd DynEarthSol/gospl_driver/examples
-../../dynearthsol-gospl ./gaussian-weakzone-3d-with-gospl.cfg
+../../dynearthsol3d ./gaussian-weakzone-3d-with-gospl.cfg
 ```
 
 Watch for the coupling messages in the log. Output is written to
@@ -496,4 +527,3 @@ gospl_coupling_frequency = 200
 - Learn about [GoSPL configuration options](https://gospl.readthedocs.io/)
 - See the [example configurations](https://github.com/GeoFLAC/DynEarthSol/tree/master/gospl_driver/examples) and their README for the parameter rationale
 - Read [`gospl_driver/README.md`](https://github.com/GeoFLAC/DynEarthSol/tree/master/gospl_driver/README.md) for the coupling in detail
-- Read the technical details in [`GOSPL_COUPLING.md`](https://github.com/GeoFLAC/DynEarthSol/tree/master/gospl_driver/GOSPL_COUPLING.md)
