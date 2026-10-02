@@ -22,8 +22,7 @@ When coupled with DynEarthSol, you can study how tectonic processes (uplift, ext
 
 Before starting, ensure you have:
 
-- ✅ GoSPL installed through conda, with Python 3.11 in the environment
-  (by default at `~/miniconda3/envs/gospl`)
+- ✅ GoSPL installed through conda
 - ✅ `gospl_extensions`
 - ✅ DynEarthSol compiled with GoSPL support (the source tree must include the
   `gospl_driver` directory), which needs a C++ toolchain and `make`
@@ -32,10 +31,40 @@ Before starting, ensure you have:
 `GOSPL=1 ./build.sh` builds an image with the conda environment,
 `gospl_extensions` and a 3D executable already inside. If you use it, jump to
 [Run with Docker](#run-with-docker).
+
+On WSL, if the script fails with `docker: command not found`, install Docker
+Desktop on Windows, then enable it for WSL: Settings → Resources → WSL
+Integration → check "Enable integration with my default WSL distro".
+
+If instead you see
+
+```
+ERROR: permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock
+```
+
+add yourself to the `docker` group:
+
+```bash
+sudo usermod -aG docker $USER
+```
+
+then restart WSL for the new group membership to take effect (`wsl --shutdown`
+from Windows, then reopen the terminal) — a plain new shell in the same
+session usually isn't enough.
 :::
 
-### Install GoSPL through conda
+### Install GoSPL
 Recommended by GoSPL users. Refer to https://gospl.readthedocs.io/en/latest/getting_started/installConda.html.
+
+To recap the quickest way,
+
+```bash
+curl -fsSL "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-$(uname -m).sh" -o /tmp/miniforge.sh
+bash /tmp/miniforge.sh -b -p $HOME/miniforge3
+rm /tmp/miniforge.sh
+$HOME/miniforge3/bin/mamba create -y -n gospl -c geodels -c conda-forge gospl python=3.11
+$HOME/miniforge3/bin/conda clean -afy
+```
 
 ### Install gospl_extensions
 
@@ -324,12 +353,25 @@ In this example,
 `GOSPL=1 ./build.sh` in the DynEarthSol repository root builds the image
 `dynearthsol/gcc-11-gospl`. It has the `gospl` conda environment (activated in
 every login shell), `gospl_extensions` and a 3D `dynearthsol3d` already inside,
-so none of the setup above is needed on the host. Mount the directory holding
-your `.cfg` and GoSPL YAML and run from it:
+so none of the setup above is needed on the host. Mount a directory for your
+case and run from it:
 
 ```bash
-docker run --rm -it -v /path/to/case:/home/human/case dynearthsol/gcc-11-gospl \
-  bash -lc 'cd ~/case && ~/DynEarthSol/dynearthsol-gospl your_input.cfg'
+docker run --rm -it -v /path/to/case:/home/human/case dynearthsol/gcc-11-gospl bash
+cd ~/case
+cp ~/DynEarthSol/gospl_driver/examples/* .
+~/DynEarthSol/dynearthsol-gospl ./gaussian-weakzone-3d-with-gospl.cfg
+```
+
+The `cp` above seeds the mounted directory with the bundled example — copy in
+your own `.cfg` and GoSPL YAML instead once you have one.
+
+To stop a run started this way, find its container ID and kill it from
+another terminal:
+
+```bash
+docker ps
+docker kill [CONTAINER ID]
 ```
 
 ## Worked example: a Gaussian weak zone rift
@@ -403,7 +445,7 @@ Change one parameter at a time, and keep a log of what you changed.
 
 | Message | Cause and fix |
 |---------|---------------|
-| `cannot find -lpython3.11` | Wrong conda path. Make sure the `gospl` environment exists at `~/miniconda3/envs/gospl` with Python 3.11, or update `CONDA_ENV_PATH` in the Makefile |
+| `cannot find -lpython3.11` | Wrong conda path. Make sure the `gospl` environment exists (e.g. `~/miniforge3/envs/gospl`) with Python 3.11, or update `CONDA_ENV_PATH` in the Makefile |
 | `cannot find -lgospl_extensions` | Extensions built elsewhere. Update `GOSPL_EXT_DIR` in the Makefile |
 | `gospl-driver.hpp: No such file` | `gospl_driver` is not in the DynEarthSol source directory |
 
