@@ -80,10 +80,21 @@ python -m pip install -r resources/requirements.txt
 python -m jupyterlab
 ```
 
-Open `Tutorial.ipynb`. Run the shell commands below in a JupyterLab terminal;
-the Python blocks are notebook cells for analysis. If opening a separate shell,
-set `DYNEXE` again to the absolute path of the executable you built, and set
-`OMP_NUM_THREADS=1` and `OMP_DYNAMIC=FALSE` there as well.
+Open `Tutorial.ipynb` and a JupyterLab terminal (File → New → Terminal).
+Run each example's `bash` block in that terminal; run its `python` block as a
+notebook cell. In the terminal, run these three commands once before Example 1,
+replacing the executable path with the absolute path from the build step:
+
+```bash
+export DYNEXE="/absolute/path/to/DynEarthSol-tutorial/dynearthsol2d"
+export OMP_NUM_THREADS=1
+export OMP_DYNAMIC=FALSE
+```
+
+A JupyterLab terminal normally inherits these variables if they were exported
+before JupyterLab started. Repeating the commands makes the run settings explicit.
+Keep this terminal for both examples; repeat the three commands if you open a
+new terminal.
 
 To study the results without running DES, use the supplied reference paths in
 the notebook's setup cell. The reference figures and numerical data are included
@@ -98,9 +109,11 @@ do not impose a velocity. Both examples use the same geometry and loading.
 
 ![Figure 1: model geometry, monitor positions and the friction contrast in both examples.](./img/des-rsf/01_model_and_friction.png)
 
-*Figure 1.* P0 and P1 sample opposite faces of the band near x = 50 km; P2
-samples its interior. The upper geometry panel exaggerates depth by 2.5×.
-The lower panels show the frictional contrast in the two examples.
+*Figure 1.* (a) Model geometry, boundary loading and monitor positions;
+depth is exaggerated by 2.5×. P0 and P1 sample the upper and lower faces of the
+band near x = 50 km, and P2 samples its interior. (b) Spatial distribution of
+`a−b` in Example 1: the entire band is VW. (c) Spatial distribution of `a−b`
+in Example 2: a central VW patch lies between VS flanks.
 
 | Setting | Value |
 | --- | --- |
@@ -134,10 +147,14 @@ in the download explains the point, segment and region blocks.
 
 ### What is measured?
 
-P0/P1 provide the signed across-band speed `vx(P0) − vx(P1)` and the change
-in their relative horizontal position. Figures 2–3 show the absolute speed,
-but displacement is calculated from coordinates, not by integrating absolute
-speed. P2 provides local shear stress and θ.
+P0 and P1 provide the signed across-band horizontal speed
+`vx(P0) − vx(P1)`. Figures 2–3 show its absolute value,
+`|vx(P0) − vx(P1)|`. Across-band displacement is calculated from the P0 and P1
+horizontal coordinates as
+`[x(P0,t) − x(P1,t)] − [x(P0,t_initial) − x(P1,t_initial)]`, where `t_initial`
+is the first saved monitor sample. This retains the sign of displacement;
+integrating the absolute speed would instead accumulate travel in both
+directions. P2 provides local shear stress and θ.
 
 Figure 5 instead interpolates displacement along both band interfaces at the
 same initial x positions. This lets the spatial profiles and the VS/VW time
@@ -152,8 +169,6 @@ repeating a calculation; `mkdir` below deliberately stops if it already exists.
 
 ```bash
 export TUTORIAL_DIR="$PWD"
-export OMP_NUM_THREADS=1
-export OMP_DYNAMIC=FALSE
 mkdir -p "$TUTORIAL_DIR/results"
 export RUN_DIR="$TUTORIAL_DIR/results/example1"
 mkdir "$RUN_DIR" && mkdir "$RUN_DIR/output" && \
@@ -161,11 +176,13 @@ mkdir "$RUN_DIR" && mkdir "$RUN_DIR/output" && \
 sed -n '/^\[mat\]/,/^\[monitor\]/p' "$RUN_DIR/example1_uniform_vw.cfg"
 ```
 
-In `[sim]`, `max_time_in_yr=850` is physical model time. The normal field-save
-interval is 25 model years; `earthquake_output_step_interval=1000` requests
-more frequent fields during a detected rapid episode. Monitor points are
-saved every ten solver steps. These are output intervals, not the solver's
-physical time step.
+In `[sim]`, `max_time_in_yr=850` is physical model time.
+`output_time_interval_in_yr=25` sets the normal field-save interval to 25 model
+years; `output_step_interval=1000000` also requests a save after that many
+solver steps. `earthquake_output_step_interval=1000` requests more frequent
+fields during a detected rapid episode. In `[monitor]`, `step_interval=10`
+saves monitor points every ten solver steps. These are output intervals, not
+the solver's physical time step.
 
 ### Step 2: run DES and inspect its output
 
@@ -203,6 +220,7 @@ from pathlib import Path
 import sys
 import numpy as np
 import h5py
+import matplotlib.pyplot as plt
 
 ROOT = Path.cwd().resolve()
 assert (ROOT / "resources/tutorial_tools.py").is_file(), "Open the notebook in the tutorial directory."
@@ -214,6 +232,8 @@ SECOND = ROOT / "results/example2"
 # RUN = ROOT / "resources/reference/example1_uniform_vw"
 # SECOND = ROOT / "resources/reference/example2_vs_vw_vs"
 FIGURES = ROOT / "resources/figures"
+print(f"Example 1 analysis source: {RUN}")
+print(f"Example 2 analysis source: {SECOND}")
 ```
 
 ```python
@@ -223,6 +243,14 @@ for number, event in enumerate(events, start=1):
     print(f"Event {number}: {event['start_yr']:.3f} yr; "
           f"peak speed {event['peak_relative_speed']:.3f} m/s")
 ```
+
+The five numbered figures below are supplied reference figures. The plotting
+cells create additional figures from the directories selected by `RUN` and
+`SECOND`; selecting reference paths deliberately plots the supplied runs.
+The basic workshop saves fewer spatial fields than the figure-generation
+runs, so compare physical trends and actual saved times before expecting a
+matching image. Python plotting is provided; the exercises focus on interpreting
+and comparing results.
 
 The supplied Example 1 has two detected episodes, near 648.255 and 836.241
 years. Here an episode groups crossings of an across-band speed of 10⁻³ m/s;
@@ -244,15 +272,27 @@ slow loading to 4.0 × 10⁻⁴ s during rapid motion. They sample the solver hi
 the connecting lines do not resolve every intervening step. The time-step
 presentation follows the idea in [Lapusta et al. (2000), Figure 9](https://www.its.caltech.edu/~lapusta/Lapusta_et_al_JGR2000.pdf#page=18).
 
-Read actual solver steps from your own field files:
+Plot the speed, displacement, stress and state from `RUN`, then plot actual
+solver time steps from its field files. These use the same quantities as
+Figure 2, arranged as a four-panel history and a separate time-step plot.
+The time-step markers show the available saves.
 
 ```python
+fig = tt.plot_history(history, title=f"Example 1 — {RUN.name}")
+plt.show()
+
 dt_rows = []
 for row in tt.field_catalog(RUN):
     with h5py.File(row["path"], "r") as field:
         dt_rows.append((float(field["time_sec"][0]), float(field["dt_sec"][0])))
 dt_rows = np.asarray(dt_rows)
 print(f"Saved dt range: {dt_rows[:, 1].min():.3e} to {dt_rows[:, 1].max():.3e} s")
+fig_dt, ax_dt = plt.subplots(figsize=(10, 3), layout="constrained")
+ax_dt.semilogy(dt_rows[:, 0] / tt.YEAR, dt_rows[:, 1], ".-", markersize=3)
+ax_dt.set(xlabel="Model time (yr)", ylabel="Saved solver time step (s)",
+          title=f"Example 1 saved time-step samples — {RUN.name}")
+ax_dt.grid(alpha=.18)
+plt.show()
 ```
 
 The published figures use denser field saves than the basic workshop cfg,
@@ -273,7 +313,9 @@ well beyond the rapid interval. Equal distances along this time axis are not
 equal durations.
 
 ```python
-event = events[0]
+EVENT_INDEX = 0  # Set to 1 for the second detected episode.
+assert EVENT_INDEX < len(events), "No such detected episode; inspect the full history first."
+event = events[EVENT_INDEX]
 time_from_peak = history["time_s"] - event["peak_time_s"]
 print(f"Sampled peak speed: {event['peak_relative_speed']:.3f} m/s")
 print(f"Threshold-crossing envelope: {event['span_s']:.3f} s")
@@ -281,8 +323,20 @@ print(f"Local stress drop to the low-rate recovery sample: "
       f"{event['local_shear_stress_drop_mpa']:.2f} MPa")
 ```
 
+Plot the selected episode from `RUN`. This helper shows a short window around
+the threshold-crossing interval on a linear time axis; Figure 3 uses a longer
+symlog window to show loading and recovery. The displacement here is zero at
+the first threshold-crossing sample.
+
+```python
+fig_event = tt.plot_event(history, event_index=EVENT_INDEX)
+fig_event.suptitle(f"Example 1 — {RUN.name}; event {EVENT_INDEX + 1}")
+plt.show()
+```
+
 **Exercise 1.** Identify the loading, rapid-slip and recovery intervals in
-Figures 2–3. Then use `events[1]` to compare the second episode. Two episodes
+Figures 2–3 and the rapid-slip interval in your plotted event. Then set
+`EVENT_INDEX=1` and rerun the event cells to compare the second episode. Two episodes
 give one observed interval, not a recurrence distribution.
 
 ## Worked example 2: a VW patch between VS flanks
@@ -319,6 +373,14 @@ for number, event in enumerate(second_events, start=1):
           f"peak speed {event['peak_relative_speed']:.3f} m/s")
 ```
 
+Plot Example 2's monitor history from `SECOND` before examining its spatial
+response. Compare the event timing and displacement jumps with Example 1.
+
+```python
+fig_second = tt.plot_history(second_history, title=f"Example 2 — {SECOND.name}")
+plt.show()
+```
+
 ### Inspect the spatial response during rapid slip
 
 ![Figure 4: divergence and out-of-plane curl of velocity during the first VS–VW–VS event.](./img/des-rsf/04_divergence_curl.png)
@@ -343,7 +405,11 @@ show the spatial mechanical response, but do not by themselves establish
 physical P/S wave speeds or isolate pure wave amplitudes. Large gradients
 inside the band also include its localized deformation.
 
+The next cell reads the supplied Figure 4 data. Its results refer to the
+reference wavefield calculation, independently of `SECOND`.
+
 ```python
+print("Source: supplied Figure 4 wavefield data")
 with np.load(FIGURES / "04_wavefield_data.npz") as data:
     offsets = data["time_after_detection_s"].copy()
     divergence = data["divergence"].copy()
@@ -352,6 +418,26 @@ index = int(np.argmin(abs(offsets - 5.8)))
 print(f"Field time after detection: {offsets[index]:.3f} s")
 print(f"Maximum absolute divergence: {np.max(abs(divergence[index])):.3e} 1/s")
 print(f"Maximum absolute curl_y: {np.max(abs(curl_y[index])):.3e} 1/s")
+```
+
+To inspect your own spatial fields, the following cell uses `SECOND` and
+selects saved fields before, near the peak of, and after its first event.
+The upper row shows signed plastic-strain increments from the pre-event field;
+the lower row shows instantaneous nodal speed. These diagnostics complement
+the divergence/curl reference figure. Read the actual saved times printed below:
+a sparse save may miss the speed peak. This plot needs pre-event and recovered
+fields; if an input variation has no detected or recovered event, inspect its
+full history first.
+
+```python
+SPATIAL_EVENT_INDEX = 0
+assert SPATIAL_EVENT_INDEX < len(second_events), "No such detected spatial episode."
+fig_spatial, selected_fields = tt.plot_snapshots(
+    SECOND, second_history, event_index=SPATIAL_EVENT_INDEX)
+fig_spatial.suptitle(f"Example 2 — {SECOND.name}; event {SPATIAL_EVENT_INDEX + 1}")
+for label, row in selected_fields:
+    print(f"{label}: {row['time_s'] / tt.YEAR:.6f} yr; step {row['step']}")
+plt.show()
 ```
 
 **Exercise 2.** Compare the four snapshots and the animation. Where are the
@@ -363,10 +449,11 @@ wave's propagation speed.
 
 ![Figure 5: successive displacement profiles and displacement histories at the VS flanks and VW centre.](./img/des-rsf/05_vs_vw_comparison.png)
 
-*Figure 5.* The upper panel plots cumulative relative displacement against
-position at successive times. Blue curves show interseismic accumulation;
-warm colours resolve the second rapid episode. The lower panel samples the
-same quantity at x = 25, 50 and 75 km. Circles and dotted lines identify the
+*Figure 5.* Top strip: positions of the VS flanks and central VW patch.
+Upper plot: cumulative across-band horizontal displacement versus x at
+successive saved times. Blue curves show interseismic accumulation;
+warm colours resolve the second rapid episode. Lower plot: time histories of the
+same displacement at x = 25 km (left VS), 50 km (central VW) and 75 km (right VS). Circles and dotted lines identify the
 interseismic snapshots shown above.
 
 All curves use the same zero at 674.465 years, after the first event. VS
@@ -379,6 +466,7 @@ Explore the supplied data behind this figure. These arrays belong to the
 illustrated reference run, regardless of the paths selected for your own runs.
 
 ```python
+print("Source: supplied Figure 5 displacement data")
 with np.load(FIGURES / "05_displacement_histories.npz") as data:
     positions = data["x_km"].copy()
     sample_times = data["time_s"].copy()
@@ -388,6 +476,68 @@ print(f"At {sample_times[index] / tt.YEAR:.3f} yr:")
 for x, displacement in zip(positions, displacements[index]):
     print(f"  x = {x:.0f} km: {displacement:.3f} m")
 ```
+
+Now plot displacement profiles and VS/VW histories from `SECOND` using the
+same interface interpolation as the reference analysis. If a quiet field is
+available between the first event's recovery and the second event, start from
+the earliest such field to reveal the next loading interval and displacement
+jump. Otherwise, start from the earliest saved field in the run. All curves
+use that one common reference time, shown in the title. Markers represent
+saved fields, and straight connecting lines do not resolve unsaved rapid motion.
+The reference Figure 5 uses a post-first-event origin and dense saves around
+its second event; your reference time depends on the fields actually available.
+
+```python
+catalog = sorted(tt.field_catalog(SECOND), key=lambda row: row["time_s"])
+if len(second_events) >= 2:
+    recovered_time = second_history["time_s"][second_events[0]["quiet_index"]]
+    next_start = second_history["time_s"][second_events[1]["start_index"]]
+    quiet_fields = [row for row in catalog if recovered_time <= row["time_s"] < next_start]
+    if quiet_fields:
+        catalog = [row for row in catalog if row["time_s"] >= quiet_fields[0]["time_s"]]
+x_km = np.linspace(0, 100, 401)
+profiles = []
+base_field = None
+for row in catalog:
+    field = tt.read_field(row["path"])
+    if base_field is None:
+        base_field = field
+    assert np.array_equal(field["connectivity"], base_field["connectivity"]), "Mesh topology changed."
+    assert np.array_equal(field["material"], base_field["material"]), "Material IDs changed."
+    profiles.append(tt._interface_profile(field, x_km))
+profiles = np.asarray(profiles)
+profiles -= profiles[0].copy()
+field_times_yr = np.asarray([row["time_s"] / tt.YEAR for row in catalog])
+positions_km = np.asarray([25., 50., 75.])
+position_histories = np.asarray([np.interp(positions_km, x_km, profile)
+                                 for profile in profiles])
+
+fig_comparison, axes = plt.subplots(2, 1, figsize=(10, 8), layout="constrained")
+# Limit the legend to six profiles; the histories use every saved field.
+indices = np.unique(np.linspace(0, len(catalog) - 1, min(6, len(catalog)), dtype=int))
+for index in indices:
+    axes[0].plot(x_km, profiles[index], label=f"{field_times_yr[index]:.3f} yr")
+for left, right, name in [(0, 45, "VS"), (45, 55, "VW"), (55, 100, "VS")]:
+    axes[0].axvspan(left, right, color="0.5", alpha=.06 if name == "VS" else .15)
+    axes[0].text((left + right) / 200, .96, name, transform=axes[0].transAxes,
+                 ha="center", va="top")
+for column, label in enumerate(["Left VS (25 km)", "Central VW (50 km)", "Right VS (75 km)"]):
+    axes[1].plot(field_times_yr, position_histories[:, column], ".-", label=label)
+axes[0].set(xlabel="Initial x (km)", ylabel="Across-band displacement (m)")
+axes[1].set(xlabel="Model time (yr)", ylabel="Across-band displacement (m)")
+for ax in axes:
+    ax.grid(alpha=.18)
+    ax.legend(fontsize=9)
+fig_comparison.suptitle(f"Example 2 — {SECOND.name}; common zero at {field_times_yr[0]:.3f} yr")
+plt.show()
+```
+
+To save a generated figure as PNG and PDF, run, for example,
+`tt.save_figure(fig_comparison, "example2_selected_run_displacement")`.
+Files are written under `results/figures/`; using the same name again replaces
+those exported figures. The supplied numbered figures remain available for
+comparison. For denser profiles and histories, run `figure5_dense.cfg` in a
+fresh directory, set `SECOND` to that directory and rerun the Example 2 cells.
 
 **Exercise 3.** Explain how the central displacement deficit in the upper
 panel corresponds to the lower panel's slowly rising VW curve. Compare the
