@@ -292,12 +292,24 @@ print(f"Example 2 analysis source: {SECOND}")
 ```
 
 ```python
+# Read monitor CSVs: P0-P1 relative horizontal velocity/displacement,
+# plus P2 shear stress, state variable and friction histories.
 history = tt.band_history(RUN)
+# Find |vx(P0) - vx(P1)| >= 1e-3 m/s (1 mm/s).
+# Group exceedances separated by at most 86400 s (one model day).
 events = tt.find_events(history)
 for number, event in enumerate(events, start=1):
     print(f"Event {number}: {event['start_yr']:.3f} yr; "
           f"peak speed {event['peak_relative_speed']:.3f} m/s")
 ```
+
+`start_yr` is the first saved threshold-exceeding time in each group;
+`peak_relative_speed` is its largest sampled absolute relative speed.
+This is an analysis criterion, separate from DES's internal rapid-output
+trigger, not a physical definition of an earthquake. It measures motion at
+P0/P1, not every slipping region in the model, and can miss peaks between
+saved samples. The defaults are `threshold=1e-3` and `merge_gap_s=86400`;
+the plotting helpers below use those same defaults internally.
 
 The five numbered figures below are supplied reference figures. The plotting
 cells create additional figures from the directories selected by `RUN` and
@@ -333,10 +345,12 @@ Figure 2, arranged as a four-panel history and a separate time-step plot.
 The time-step markers show the available saves.
 
 ```python
+# Plot speed magnitude, signed relative displacement, P2 shear stress and theta.
 fig = tt.plot_history(history, title=f"Example 1 — {RUN.name}")
 plt.show()
 
 dt_rows = []
+# List VTKHDF save files with their saved model times and solver steps.
 for row in tt.field_catalog(RUN):
     with h5py.File(row["path"], "r") as field:
         dt_rows.append((float(field["time_sec"][0]), float(field["dt_sec"][0])))
@@ -384,6 +398,8 @@ symlog window to show loading and recovery. The displacement here is zero at
 the first threshold-crossing sample.
 
 ```python
+# Plot the selected event from 10 s before its first exceedance to 10 s
+# after its last; time zero is the sampled speed peak (default detection).
 fig_event = tt.plot_event(history, event_index=EVENT_INDEX)
 fig_event.suptitle(f"Example 1 — {RUN.name}; event {EVENT_INDEX + 1}")
 plt.show()
@@ -421,6 +437,7 @@ cd "$SECOND_DIR"
 After successful completion, return to the notebook:
 
 ```python
+# Read Example 2 monitors and apply the same speed/gap criteria as Example 1.
 second_history = tt.band_history(SECOND)
 second_events = tt.find_events(second_history)
 for number, event in enumerate(second_events, start=1):
@@ -484,9 +501,17 @@ a sparse save may miss the speed peak. This plot needs pre-event and recovered
 fields; if an input variation has no detected or recovered event, inspect its
 full history first.
 
+`plot_snapshots` chooses the last pre-event field whose maximum nodal speed
+is below `1e-7 m/s`, the field nearest the sampled speed peak, and the first
+field at or after the first post-event P0/P1 relative-speed sample below
+`1e-7 m/s`. Here "recovered" denotes that speed threshold, not proof that the
+band has physically locked; inspect the printed snapshot times.
+
 ```python
 SPATIAL_EVENT_INDEX = 0
 assert SPATIAL_EVENT_INDEX < len(second_events), "No such detected spatial episode."
+# Select saved fields before, nearest the sampled peak, and after recovery;
+# plot plastic-strain changes from the pre-event field and nodal speed.
 fig_spatial, selected_fields = tt.plot_snapshots(
     SECOND, second_history, event_index=SPATIAL_EVENT_INDEX)
 fig_spatial.suptitle(f"Example 2 — {SECOND.name}; event {SPATIAL_EVENT_INDEX + 1}")
@@ -554,11 +579,13 @@ x_km = np.linspace(0, 100, 401)
 profiles = []
 base_field = None
 for row in catalog:
+    # Read mesh, velocity, plastic strain, material IDs and stress from VTKHDF.
     field = tt.read_field(row["path"])
     if base_field is None:
         base_field = field
     assert np.array_equal(field["connectivity"], base_field["connectivity"]), "Mesh topology changed."
     assert np.array_equal(field["material"], base_field["material"]), "Material IDs changed."
+    # Interpolate upper-minus-lower horizontal displacement at common initial x.
     profiles.append(tt._interface_profile(field, x_km))
 profiles = np.asarray(profiles)
 profiles -= profiles[0].copy()
