@@ -91,6 +91,38 @@ and `use_global_velocity_scaling`. The executable must be a 2D HDF5 build.
 Keep this terminal open so `DYNEXE` remains defined. The mesh is small enough
 that one OpenMP thread is appropriate.
 
+**Only if HDF5 auto-detection fails:** first install the HDF5 development
+package listed above. If it is installed but the build still cannot find it,
+check its location and rerun the complete build command with explicit paths.
+These overrides select an existing installation; they do not install HDF5.
+
+On **Ubuntu x86_64**, the serial development package normally uses the paths
+below. Verify them before building; other architectures can use a different
+library directory.
+
+```bash
+ls /usr/include/hdf5/serial/H5Lpublic.h
+ls /usr/lib/x86_64-linux-gnu/hdf5/serial/libhdf5.so
+make -j2 ndims=2 opt=2 openmp=1 hdf5=1 \
+  HDF5_INCLUDE_DIR=/usr/include/hdf5/serial \
+  HDF5_LIB_DIR=/usr/lib/x86_64-linux-gnu/hdf5/serial
+```
+
+On **macOS with Homebrew**, use the installed formula's prefix:
+
+```bash
+ls "$(brew --prefix hdf5)/include/H5Lpublic.h"
+ls "$(brew --prefix hdf5)/lib/libhdf5.dylib"
+make -j2 ndims=2 opt=2 openmp=1 hdf5=1 \
+  HDF5_INCLUDE_DIR="$(brew --prefix hdf5)/include" \
+  HDF5_LIB_DIR="$(brew --prefix hdf5)/lib"
+```
+
+Each multi-line `make` block is one shell command: the trailing backslashes
+continue it onto the next line. Keep the path assignments on that command;
+do not run them as separate commands after `make`. Once the build succeeds,
+continue with the `DYNEXE` exports and help check above.
+
 ### Prepare Python
 
 Change to the extracted `DES-RSF-Tutorial` directory, then run:
