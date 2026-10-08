@@ -40,8 +40,30 @@ outputs and the data behind the five figures.
 
 Use Linux, macOS or Windows Subsystem for Linux (WSL). On Windows, run both DES
 and Jupyter inside WSL. You need a C++ compiler, Make, Boost.Program_options,
-HDF5 and Python 3.10 or later. The commands below use the Debian/Ubuntu HDF5
-paths; adjust them for another installation.
+HDF5 and Python 3.10 or later. HDF5 development headers and libraries are
+required: this tutorial reads VTKHDF spatial fields, so keep `hdf5=1` when
+building DES. Installing Python's `h5py` alone does not provide the system
+development package needed to compile DES.
+
+Install the dependencies for your operating system before building.
+
+**Ubuntu 22.04 or later (including Ubuntu in WSL):**
+
+```bash
+sudo apt update
+sudo apt install -y git g++ make libboost-program-options-dev libhdf5-dev pkg-config python3 python3-venv
+```
+
+**macOS:** install the Xcode Command Line Tools (`xcode-select --install`,
+if not already installed) and [Homebrew](https://brew.sh/), then run:
+
+```bash
+brew install boost libomp hdf5 pkg-config python
+```
+
+`libomp` supplies the OpenMP runtime for Apple's compiler. The pinned DES
+revision below automatically locates HDF5 on Ubuntu and macOS; do not pass
+Ubuntu-specific `HDF5_INCLUDE_DIR` or `HDF5_LIB_DIR` paths on macOS.
 
 ### Build and check DES
 
@@ -54,16 +76,17 @@ git clone --recursive https://github.com/GeoFLAC/DynEarthSol.git DynEarthSol-tut
 cd DynEarthSol-tutorial
 git checkout 1b4e94f1c333fdade9dc512cf9cb20e10e8e9aad
 git submodule update --init --recursive
-make -j2 ndims=2 opt=2 openmp=1 hdf5=1 \
-  HDF5_INCLUDE_DIR=/usr/include/hdf5/serial \
-  HDF5_LIB_DIR=/usr/lib/x86_64-linux-gnu/hdf5/serial
+make config ndims=2 opt=2 openmp=1 hdf5=1
+make -j2 ndims=2 opt=2 openmp=1 hdf5=1
 export DYNEXE="$PWD/dynearthsol2d"
 export OMP_NUM_THREADS=1
 export OMP_DYNAMIC=FALSE
 "$DYNEXE" --help
 ```
 
-Check that the help lists `rsf_slip_rate_projection_option`, `rsf_dtheta_max`
+Check that `make config` reports `hdf5 1` and existing HDF5 include and library
+directories for your installation. The same build commands work on Ubuntu and
+macOS. Check that the help lists `rsf_slip_rate_projection_option`, `rsf_dtheta_max`
 and `use_global_velocity_scaling`. The executable must be a 2D HDF5 build.
 Keep this terminal open so `DYNEXE` remains defined. The mesh is small enough
 that one OpenMP thread is appropriate.
@@ -565,6 +588,8 @@ workshop.
 
 | Symptom | Check |
 | --- | --- |
+| HDF5 headers or library not found during the build | Install `libhdf5-dev` on Ubuntu or `hdf5` with Homebrew on macOS, remove old explicit HDF5 path overrides, and rerun the build with `hdf5=1`. Python's `h5py` is not a substitute for these build dependencies. |
+| `omp.h` or `libomp` not found on macOS | Run `brew install libomp`, then rerun the build. |
 | Executable not found | Set `DYNEXE` to the absolute path of the compatible 2D executable, then check `test -x "$DYNEXE"`. |
 | Unknown RSF option | Check the solver revision and `--help`; an older generic DES build may lack these controls. |
 | `.poly` file not found | Run inside the case directory containing both the cfg and `decollement.poly`. |
