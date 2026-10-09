@@ -40,8 +40,30 @@ outputs and the data behind the five figures.
 
 Use Linux, macOS or Windows Subsystem for Linux (WSL). On Windows, run both DES
 and Jupyter inside WSL. You need a C++ compiler, Make, Boost.Program_options,
-HDF5 and Python 3.10 or later. The commands below use the Debian/Ubuntu HDF5
-paths; adjust them for another installation.
+HDF5 and Python 3.10 or later. HDF5 development headers and libraries are
+required: this tutorial reads VTKHDF spatial fields, so keep `hdf5=1` when
+building DES. Installing Python's `h5py` alone does not provide the system
+development package needed to compile DES.
+
+Install the dependencies for your operating system before building.
+
+**Ubuntu 22.04 or later (including Ubuntu in WSL):**
+
+```bash
+sudo apt update
+sudo apt install -y git g++ make libboost-program-options-dev libhdf5-dev pkg-config python3 python3-venv
+```
+
+**macOS:** install the Xcode Command Line Tools (`xcode-select --install`,
+if not already installed) and [Homebrew](https://brew.sh/), then run:
+
+```bash
+brew install boost libomp hdf5 pkg-config python
+```
+
+`libomp` supplies the OpenMP runtime for Apple's compiler. The pinned DES
+revision below automatically locates HDF5 on Ubuntu and macOS; do not pass
+Ubuntu-specific `HDF5_INCLUDE_DIR` or `HDF5_LIB_DIR` paths on macOS.
 
 ### Build and check DES
 
@@ -54,19 +76,52 @@ git clone --recursive https://github.com/GeoFLAC/DynEarthSol.git DynEarthSol-tut
 cd DynEarthSol-tutorial
 git checkout 1b4e94f1c333fdade9dc512cf9cb20e10e8e9aad
 git submodule update --init --recursive
-make -j2 ndims=2 opt=2 openmp=1 hdf5=1 \
-  HDF5_INCLUDE_DIR=/usr/include/hdf5/serial \
-  HDF5_LIB_DIR=/usr/lib/x86_64-linux-gnu/hdf5/serial
+make config ndims=2 opt=2 openmp=1 hdf5=1
+make -j2 ndims=2 opt=2 openmp=1 hdf5=1
 export DYNEXE="$PWD/dynearthsol2d"
 export OMP_NUM_THREADS=1
 export OMP_DYNAMIC=FALSE
 "$DYNEXE" --help
 ```
 
-Check that the help lists `rsf_slip_rate_projection_option`, `rsf_dtheta_max`
+Check that `make config` reports `hdf5 1` and existing HDF5 include and library
+directories for your installation. The same build commands work on Ubuntu and
+macOS. Check that the help lists `rsf_slip_rate_projection_option`, `rsf_dtheta_max`
 and `use_global_velocity_scaling`. The executable must be a 2D HDF5 build.
 Keep this terminal open so `DYNEXE` remains defined. The mesh is small enough
 that one OpenMP thread is appropriate.
+
+**Only if HDF5 auto-detection fails:** first install the HDF5 development
+package listed above. If it is installed but the build still cannot find it,
+check its location and rerun the complete build command with explicit paths.
+These overrides select an existing installation; they do not install HDF5.
+
+On **Ubuntu x86_64**, the serial development package normally uses the paths
+below. Verify them before building; other architectures can use a different
+library directory.
+
+```bash
+ls /usr/include/hdf5/serial/H5Lpublic.h
+ls /usr/lib/x86_64-linux-gnu/hdf5/serial/libhdf5.so
+make -j2 ndims=2 opt=2 openmp=1 hdf5=1 \
+  HDF5_INCLUDE_DIR=/usr/include/hdf5/serial \
+  HDF5_LIB_DIR=/usr/lib/x86_64-linux-gnu/hdf5/serial
+```
+
+On **macOS with Homebrew**, use the installed formula's prefix:
+
+```bash
+ls "$(brew --prefix hdf5)/include/H5Lpublic.h"
+ls "$(brew --prefix hdf5)/lib/libhdf5.dylib"
+make -j2 ndims=2 opt=2 openmp=1 hdf5=1 \
+  HDF5_INCLUDE_DIR="$(brew --prefix hdf5)/include" \
+  HDF5_LIB_DIR="$(brew --prefix hdf5)/lib"
+```
+
+Each multi-line `make` block is one shell command: the trailing backslashes
+continue it onto the next line. Keep the path assignments on that command;
+do not run them as separate commands after `make`. Once the build succeeds,
+continue with the `DYNEXE` exports and help check above.
 
 ### Prepare Python
 
@@ -237,12 +292,24 @@ print(f"Example 2 analysis source: {SECOND}")
 ```
 
 ```python
+# Read monitor CSVs: P0-P1 relative horizontal velocity/displacement,
+# plus P2 shear stress, state variable and friction histories.
 history = tt.band_history(RUN)
+# Find |vx(P0) - vx(P1)| >= 1e-3 m/s (1 mm/s).
+# Group exceedances separated by at most 86400 s (one model day).
 events = tt.find_events(history)
 for number, event in enumerate(events, start=1):
     print(f"Event {number}: {event['start_yr']:.3f} yr; "
           f"peak speed {event['peak_relative_speed']:.3f} m/s")
 ```
+
+`start_yr` is the first saved threshold-exceeding time in each group;
+`peak_relative_speed` is its largest sampled absolute relative speed.
+This is an analysis criterion, separate from DES's internal rapid-output
+trigger, not a physical definition of an earthquake. It measures motion at
+P0/P1, not every slipping region in the model, and can miss peaks between
+saved samples. The defaults are `threshold=1e-3` and `merge_gap_s=86400`;
+the plotting helpers below use those same defaults internally.
 
 The five numbered figures below are supplied reference figures. The plotting
 cells create additional figures from the directories selected by `RUN` and
@@ -260,43 +327,53 @@ this analysis threshold is distinct from DES's automatic output trigger.
 
 ### Read the full history
 
-![Figure 2: speed, solver time step, displacement, shear stress and state over 850 model years.](./img/des-rsf/02_full_history.png)
+![Figure 2: speed, mean solver time step, reconstructed pseudo-density, displacement, shear stress and state over 850 model years.](./img/des-rsf/02_full_history.png)
 
-*Figure 2.* Read vertically at each event: speed rises, the physical time step
-shrinks, displacement increases abruptly, and shear stress drops. Stress then
-reloads. The time-step curve uses `dt_sec` saved by the solver, rather than
-the interval between field files.
+*Figure 2.* Six panels from the supplied Example 1 reference run. Read
+vertically at each event: speed rises, mean solver dt shrinks, reconstructed
+pseudo-density decreases, displacement increases abruptly, and shear stress
+drops. Stress then reloads. The dt curve uses monitor-interval averages;
+pseudo-density markers use the seven supplied spatial fields. Markers are
+not joined because they do not resolve the evolution between field saves.
 
-Saved time-step samples in this figure range from about 1.65 × 10⁶ s during
-slow loading to 4.0 × 10⁻⁴ s during rapid motion. They sample the solver history;
-the connecting lines do not resolve every intervening step. The time-step
-presentation follows the idea in [Lapusta et al. (2000), Figure 9](https://www.its.caltech.edu/~lapusta/Lapusta_et_al_JGR2000.pdf#page=18).
+Plot the same six panels from `RUN` on a shared model-time axis: speed, mean
+solver time step, pseudo-density, displacement, stress and state.
+`plot_history` calculates the
+mean time step as `diff(time_s) / diff(step)` between consecutive monitor
+records and plots it at each interval's midpoint. The workshop records every
+10 solver steps, so this is an interval average, not an individual step's dt.
+It resolves the time-step trend more densely than the spatial field saves,
+but can smooth short-lived extrema. Both the supplied Figure 2 and your plot
+use this same monitor-based calculation.
 
-Plot the speed, displacement, stress and state from `RUN`, then plot actual
-solver time steps from its field files. These use the same quantities as
-Figure 2, arranged as a four-panel history and a separate time-step plot.
-The time-step markers show the available saves.
+The pseudo-density panel represents numerical inertia from mass scaling,
+not physical rock density. `pseudo_density_samples` reads the run's cfg and
+instantaneous VTKHDF fields and reconstructs the pinned solver's formula:
+`rho_pseudo = K / min(S * Vmax, sqrt(M / rho))**2`, where `S` is
+`inertial_scaling`, `Vmax` is the largest magnitude of an element's mean nodal
+velocity (floored by the prescribed boundary-speed bound), and `M` is the
+shear modulus by default, or the bulk modulus for
+`mass_scaling_reference_speed=bulk`. The helper requires uniform elastic
+moduli and physical density, as in these workshop models.
+
+With the workshop's default shear-speed ceiling, `K=50 GPa`, `G=30 GPa`
+and `rho=2700 kg/m³`, pseudo-density cannot fall below `rho*K/G=4500 kg/m³`.
+The VTKHDF `density` array contains physical density, not this quantity.
+Reconstruction from a saved velocity field is a diagnostic, not a direct
+record of assembled nodal masses or their exact update times. Sparse field
+saves can miss rapid changes; mean dt alone cannot determine pseudo-density
+because other constraints, including the RSF state limit, also control dt.
 
 ```python
+# Plot speed, mean dt, reconstructed pseudo-density, displacement, stress and theta.
 fig = tt.plot_history(history, title=f"Example 1 — {RUN.name}")
-plt.show()
-
-dt_rows = []
-for row in tt.field_catalog(RUN):
-    with h5py.File(row["path"], "r") as field:
-        dt_rows.append((float(field["time_sec"][0]), float(field["dt_sec"][0])))
-dt_rows = np.asarray(dt_rows)
-print(f"Saved dt range: {dt_rows[:, 1].min():.3e} to {dt_rows[:, 1].max():.3e} s")
-fig_dt, ax_dt = plt.subplots(figsize=(10, 3), layout="constrained")
-ax_dt.semilogy(dt_rows[:, 0] / tt.YEAR, dt_rows[:, 1], ".-", markersize=3)
-ax_dt.set(xlabel="Model time (yr)", ylabel="Saved solver time step (s)",
-          title=f"Example 1 saved time-step samples — {RUN.name}")
-ax_dt.grid(alpha=.18)
 plt.show()
 ```
 
-The published figures use denser field saves than the basic workshop cfg,
-so your saved extrema and available snapshot times may differ.
+Rebuild the supplied Figure 2 (PNG/PDF) and its numerical CSV data with
+`python resources/plot_history_figure.py` from the extracted tutorial directory.
+It uses the bundled reference run; your notebook uses `RUN`. The available
+field saves can differ, so compare actual sample times and physical trends.
 
 ### Follow one complete event
 
@@ -329,6 +406,8 @@ symlog window to show loading and recovery. The displacement here is zero at
 the first threshold-crossing sample.
 
 ```python
+# Plot the selected event from 10 s before its first exceedance to 10 s
+# after its last; time zero is the sampled speed peak (default detection).
 fig_event = tt.plot_event(history, event_index=EVENT_INDEX)
 fig_event.suptitle(f"Example 1 — {RUN.name}; event {EVENT_INDEX + 1}")
 plt.show()
@@ -366,6 +445,7 @@ cd "$SECOND_DIR"
 After successful completion, return to the notebook:
 
 ```python
+# Read Example 2 monitors and apply the same speed/gap criteria as Example 1.
 second_history = tt.band_history(SECOND)
 second_events = tt.find_events(second_history)
 for number, event in enumerate(second_events, start=1):
@@ -377,6 +457,7 @@ Plot Example 2's monitor history from `SECOND` before examining its spatial
 response. Compare the event timing and displacement jumps with Example 1.
 
 ```python
+# Use the same six panels, including mean dt and pseudo-density, for Example 2.
 fig_second = tt.plot_history(second_history, title=f"Example 2 — {SECOND.name}")
 plt.show()
 ```
@@ -429,9 +510,17 @@ a sparse save may miss the speed peak. This plot needs pre-event and recovered
 fields; if an input variation has no detected or recovered event, inspect its
 full history first.
 
+`plot_snapshots` chooses the last pre-event field whose maximum nodal speed
+is below `1e-7 m/s`, the field nearest the sampled speed peak, and the first
+field at or after the first post-event P0/P1 relative-speed sample below
+`1e-7 m/s`. Here "recovered" denotes that speed threshold, not proof that the
+band has physically locked; inspect the printed snapshot times.
+
 ```python
 SPATIAL_EVENT_INDEX = 0
 assert SPATIAL_EVENT_INDEX < len(second_events), "No such detected spatial episode."
+# Select saved fields before, nearest the sampled peak, and after recovery;
+# plot plastic-strain changes from the pre-event field and nodal speed.
 fig_spatial, selected_fields = tt.plot_snapshots(
     SECOND, second_history, event_index=SPATIAL_EVENT_INDEX)
 fig_spatial.suptitle(f"Example 2 — {SECOND.name}; event {SPATIAL_EVENT_INDEX + 1}")
@@ -488,6 +577,7 @@ The reference Figure 5 uses a post-first-event origin and dense saves around
 its second event; your reference time depends on the fields actually available.
 
 ```python
+# List VTKHDF save files with their saved model times and solver steps.
 catalog = sorted(tt.field_catalog(SECOND), key=lambda row: row["time_s"])
 if len(second_events) >= 2:
     recovered_time = second_history["time_s"][second_events[0]["quiet_index"]]
@@ -499,11 +589,13 @@ x_km = np.linspace(0, 100, 401)
 profiles = []
 base_field = None
 for row in catalog:
+    # Read mesh, velocity, plastic strain, material IDs and stress from VTKHDF.
     field = tt.read_field(row["path"])
     if base_field is None:
         base_field = field
     assert np.array_equal(field["connectivity"], base_field["connectivity"]), "Mesh topology changed."
     assert np.array_equal(field["material"], base_field["material"]), "Material IDs changed."
+    # Interpolate upper-minus-lower horizontal displacement at common initial x.
     profiles.append(tt._interface_profile(field, x_km))
 profiles = np.asarray(profiles)
 profiles -= profiles[0].copy()
@@ -565,6 +657,8 @@ workshop.
 
 | Symptom | Check |
 | --- | --- |
+| HDF5 headers or library not found during the build | Install `libhdf5-dev` on Ubuntu or `hdf5` with Homebrew on macOS, remove old explicit HDF5 path overrides, and rerun the build with `hdf5=1`. Python's `h5py` is not a substitute for these build dependencies. |
+| `omp.h` or `libomp` not found on macOS | Run `brew install libomp`, then rerun the build. |
 | Executable not found | Set `DYNEXE` to the absolute path of the compatible 2D executable, then check `test -x "$DYNEXE"`. |
 | Unknown RSF option | Check the solver revision and `--help`; an older generic DES build may lack these controls. |
 | `.poly` file not found | Run inside the case directory containing both the cfg and `decollement.poly`. |
