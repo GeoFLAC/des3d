@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" width="960" height="420" role="img" aria-label="DES3D-goSPL coupling loop: DES3D runs N steps, sends averaged velocity, goSPL runs, returns elevation change, DES3D applies it">
+<style>
+text{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+</style>
+<defs>
+<marker id="ab" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#B5BCC5"/></marker>
+</defs>
+<rect width="960" height="420" rx="16" fill="#F7F6F2"/>
+
+<path id="pTop" d="M330 130 C 450 40, 510 40, 630 130" fill="none" stroke="#D3D8DE" stroke-width="4" marker-end="url(#ab)"/>
+<path id="pBot" d="M630 240 C 510 330, 450 330, 330 240" fill="none" stroke="#D3D8DE" stroke-width="4" marker-end="url(#ab)"/>
+
+<text x="180" y="70" text-anchor="middle" font-size="30" font-weight="700" fill="#2F6FB0">DES3D</text>
+<text x="780" y="70" text-anchor="middle" font-size="30" font-weight="700" fill="#B5651D">goSPL</text>
+
+<!-- DES3D box -->
+<rect x="40" y="90" width="280" height="180" rx="14" fill="#EAF1F8" stroke="#2F6FB0" stroke-width="2">
+<animate attributeName="stroke-width" values="5;2;2;2;5;5" keyTimes="0;0.2;0.4;0.6;0.8;1" calcMode="discrete" dur="12.5s" repeatCount="indefinite"/>
+</rect>
+<path fill="#CFE0F0" stroke="#2F6FB0" stroke-width="2.5" d="M55 260 L55 150 C130 150 140 150 165 150 L180 150 L195 150 C220 150 230 150 305 150 L305 260 Z">
+<animate attributeName="d" dur="12.5s" repeatCount="indefinite" keyTimes="0;0.2;0.8;0.9;1"
+ values="M55 260 L55 150 C130 150 140 150 165 150 L180 150 L195 150 C220 150 230 150 305 150 L305 260 Z;
+ M55 260 L55 150 C130 150 140 122 165 122 L180 122 L195 122 C220 122 230 150 305 150 L305 260 Z;
+ M55 260 L55 150 C130 150 140 122 165 122 L180 122 L195 122 C220 122 230 150 305 150 L305 260 Z;
+ M55 260 L55 150 C130 150 140 122 165 122 L180 140 L195 122 C220 122 230 150 305 150 L305 260 Z;
+ M55 260 L55 150 C130 150 140 122 165 122 L180 140 L195 122 C220 122 230 150 305 150 L305 260 Z"/>
+</path>
+<path d="M55 205 H305 M55 235 H305" stroke="#B7CDE3" stroke-width="1.5"/>
+<text x="180" y="215" text-anchor="middle" font-size="20" font-weight="600" fill="#1B2430" opacity="0">× N steps
+<animate attributeName="opacity" values="1;0;0;0;0;0" keyTimes="0;0.2;0.4;0.6;0.8;1" calcMode="discrete" dur="12.5s" repeatCount="indefinite"/></text>
+<text x="180" y="215" text-anchor="middle" font-size="20" font-weight="600" fill="#1B2430" opacity="0">z ← z + Δh
+<animate attributeName="opacity" values="0;0;0;0;1;1" keyTimes="0;0.2;0.4;0.6;0.8;1" calcMode="discrete" dur="12.5s" repeatCount="indefinite"/></text>
+
+<!-- goSPL box -->
+<rect x="640" y="90" width="280" height="180" rx="14" fill="#FBEFE3" stroke="#D9822B" stroke-width="2">
+<animate attributeName="stroke-width" values="2;2;5;2;2;2" keyTimes="0;0.2;0.4;0.6;0.8;1" calcMode="discrete" dur="12.5s" repeatCount="indefinite"/>
+</rect>
+<path d="M780 255 L780 205 L735 165 L705 115 M780 205 L825 160 L865 115 M735 165 L760 115 M825 160 L810 115" fill="none" stroke="#EBD3BA" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<path pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" d="M780 255 L780 205 L735 165 L705 115 M780 205 L825 160 L865 115 M735 165 L760 115 M825 160 L810 115" fill="none" stroke="#D9822B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+<animate attributeName="stroke-dashoffset" values="1;1;0;0" keyTimes="0;0.4;0.6;1" dur="12.5s" repeatCount="indefinite"/>
+</path>
+
+<text x="180" y="298" text-anchor="middle" font-size="18" fill="#5A6470">mechanics · whole volume</text>
+<text x="780" y="298" text-anchor="middle" font-size="18" fill="#5A6470">surface processes · top surface</text>
+
+<!-- packets -->
+<g opacity="0">
+<rect x="-34" y="-20" width="68" height="40" rx="20" fill="#2F6FB0"/>
+<text x="0" y="8" text-anchor="middle" font-size="24" font-weight="700" fill="#FFFFFF">v̄</text>
+<animateMotion dur="12.5s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.2;0.38;1" calcMode="linear"><mpath href="#pTop"/></animateMotion>
+<animate attributeName="opacity" values="0;1;0;0;0;0" keyTimes="0;0.2;0.4;0.6;0.8;1" calcMode="discrete" dur="12.5s" repeatCount="indefinite"/>
+</g>
+<g opacity="0">
+<rect x="-34" y="-20" width="68" height="40" rx="20" fill="#C9701F"/>
+<text x="0" y="8" text-anchor="middle" font-size="24" font-weight="700" fill="#FFFFFF">Δh</text>
+<animateMotion dur="12.5s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.6;0.78;1" calcMode="linear"><mpath href="#pBot"/></animateMotion>
+<animate attributeName="opacity" values="0;0;0;1;0;0" keyTimes="0;0.2;0.4;0.6;0.8;1" calcMode="discrete" dur="12.5s" repeatCount="indefinite"/>
+</g>
+
+<!-- captions -->
+<g font-size="21" fill="#1B2430" text-anchor="middle">
+<text x="480" y="385" opacity="0">① DES3D runs N mechanical steps: the surface moves with tectonics
+<animate attributeName="opacity" values="1;0;0;0;0;0" keyTimes="0;0.2;0.4;0.6;0.8;1" calcMode="discrete" dur="12.5s" repeatCount="indefinite"/></text>
+<text x="480" y="385" opacity="0">② DES3D sends the time-averaged surface velocity v̄ = Δcoord / Δt
+<animate attributeName="opacity" values="0;1;0;0;0;0" keyTimes="0;0.2;0.4;0.6;0.8;1" calcMode="discrete" dur="12.5s" repeatCount="indefinite"/></text>
+<text x="480" y="385" opacity="0">③ goSPL advances Δt: advection + uplift, river incision, hillslope diffusion
+<animate attributeName="opacity" values="0;0;1;0;0;0" keyTimes="0;0.2;0.4;0.6;0.8;1" calcMode="discrete" dur="12.5s" repeatCount="indefinite"/></text>
+<text x="480" y="385" opacity="0">④ goSPL returns Δh: erosion and diffusion only (uplift v_z·Δt removed)
+<animate attributeName="opacity" values="0;0;0;1;0;0" keyTimes="0;0.2;0.4;0.6;0.8;1" calcMode="discrete" dur="12.5s" repeatCount="indefinite"/></text>
+<text x="480" y="385" opacity="0">⑤ DES3D applies it: z_surface ← z_surface + Δh, then repeats
+<animate attributeName="opacity" values="0;0;0;0;1;1" keyTimes="0;0.2;0.4;0.6;0.8;1" calcMode="discrete" dur="12.5s" repeatCount="indefinite"/></text>
+</g>
+</svg>
