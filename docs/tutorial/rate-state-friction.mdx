@@ -327,35 +327,53 @@ this analysis threshold is distinct from DES's automatic output trigger.
 
 ### Read the full history
 
-![Figure 2: speed, solver time step, displacement, shear stress and state over 850 model years.](./img/des-rsf/02_full_history.png)
+![Figure 2: speed, mean solver time step, reconstructed pseudo-density, displacement, shear stress and state over 850 model years.](./img/des-rsf/02_full_history.png)
 
-*Figure 2.* Read vertically at each event: speed rises, the physical time step
-shrinks, displacement increases abruptly, and shear stress drops. Stress then
-reloads. The time-step curve uses `dt_sec` saved by the solver, rather than
-the interval between field files.
+*Figure 2.* Six panels from the supplied Example 1 reference run. Read
+vertically at each event: speed rises, mean solver dt shrinks, reconstructed
+pseudo-density decreases, displacement increases abruptly, and shear stress
+drops. Stress then reloads. The dt curve uses monitor-interval averages;
+pseudo-density markers use the seven supplied spatial fields. Markers are
+not joined because they do not resolve the evolution between field saves.
 
-Saved time-step samples in this figure range from about 1.65 × 10⁶ s during
-slow loading to 4.0 × 10⁻⁴ s during rapid motion. They sample the solver history;
-the connecting lines do not resolve every intervening step. The time-step
-presentation follows the idea in [Lapusta et al. (2000), Figure 9](https://www.its.caltech.edu/~lapusta/Lapusta_et_al_JGR2000.pdf#page=18).
-
-Plot five panels from `RUN` on a shared model-time axis: speed, mean solver
-time step, displacement, stress and state. `plot_history` calculates the
+Plot the same six panels from `RUN` on a shared model-time axis: speed, mean
+solver time step, pseudo-density, displacement, stress and state.
+`plot_history` calculates the
 mean time step as `diff(time_s) / diff(step)` between consecutive monitor
 records and plots it at each interval's midpoint. The workshop records every
 10 solver steps, so this is an interval average, not an individual step's dt.
 It resolves the time-step trend more densely than the spatial field saves,
-but can smooth short-lived extrema. Unlike the supplied Figure 2, this
-time-step panel uses monitor CSVs rather than VTKHDF `dt_sec` samples.
+but can smooth short-lived extrema. Both the supplied Figure 2 and your plot
+use this same monitor-based calculation.
+
+The pseudo-density panel represents numerical inertia from mass scaling,
+not physical rock density. `pseudo_density_samples` reads the run's cfg and
+instantaneous VTKHDF fields and reconstructs the pinned solver's formula:
+`rho_pseudo = K / min(S * Vmax, sqrt(M / rho))**2`, where `S` is
+`inertial_scaling`, `Vmax` is the largest magnitude of an element's mean nodal
+velocity (floored by the prescribed boundary-speed bound), and `M` is the
+shear modulus by default, or the bulk modulus for
+`mass_scaling_reference_speed=bulk`. The helper requires uniform elastic
+moduli and physical density, as in these workshop models.
+
+With the workshop's default shear-speed ceiling, `K=50 GPa`, `G=30 GPa`
+and `rho=2700 kg/m³`, pseudo-density cannot fall below `rho*K/G=4500 kg/m³`.
+The VTKHDF `density` array contains physical density, not this quantity.
+Reconstruction from a saved velocity field is a diagnostic, not a direct
+record of assembled nodal masses or their exact update times. Sparse field
+saves can miss rapid changes; mean dt alone cannot determine pseudo-density
+because other constraints, including the RSF state limit, also control dt.
 
 ```python
-# Plot speed, monitor-interval mean dt, displacement, P2 shear stress and theta.
+# Plot speed, mean dt, reconstructed pseudo-density, displacement, stress and theta.
 fig = tt.plot_history(history, title=f"Example 1 — {RUN.name}")
 plt.show()
 ```
 
-The published figures use denser field saves than the basic workshop cfg,
-so your saved extrema and available snapshot times may differ.
+Rebuild the supplied Figure 2 (PNG/PDF) and its numerical CSV data with
+`python resources/plot_history_figure.py` from the extracted tutorial directory.
+It uses the bundled reference run; your notebook uses `RUN`. The available
+field saves can differ, so compare actual sample times and physical trends.
 
 ### Follow one complete event
 
@@ -439,7 +457,7 @@ Plot Example 2's monitor history from `SECOND` before examining its spatial
 response. Compare the event timing and displacement jumps with Example 1.
 
 ```python
-# Use the same five panels, including monitor-interval mean dt, for Example 2.
+# Use the same six panels, including mean dt and pseudo-density, for Example 2.
 fig_second = tt.plot_history(second_history, title=f"Example 2 — {SECOND.name}")
 plt.show()
 ```
