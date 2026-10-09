@@ -339,28 +339,18 @@ slow loading to 4.0 × 10⁻⁴ s during rapid motion. They sample the solver hi
 the connecting lines do not resolve every intervening step. The time-step
 presentation follows the idea in [Lapusta et al. (2000), Figure 9](https://www.its.caltech.edu/~lapusta/Lapusta_et_al_JGR2000.pdf#page=18).
 
-Plot the speed, displacement, stress and state from `RUN`, then plot actual
-solver time steps from its field files. These use the same quantities as
-Figure 2, arranged as a four-panel history and a separate time-step plot.
-The time-step markers show the available saves.
+Plot five panels from `RUN` on a shared model-time axis: speed, mean solver
+time step, displacement, stress and state. `plot_history` calculates the
+mean time step as `diff(time_s) / diff(step)` between consecutive monitor
+records and plots it at each interval's midpoint. The workshop records every
+10 solver steps, so this is an interval average, not an individual step's dt.
+It resolves the time-step trend more densely than the spatial field saves,
+but can smooth short-lived extrema. Unlike the supplied Figure 2, this
+time-step panel uses monitor CSVs rather than VTKHDF `dt_sec` samples.
 
 ```python
-# Plot speed magnitude, signed relative displacement, P2 shear stress and theta.
+# Plot speed, monitor-interval mean dt, displacement, P2 shear stress and theta.
 fig = tt.plot_history(history, title=f"Example 1 — {RUN.name}")
-plt.show()
-
-dt_rows = []
-# List VTKHDF save files with their saved model times and solver steps.
-for row in tt.field_catalog(RUN):
-    with h5py.File(row["path"], "r") as field:
-        dt_rows.append((float(field["time_sec"][0]), float(field["dt_sec"][0])))
-dt_rows = np.asarray(dt_rows)
-print(f"Saved dt range: {dt_rows[:, 1].min():.3e} to {dt_rows[:, 1].max():.3e} s")
-fig_dt, ax_dt = plt.subplots(figsize=(10, 3), layout="constrained")
-ax_dt.semilogy(dt_rows[:, 0] / tt.YEAR, dt_rows[:, 1], ".-", markersize=3)
-ax_dt.set(xlabel="Model time (yr)", ylabel="Saved solver time step (s)",
-          title=f"Example 1 saved time-step samples — {RUN.name}")
-ax_dt.grid(alpha=.18)
 plt.show()
 ```
 
@@ -449,6 +439,7 @@ Plot Example 2's monitor history from `SECOND` before examining its spatial
 response. Compare the event timing and displacement jumps with Example 1.
 
 ```python
+# Use the same five panels, including monitor-interval mean dt, for Example 2.
 fig_second = tt.plot_history(second_history, title=f"Example 2 — {SECOND.name}")
 plt.show()
 ```
@@ -568,6 +559,7 @@ The reference Figure 5 uses a post-first-event origin and dense saves around
 its second event; your reference time depends on the fields actually available.
 
 ```python
+# List VTKHDF save files with their saved model times and solver steps.
 catalog = sorted(tt.field_catalog(SECOND), key=lambda row: row["time_s"])
 if len(second_events) >= 2:
     recovered_time = second_history["time_s"][second_events[0]["quiet_index"]]
