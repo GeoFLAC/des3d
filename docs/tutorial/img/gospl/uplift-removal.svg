@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" width="960" height="400" role="img" aria-label="goSPL total change (uplift plus erosion) minus uplift v_z times dt equals delta h, the erosion-only change sent back to DES3D">
+<style>text{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}</style>
+<rect width="960" height="400" rx="16" fill="#F7F6F2"/>
+<rect x="30" y="30" width="260" height="340" rx="14" fill="#FFFFFF" stroke="#DDE1E6" stroke-width="1"/>
+<line x1="50" y1="210" x2="270" y2="210" stroke="#9AA3AE" stroke-width="2" stroke-dasharray="8 6"/><line x1="120" y1="208" x2="120" y2="100" stroke="#2F6FB0" stroke-width="8"/><path d="M106 102 L120 80 L134 102 Z" fill="#2F6FB0"/><line x1="190" y1="80" x2="190" y2="120" stroke="#D9822B" stroke-width="8"/><path d="M176 118 L190 140 L204 118 Z" fill="#D9822B"/><circle cx="250" cy="140" r="10" fill="#1B2430"/><text x="250" y="118" text-anchor="middle" font-size="18" fill="#4A5563">net</text>
+<text x="160" y="270" text-anchor="middle" font-size="24" font-weight="700" fill="#1B2430">goSPL's total change</text>
+<text x="160" y="306" text-anchor="middle" font-size="20" fill="#2F6FB0">uplift +</text>
+<text x="160" y="334" text-anchor="middle" font-size="20" fill="#B5651D">erosion &amp; diffusion</text>
+<rect x="350" y="30" width="260" height="340" rx="14" fill="#FFFFFF" stroke="#DDE1E6" stroke-width="1"/>
+<line x1="370" y1="210" x2="590" y2="210" stroke="#9AA3AE" stroke-width="2" stroke-dasharray="8 6"/><line x1="480" y1="208" x2="480" y2="100" stroke="#2F6FB0" stroke-width="8"/><path d="M466 102 L480 80 L494 102 Z" fill="#2F6FB0"/>
+<text x="480" y="270" text-anchor="middle" font-size="24" font-weight="700" fill="#1B2430">v_z · Δt</text>
+<text x="480" y="306" text-anchor="middle" font-size="20" fill="#6B7480">DES3D already moved</text>
+<text x="480" y="334" text-anchor="middle" font-size="20" fill="#6B7480">the node there</text>
+<rect x="670" y="30" width="260" height="340" rx="14" fill="#FFFFFF" stroke="#D9822B" stroke-width="3"/>
+<line x1="690" y1="110" x2="910" y2="110" stroke="#9AA3AE" stroke-width="2" stroke-dasharray="8 6"/><line x1="800" y1="112" x2="800" y2="152" stroke="#D9822B" stroke-width="8"/><path d="M786 150 L800 172 L814 150 Z" fill="#D9822B"/>
+<text x="800" y="270" text-anchor="middle" font-size="24" font-weight="700" fill="#B5651D">Δh, sent back</text>
+<text x="800" y="306" text-anchor="middle" font-size="20" fill="#6B7480">DES3D sets</text>
+<text x="800" y="334" text-anchor="middle" font-size="20" fill="#6B7480">z ← z + Δh</text>
+<text x="320" y="215" text-anchor="middle" font-size="44" fill="#6B7480">−</text><text x="640" y="215" text-anchor="middle" font-size="44" fill="#6B7480">=</text>
+</svg>
