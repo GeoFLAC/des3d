@@ -327,14 +327,15 @@ this analysis threshold is distinct from DES's automatic output trigger.
 
 ### Read the full history
 
-![Figure 2: speed, mean solver time step, reconstructed pseudo-density, displacement, shear stress and state over 850 model years.](./img/des-rsf/02_full_history.png)
+![Figure 2: speed, mean solver time step, monitor-estimated pseudo-density, displacement, shear stress and state over 850 model years.](./img/des-rsf/02_full_history.png)
 
 *Figure 2.* Six panels from the supplied Example 1 reference run. Read
-vertically at each event: speed rises, mean solver dt shrinks, reconstructed
+vertically at each event: speed rises, mean solver dt shrinks, estimated
 pseudo-density decreases, displacement increases abruptly, and shear stress
 drops. Stress then reloads. The dt curve uses monitor-interval averages;
-pseudo-density markers use the seven supplied spatial fields. Markers are
-not joined because they do not resolve the evolution between field saves.
+pseudo-density is estimated from the largest speed at the three monitor
+points. All six panels use monitor CSV data and the run's material/control
+settings, without reading spatial field files.
 
 Plot the same six panels from `RUN` on a shared model-time axis: speed, mean
 solver time step, pseudo-density, displacement, stress and state.
@@ -347,33 +348,35 @@ but can smooth short-lived extrema. Both the supplied Figure 2 and your plot
 use this same monitor-based calculation.
 
 The pseudo-density panel represents numerical inertia from mass scaling,
-not physical rock density. `pseudo_density_samples` reads the run's cfg and
-instantaneous VTKHDF fields and reconstructs the pinned solver's formula:
-`rho_pseudo = K / min(S * Vmax, sqrt(M / rho))**2`, where `S` is
-`inertial_scaling`, `Vmax` is the largest magnitude of an element's mean nodal
-velocity (floored by the prescribed boundary-speed bound), and `M` is the
+not physical rock density. `pseudo_density_samples(history)` uses the run's
+cfg and estimates the global speed as the largest vector speed
+`sqrt(vx**2 + vz**2)` at P0, P1 and P2, floored by the prescribed boundary-speed
+bound. This is different from the across-band relative speed used to detect
+events. It then applies `rho_pseudo = K / min(S * V_est, sqrt(M / rho))**2`,
+where `S` is `inertial_scaling`, `rho` is the configured constant `rho0`, and `M` is the
 shear modulus by default, or the bulk modulus for
 `mass_scaling_reference_speed=bulk`. The helper requires uniform elastic
 moduli and physical density, as in these workshop models.
 
 With the workshop's default shear-speed ceiling, `K=50 GPa`, `G=30 GPa`
 and `rho=2700 kg/m³`, pseudo-density cannot fall below `rho*K/G=4500 kg/m³`.
-The VTKHDF `density` array contains physical density, not this quantity.
-Reconstruction from a saved velocity field is a diagnostic, not a direct
-record of assembled nodal masses or their exact update times. Sparse field
-saves can miss rapid changes; mean dt alone cannot determine pseudo-density
-because other constraints, including the RSF state limit, also control dt.
+The solver uses the global maximum element-mean speed; three monitor points
+only approximate that value and can miss motion elsewhere. The curve is
+therefore labeled **monitor-based estimate**, not an exact record of solver
+pseudo-density. It provides a densely sampled view of mass-scaling changes.
+Mean dt alone cannot determine pseudo-density because other constraints,
+including the RSF state limit, also control dt.
 
 ```python
-# Plot speed, mean dt, reconstructed pseudo-density, displacement, stress and theta.
+# Plot speed, mean dt, monitor-estimated pseudo-density, displacement, stress and theta.
 fig = tt.plot_history(history, title=f"Example 1 — {RUN.name}")
 plt.show()
 ```
 
 Rebuild the supplied Figure 2 (PNG/PDF) and its numerical CSV data with
 `python resources/plot_history_figure.py` from the extracted tutorial directory.
-It uses the bundled reference run; your notebook uses `RUN`. The available
-field saves can differ, so compare actual sample times and physical trends.
+It uses the bundled reference run; your notebook uses `RUN`. Compare actual
+monitor sample times and physical trends when runs differ.
 
 ### Follow one complete event
 
