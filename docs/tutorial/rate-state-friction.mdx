@@ -11,7 +11,10 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 This tutorial uses two small 2D DynEarthSol models to follow slow loading,
 rapid slip and recovery. You will run a uniform velocity-weakening (VW) band,
 then compare it with a VW patch between velocity-strengthening (VS) flanks.
-Five figures connect the model inputs to its time histories and spatial response.
+Figure 1 introduces the model. For each exercise, predict what you might see,
+run the plotting cell, and describe your observations before opening the
+collapsed reference result. Python plotting is provided; interpretation is
+the main task.
 
 ## What is rate-and-state friction?
 
@@ -311,33 +314,24 @@ P0/P1, not every slipping region in the model, and can miss peaks between
 saved samples. The defaults are `threshold=1e-3` and `merge_gap_s=86400`;
 the plotting helpers below use those same defaults internally.
 
-The five numbered figures below are supplied reference figures. The plotting
-cells create additional figures from the directories selected by `RUN` and
-`SECOND`; selecting reference paths deliberately plots the supplied runs.
-The basic workshop saves fewer spatial fields than the figure-generation
-runs, so compare physical trends and actual saved times before expecting a
-matching image. Python plotting is provided; the exercises focus on interpreting
-and comparing results.
-
-The supplied Example 1 has two detected episodes, near 648.255 and 836.241
-years. Here an episode groups crossings of an across-band speed of 10⁻³ m/s;
-this analysis threshold is distinct from DES's automatic output trigger.
+The plotting cells use the directories selected by `RUN` and `SECOND`.
+Plot your selected runs first, answer the observation questions, then open
+**Reference result and interpretation** to compare with Figures 2–5.
+If you selected the reference paths, you are analysing supplied results
+rather than a new calculation. Sections explicitly labeled **supplied data**
+always use the bundled reference arrays, independently of `RUN` and `SECOND`.
+The basic workshop saves fewer spatial fields than some reference runs;
+compare physical trends and actual saved times rather than exact images.
 
 ## Worked example 1: from loading to rapid slip
 
 ### Read the full history
 
-![Figure 2: speed, mean solver time step, monitor-estimated pseudo-density, displacement, shear stress and state over 850 model years.](./img/des-rsf/02_full_history.png)
+Before plotting, predict how speed, stress and state might change during a
+rapid episode. What changes would you expect in the numerical time step and
+pseudo-density?
 
-*Figure 2.* Six panels from the supplied Example 1 reference run. Read
-vertically at each event: speed rises, mean solver dt shrinks, estimated
-pseudo-density decreases, displacement increases abruptly, and shear stress
-drops. Stress then reloads. The dt curve uses monitor-interval averages;
-pseudo-density is estimated from the largest speed at the three monitor
-points. All six panels use monitor CSV data and the run's material/control
-settings, without reading spatial field files.
-
-Plot the same six panels from `RUN` on a shared model-time axis: speed, mean
+Plot six panels from `RUN` on a shared model-time axis: speed, mean
 solver time step, pseudo-density, displacement, stress and state.
 `plot_history` calculates the
 mean time step as `diff(time_s) / diff(step)` between consecutive monitor
@@ -373,24 +367,41 @@ fig = tt.plot_history(history, title=f"Example 1 — {RUN.name}")
 plt.show()
 ```
 
+**Observe before comparing.** How many rapid episodes do you find? At each
+speed peak, describe the changes in displacement, stress and state. How do
+mean dt and estimated pseudo-density behave? Identify which two panels
+represent numerical controls rather than physical material properties.
+
+<details>
+<summary>Reference result and interpretation — Figure 2</summary>
+
+![Figure 2: speed, mean solver time step, monitor-estimated pseudo-density, displacement, shear stress and state over 850 model years.](./img/des-rsf/02_full_history.png)
+
+*Figure 2.* Six panels from the supplied Example 1 reference run. Read
+vertically at each event: speed rises, mean solver dt shrinks, estimated
+pseudo-density decreases, displacement increases abruptly, and shear stress
+drops. Stress then reloads. The dt curve uses monitor-interval averages;
+pseudo-density is estimated from the largest speed at the three monitor
+points. All six panels use monitor CSV data and the run's material/control
+settings, without reading spatial field files.
+
+The supplied Example 1 has two detected episodes, near 648.255 and 836.241
+years. Here an episode groups across-band speeds of at least 1 mm/s with
+the one-model-day gap rule described above. Use these as comparison values,
+not a requirement that every modified run reproduce the same timing.
+
 Rebuild the supplied Figure 2 (PNG/PDF) and its numerical CSV data with
 `python resources/plot_history_figure.py` from the extracted tutorial directory.
 It uses the bundled reference run; your notebook uses `RUN`. Compare actual
 monitor sample times and physical trends when runs differ.
 
+</details>
+
 ### Follow one complete event
 
-![Figure 3: the first uniform-VW event from slow loading through rapid slip to recovery.](./img/des-rsf/03_event_mechanics.png)
-
-*Figure 3.* Time is measured from the sampled speed peak. The continuous
-symlog axis is linear within ±10 s and logarithmic outside, so both slow tails
-and the rapid interval remain visible. Shading spans the first to last
-10⁻³ m/s threshold exceedance in this episode.
-
-The sampled peak reaches approximately 1.92 m/s. Most displacement accumulates
-while the band moves rapidly and stress is released; the recovery continues
-well beyond the rapid interval. Equal distances along this time axis are not
-equal durations.
+Choose an episode from your own event list. Before plotting its short-time
+history, predict when most displacement will accumulate relative to the
+speed peak and stress change.
 
 ```python
 EVENT_INDEX = 0  # Set to 1 for the second detected episode.
@@ -416,10 +427,28 @@ fig_event.suptitle(f"Example 1 — {RUN.name}; event {EVENT_INDEX + 1}")
 plt.show()
 ```
 
-**Exercise 1.** Identify the loading, rapid-slip and recovery intervals in
-Figures 2–3 and the rapid-slip interval in your plotted event. Then set
-`EVENT_INDEX=1` and rerun the event cells to compare the second episode. Two episodes
-give one observed interval, not a recurrence distribution.
+**Exercise 1.** Identify loading, rapid slip and recovery in your full
+history and selected event plot. When is displacement accumulated relative
+to the speed peak? If a second episode was detected, set `EVENT_INDEX=1` and
+rerun the event cells to compare it. Two episodes give one observed interval,
+not a recurrence distribution. Then compare with the reference below.
+
+<details>
+<summary>Reference result and interpretation — Figure 3</summary>
+
+![Figure 3: the first uniform-VW event from slow loading through rapid slip to recovery.](./img/des-rsf/03_event_mechanics.png)
+
+*Figure 3.* Time is measured from the sampled speed peak. The continuous
+symlog axis is linear within ±10 s and logarithmic outside, so both slow tails
+and the rapid interval remain visible. Shading spans the first to last
+10⁻³ m/s threshold exceedance in this episode.
+
+The sampled peak reaches approximately 1.92 m/s. Most displacement accumulates
+while the band moves rapidly and stress is released; the recovery continues
+well beyond the rapid interval. Equal distances along this time axis are not
+equal durations.
+
+</details>
 
 ## Worked example 2: a VW patch between VS flanks
 
@@ -465,44 +494,10 @@ fig_second = tt.plot_history(second_history, title=f"Example 2 — {SECOND.name}
 plt.show()
 ```
 
-### Inspect the spatial response during rapid slip
+### Inspect your simulated spatial response
 
-![Figure 4: divergence and out-of-plane curl of velocity during the first VS–VW–VS event.](./img/des-rsf/04_divergence_curl.png)
-
-*Figure 4.* Top: divergence of velocity. Bottom: its out-of-plane curl. Times
-are seconds after the first event's analysis threshold crossing. The bracket
-marks the central VW interval. The full band is visible, with values beyond
-each fixed colour range saturated.
-
-In the 2D x–z plane, these scalar diagnostics are
-`div v = ∂vx/∂x + ∂vz/∂z` and `curl_y v = ∂vx/∂z − ∂vz/∂x`, both in s⁻¹.
-They highlight dilatational and rotational motion around the slipping band.
-Derivatives are calculated directly within each linear triangular element on
-the current mesh, without smoothing.
-
-[View the velocity-gradient animation](./img/des-rsf/04_divergence_curl.gif).
-Its frames have nonuniform physical time intervals; read their timestamps
-rather than interpreting playback speed as physical time.
-
-This calculation retains adaptive mass scaling and damping. The gradients
-show the spatial mechanical response, but do not by themselves establish
-physical P/S wave speeds or isolate pure wave amplitudes. Large gradients
-inside the band also include its localized deformation.
-
-The next cell reads the supplied Figure 4 data. Its results refer to the
-reference wavefield calculation, independently of `SECOND`.
-
-```python
-print("Source: supplied Figure 4 wavefield data")
-with np.load(FIGURES / "04_wavefield_data.npz") as data:
-    offsets = data["time_after_detection_s"].copy()
-    divergence = data["divergence"].copy()
-    curl_y = data["curl_y"].copy()
-index = int(np.argmin(abs(offsets - 5.8)))
-print(f"Field time after detection: {offsets[index]:.3f} s")
-print(f"Maximum absolute divergence: {np.max(abs(divergence[index])):.3e} 1/s")
-print(f"Maximum absolute curl_y: {np.max(abs(curl_y[index])):.3e} 1/s")
-```
+Before plotting, predict where plastic deformation and rapid motion will be
+concentrated: the VW patch, the VS flanks, or the surrounding host.
 
 To inspect your own spatial fields, the following cell uses `SECOND` and
 selects saved fields before, near the peak of, and after its first event.
@@ -532,44 +527,74 @@ for label, row in selected_fields:
 plt.show()
 ```
 
-**Exercise 2.** Compare the four snapshots and the animation. Where are the
-largest gradients? How does the host response change as the slip accelerates
-and decays? Distinguish evidence for spatial motion from a measurement of a
-wave's propagation speed.
+**Exercise 2.** Use your three snapshots and their printed times to describe
+where plastic strain accumulates and how the velocity pattern changes.
+Does your nearest saved field capture the rapid episode well? State what
+would require more frequent field output to resolve.
+
+### Explore the supplied wavefield data
+
+This separate exploration uses the bundled Figure 4 wavefield calculation,
+not your `SECOND` run. Its denser output illustrates velocity gradients;
+the preceding snapshot cell instead plots plastic-strain changes and speed.
+
+In the 2D x–z plane, these scalar diagnostics are
+`div v = ∂vx/∂x + ∂vz/∂z` and `curl_y v = ∂vx/∂z − ∂vz/∂x`, both in s⁻¹.
+They highlight dilatational and rotational motion around the slipping band.
+Derivatives are calculated directly within each linear triangular element on
+the current mesh, without smoothing.
+
+The next cell selects the saved reference time nearest 5.8 s after event
+detection and reports spatial maxima of the already-computed gradients.
+It does not calculate gradients from your own output.
+
+```python
+print("Source: supplied Figure 4 wavefield data")
+with np.load(FIGURES / "04_wavefield_data.npz") as data:
+    offsets = data["time_after_detection_s"].copy()
+    divergence = data["divergence"].copy()
+    curl_y = data["curl_y"].copy()
+index = int(np.argmin(abs(offsets - 5.8)))
+print(f"Field time after detection: {offsets[index]:.3f} s")
+print(f"Maximum absolute divergence: {np.max(abs(divergence[index])):.3e} 1/s")
+print(f"Maximum absolute curl_y: {np.max(abs(curl_y[index])):.3e} 1/s")
+```
+
+**Observe before comparing.** Check the selected time and the two maxima.
+Can these scalar maxima alone tell you where the deformation occurs?
+Open the reference to inspect its spatial distribution and animation.
+
+<details>
+<summary>Reference result and interpretation — Figure 4</summary>
+
+![Figure 4: divergence and out-of-plane curl of velocity during the first VS–VW–VS event.](./img/des-rsf/04_divergence_curl.png)
+
+*Figure 4.* Top: divergence of velocity. Bottom: its out-of-plane curl. Times
+are seconds after the first event's analysis threshold crossing. The bracket
+marks the central VW interval. The full band is visible, with values beyond
+each fixed colour range saturated.
+
+[View the velocity-gradient animation](./img/des-rsf/04_divergence_curl.gif).
+Its frames have nonuniform physical time intervals; read their timestamps
+rather than interpreting playback speed as physical time.
+
+This calculation retains adaptive mass scaling and damping. The gradients
+show the spatial mechanical response, but do not by themselves establish
+physical P/S wave speeds or isolate pure wave amplitudes. Large gradients
+inside the band also include its localized deformation.
+
+Compare the reference snapshots and animation. Where are the largest
+gradients? How does the host response change as slip accelerates and decays?
+Distinguish evidence for spatial motion from a measurement of propagation speed.
+
+</details>
 
 ### Compare creep and sudden displacement
 
-![Figure 5: successive displacement profiles and displacement histories at the VS flanks and VW centre.](./img/des-rsf/05_vs_vw_comparison.png)
+Before plotting, predict whether the VS flanks and VW centre will accumulate
+displacement at the same rate between and during rapid episodes.
 
-*Figure 5.* Top strip: positions of the VS flanks and central VW patch.
-Upper plot: cumulative across-band horizontal displacement versus x at
-successive saved times. Blue curves show interseismic accumulation;
-warm colours resolve the second rapid episode. Lower plot: time histories of the
-same displacement at x = 25 km (left VS), 50 km (central VW) and 75 km (right VS). Circles and dotted lines identify the
-interseismic snapshots shown above.
-
-All curves use the same zero at 674.465 years, after the first event. VS
-flanks accumulate displacement steadily while the VW centre falls behind.
-Near 743.974 years, the centre makes a rapid displacement jump and catches up.
-The finite band still deforms between events: “locked” here means a relative
-displacement deficit, not exactly zero motion.
-
-Explore the supplied data behind this figure. These arrays belong to the
-illustrated reference run, regardless of the paths selected for your own runs.
-
-```python
-print("Source: supplied Figure 5 displacement data")
-with np.load(FIGURES / "05_displacement_histories.npz") as data:
-    positions = data["x_km"].copy()
-    sample_times = data["time_s"].copy()
-    displacements = data["displacement_m"].copy()
-index = int(np.argmin(abs(sample_times / tt.YEAR - 740.8)))
-print(f"At {sample_times[index] / tt.YEAR:.3f} yr:")
-for x, displacement in zip(positions, displacements[index]):
-    print(f"  x = {x:.0f} km: {displacement:.3f} m")
-```
-
-Now plot displacement profiles and VS/VW histories from `SECOND` using the
+Plot displacement profiles and VS/VW histories from `SECOND` using the
 same interface interpolation as the reference analysis. If a quiet field is
 available between the first event's recovery and the second event, start from
 the earliest such field to reveal the next loading interval and displacement
@@ -634,10 +659,47 @@ those exported figures. The supplied numbered figures remain available for
 comparison. For denser profiles and histories, run `figure5_dense.cfg` in a
 fresh directory, set `SECOND` to that directory and rerun the Example 2 cells.
 
-**Exercise 3.** Explain how the central displacement deficit in the upper
-panel corresponds to the lower panel's slowly rising VW curve. Compare the
-VW jump with the VS increments across the same event. Why would three curves
-with separate arbitrary displacement offsets obscure this comparison?
+**Exercise 3.** In your plots, compare displacement accumulation at the
+VS flanks and VW centre. Does either region develop a relative displacement
+deficit, and when does it change? Explain how the spatial profiles relate
+to the three time histories. Why would separate arbitrary displacement
+offsets obscure the comparison? Then open the reference below.
+
+<details>
+<summary>Reference result and interpretation — Figure 5</summary>
+
+![Figure 5: successive displacement profiles and displacement histories at the VS flanks and VW centre.](./img/des-rsf/05_vs_vw_comparison.png)
+
+*Figure 5.* Top strip: positions of the VS flanks and central VW patch.
+Upper plot: cumulative across-band horizontal displacement versus x at
+successive saved times. Blue curves show interseismic accumulation;
+warm colours resolve the second rapid episode. Lower plot: time histories of the
+same displacement at x = 25 km (left VS), 50 km (central VW) and 75 km (right VS). Circles and dotted lines identify the
+interseismic snapshots shown above.
+
+All curves use the same zero at 674.465 years, after the first event. VS
+flanks accumulate displacement steadily while the VW centre falls behind.
+Near 743.974 years, the centre makes a rapid displacement jump and catches up.
+The finite band still deforms between events: “locked” here means a relative
+displacement deficit, not exactly zero motion.
+
+</details>
+
+**Optional: inspect the supplied Figure 5 numerical data.** This cell reads
+the illustrated reference run, independently of `SECOND`. Compare the three
+positions at the selected saved time with the reference figure above.
+
+```python
+print("Source: supplied Figure 5 displacement data")
+with np.load(FIGURES / "05_displacement_histories.npz") as data:
+    positions = data["x_km"].copy()
+    sample_times = data["time_s"].copy()
+    displacements = data["displacement_m"].copy()
+index = int(np.argmin(abs(sample_times / tt.YEAR - 740.8)))
+print(f"At {sample_times[index] / tt.YEAR:.3f} yr:")
+for x, displacement in zip(positions, displacements[index]):
+    print(f"  x = {x:.0f} km: {displacement:.3f} m")
+```
 
 ## Try a controlled variation
 
