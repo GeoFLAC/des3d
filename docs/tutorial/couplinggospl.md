@@ -22,7 +22,8 @@ When coupled with DynEarthSol, you can study how tectonic processes (uplift, ext
 
 Before starting, ensure you have:
 
-- ✅ GoSPL installed through conda
+- ✅ GoSPL 2026.6.30 or later installed through conda (earlier releases do not
+  read the letter boundary codes used below)
 - ✅ `gospl_extensions`
 - ✅ DynEarthSol compiled with GoSPL support (the source tree must include the
   `gospl_driver` directory), which needs a C++ toolchain and `make`
@@ -330,7 +331,7 @@ The keys you will change most often:
 | `spl: m`, `spl: n` | Drainage-area and slope exponents of the stream power law |
 | `diffusion: hillslopeKa` | Hillslope diffusivity, m²/yr |
 | `domain: flowdir` | Flow routing (`6` is multi-direction) |
-| `domain: bc` | Boundaries, in the order N,E,S,W (o=open, f=fixed, w=wall): e.g., `'wowo'` opens east and west closing north and south |
+| `domain: bc` | Boundaries, in the order N,E,S,W (o=open, f=fixed, w=wall): e.g., `'wowo'` opens east and west closing north and south. The letters need GoSPL 2026.6.30 or later; earlier releases read only the digits `0` and `1`, in the order S,E,N,W |
 | `domain: seadepo` | Marine deposition on or off |
 | `sea: position` | Sea level in metres relative to the initial surface |
 
@@ -343,9 +344,14 @@ the coupling interval, so it trails DES time by whatever has accumulated since
 the last event. Three consequences:
 
 - **Outputs snap to coupling events.** A file is written at the first coupling
-  event at or after each multiple of `tout`. If the coupling interval divides
-  `tout`, as `gospl_coupling_mode = time` makes easy, outputs are exactly `tout`
-  apart; otherwise the spacing is uneven.
+  event at or after each multiple of `tout`, so outputs are exactly `tout` apart
+  only when the actual coupling times land on those multiples. A configured
+  interval that divides `tout` does not guarantee it. In `time` mode an event
+  fires once the accumulated DES time reaches `gospl_coupling_interval_in_yr`,
+  usually overshooting it by part of a DES step that is not carried over (see
+  [Known limitations](#known-limitations)); in `steps` mode the interval in
+  years follows DES's adaptive time step. Expect spacing near `tout`, off by up
+  to one coupling interval.
 - **A coupling interval longer than `tout` mislabels outputs.** Every event then
   writes, but the time stamped in the output is the nominal one,
   `start + k·tout`, which falls further behind the model time with each write.
