@@ -96,10 +96,14 @@ Installing locally for DynEarthSol integration...
 ### Build DynEarthSol with GoSPL support
 
 1. Set `use_gospl = 1` in Makefile.
-2. Set `GOSPL_EXT_DIR`: e.g., `GOSPL_EXT_DIR = $(HOME)/opt/gospl_extensions`
+2. Set `GOSPL_EXT_DIR` if `gospl_extensions` isn't at the default
+   `$(HOME)/opt/gospl_extensions`: e.g., `GOSPL_EXT_DIR = $(HOME)/opt/gospl_extensions`.
+   Edit it in the Makefile, pass it on the `make` command line, or `export` it
+   in your shell — all three work.
 3. Check `CONDA_ENV_PATH`, the gospl environment. It defaults to
    `$(HOME)/miniforge3/envs/gospl`, where the Miniforge install above puts it;
-   set it only if your environment is elsewhere.
+   set it the same way (Makefile, command line, or `export`) only if your
+   environment is elsewhere.
 4. Set `ndims = 3`, which is **required** for the GoSPL coupling.
 5. Set `usemmg = 1`, which is **recommended**: MMG mesh optimization during
    remeshing (see [Adaptive mesh refinement with MMG](./usingmmg)).
@@ -357,10 +361,10 @@ the last event. Three consequences:
   `start + k·tout`, which falls further behind the model time with each write.
   In `steps` mode the interval in years varies with DES's adaptive time step, so
   this can happen without you noticing.
-- **`dt` and `end` still matter.** DES overrides them for stepping, but when
-  GoSPL reads the YAML it raises `tout` to `dt` if smaller, and lowers it to
-  `end − start` if `start + tout > end`. Keep `dt ≤ tout` and `end` at least
-  the DES run length, `max_time_in_yr`.
+- **`dt` and `end` still bound `tout`.** When GoSPL reads the YAML it raises
+  `tout` to `dt` if smaller, and lowers it to `end − start` if
+  `start + tout > end`, printing a one-line notice for each. Keep `dt ≤ tout`
+  and `end` at least the DES run length, `max_time_in_yr`.
 
 :::tip Align GoSPL and DES frames
 Set `tout` equal to DES's `output_time_interval_in_yr` and couple at a divisor
@@ -387,6 +391,29 @@ In this example,
 - the mesh is generated automatically and saved as `gospl_mesh.npz` in your working directory.
 - DynEarthSol outputs will be saved in the working directory.
 - GoSPL outputs will be saved in the `coupling_test` directory. 
+
+### Console output
+
+GoSPL's own per-step logging would otherwise bury DES's progress lines — a
+run coupling every 200 steps with DES reporting progress every 200000 steps
+would print roughly 4000 GoSPL lines between two DES progress lines. To keep
+the log readable, DynEarthSol prints the first coupling event in full as a
+setup check, then collapses every coupling event since the last progress
+line into a single summary printed alongside it:
+
+```
+GoSPL: 5 couplings over 8.636e+02 yr, dh [-1.866e-04, 1.848e-02] m, net mean +1.095e-04 m, vel (m/yr) ...
+```
+
+This line reports the number of coupling events, the model years they
+covered, the range and mean of the surface elevation change (`Δh`,
+[erosion + diffusion only](#how-coupling-works)), and the velocity ranges
+sent to GoSPL. It appears at DES's own reporting cadence — set by
+`sim.info_display_step_interval` (see [Progress reporting](../usage/run#progress-reporting))
+— so a coarser interval means less GoSPL output too. GoSPL's `--- step done`
+lines are filtered out; its `+++ Output` lines, and any errors or
+instantaneous-velocity-fallback notices, are not and still print as they
+happen.
 
 ### Run with Docker
 
