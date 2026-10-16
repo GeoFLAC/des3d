@@ -107,6 +107,15 @@ faults get finer elements and the quiet far field stays coarse. See
 
 ## Part 1: Rifting a brittle crust (core complex)
 
+:::caution MMG parts of Part 1 depend on an unmerged pull request
+The stock run and Exercises 1 and 2 work on the current DynEarthSol release
+with the plain Triangle build. The MMG box and Exercise 3 describe the
+adaptive-remeshing parameters of a pull request that is not merged yet
+(`smallest_size` and `largest_size` setting the MMG size band,
+`mmg_metric_refine_coeff`). On the current release those names differ; see
+[Adaptive mesh refinement with MMG](./usingmmg) for the parameters it has today.
+:::
+
 The bundled example
 [`examples/core-complex.cfg`](https://github.com/GeoFLAC/DynEarthSol/blob/master/examples/core-complex.cfg)
 stretches a single 10 km brittle layer with a pre-cut dipping fault. With
