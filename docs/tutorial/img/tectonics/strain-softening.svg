@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" width="960" height="420" role="img" aria-label="Strain softening in core-complex.cfg: cohesion drops linearly from 44 MPa at plastic strain 0 to 4 MPa at plastic strain 0.5 and stays there; the friction angle stays at 30 degrees; the weak-zone seed starts at plastic strain 0.5, already fully softened">
+<style>
+text{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+</style>
+<defs>
+<marker id="ab" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#B5BCC5"/></marker>
+<marker id="ad" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#6B7280"/></marker>
+</defs>
+<rect width="960" height="420" rx="16" fill="#F7F6F2"/>
+
+<text x="480" y="40" text-anchor="middle" font-size="22" font-weight="700" fill="#374151">Strain softening in core-complex.cfg</text>
+
+<!-- softening band -->
+<rect x="140" y="70" width="350" height="260" fill="#E6E9EE" opacity="0.7"/>
+<text x="315" y="92" text-anchor="middle" font-size="15" fill="#6B7280">softening</text>
+<text x="665" y="92" text-anchor="middle" font-size="15" fill="#6B7280">fully softened</text>
+
+<!-- axes -->
+<path d="M140 330 L860 330" stroke="#6B7280" stroke-width="2" marker-end="url(#ad)" fill="none"/>
+<path d="M140 330 L140 60" stroke="#6B7280" stroke-width="2" marker-end="url(#ad)" fill="none"/>
+<text x="500" y="390" text-anchor="middle" font-size="17" fill="#374151">accumulated plastic strain</text>
+
+<!-- x ticks -->
+<path d="M140 330 L140 338" stroke="#6B7280" stroke-width="2"/>
+<text x="140" y="358" text-anchor="middle" font-size="15" fill="#374151">pls0 = 0</text>
+<path d="M490 330 L490 338" stroke="#6B7280" stroke-width="2"/>
+<text x="490" y="358" text-anchor="middle" font-size="15" fill="#374151">pls1 = 0.5</text>
+<path d="M840 330 L840 338" stroke="#6B7280" stroke-width="2"/>
+<text x="840" y="358" text-anchor="middle" font-size="15" fill="#374151">1.0</text>
+
+<!-- vertical guide at pls1 -->
+<path d="M490 330 L490 70" stroke="#9AA3AE" stroke-width="2" stroke-dasharray="6 6" fill="none"/>
+
+<!-- cohesion: 44 MPa -> 4 MPa over pls 0 -> 0.5, then flat -->
+<path d="M140 80 L490 307 L840 307" stroke="#2F6FB0" stroke-width="4" fill="none" stroke-linejoin="round"/>
+<circle cx="140" cy="80" r="6" fill="#2F6FB0"/>
+<circle cx="490" cy="307" r="6" fill="#2F6FB0"/>
+<text x="132" y="85" text-anchor="end" font-size="15" fill="#2F6FB0">44 MPa</text>
+<text x="132" y="312" text-anchor="end" font-size="15" fill="#2F6FB0">4 MPa</text>
+<text x="160" y="72" font-size="15" font-weight="700" fill="#2F6FB0">cohesion0</text>
+<text x="510" y="300" font-size="15" font-weight="700" fill="#2F6FB0">cohesion1</text>
+
+<!-- friction angle: 30 deg, no softening -->
+<path d="M140 175 L840 175" stroke="#B5651D" stroke-width="4" fill="none"/>
+<circle cx="140" cy="175" r="6" fill="#B5651D"/>
+<circle cx="490" cy="175" r="6" fill="#B5651D"/>
+<text x="868" y="180" font-size="15" fill="#B5651D">30°</text>
+<text x="520" y="165" font-size="15" font-weight="700" fill="#B5651D">friction_angle0 = friction_angle1</text>
+<text x="520" y="196" font-size="14" fill="#B5651D">no friction softening in this example</text>
+
+<!-- weak zone seed -->
+<path d="M620 240 C 580 250, 540 265, 500 300" stroke="#B5BCC5" stroke-width="3" fill="none" marker-end="url(#ab)"/>
+<text x="628" y="232" font-size="15" fill="#374151">the weak-zone seed starts here:</text>
+<text x="628" y="254" font-size="14" fill="#6B7280">weakzone_plstrain = 0.5 = pls1,</text>
+<text x="628" y="272" font-size="14" fill="#6B7280">so the seed is fully softened at t = 0</text>
+</svg>

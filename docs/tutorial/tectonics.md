@@ -64,7 +64,7 @@ strain goes from `pls0` to `pls1`. Fast softening (small `pls1`) favours one
 long-lived fault; slow softening spreads deformation over many short-lived
 faults.
 
-{/* TODO: small sketch of cohesion vs plastic strain with pls0/pls1 marked. */}
+![Strain softening in core-complex.cfg: cohesion drops from 44 to 4 MPa between plastic strain 0 and 0.5, friction stays at 30°, the weak-zone seed starts fully softened](./img/tectonics/strain-softening.svg)
 
 ### Seeding deformation: the weak zone
 
@@ -133,6 +133,8 @@ it is the fastest way to see every ingredient of a DES tectonic run.
 | Weak zone | Planar (`weakzone_option = 1`), dipping 60°, 1.2 km half-width, in the lower half of the layer at x = 50 km |
 | Surface | Hillslope diffusion, `surface_diffusivity = 1e-7` m²/s |
 | Thermal | Isothermal, 273 K |
+
+![Animated sketch of the core-complex run: the 100 by 10 km layer is pulled apart at both walls, the 60° seed fault cuts to the surface, the hanging wall drops into a basin, the footwall rises and the fault flattens into a dome](./img/tectonics/core-complex-rolling-hinge.svg)
 
 ### Step 1: Walk through the configuration
 
