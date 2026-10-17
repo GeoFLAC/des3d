@@ -12,9 +12,21 @@ lithosphere but certainly not limited to it.
 
 # How to cite
 
-Choi, E., Tan, E., Lavier, L. L., & Calo, V. M. (2013). DynEarthSol2D: An efficient unstructured finite element method to study long-term tectonic deformation. *Journal of Geophysical Research: Solid Earth*, 118(5), 2429–2444. DOI:[10.1002/jgrb.50148](https://doi.org/10.1002/jgrb.50148)
+Please cite the DES3D v2.0 paper (preprint):
 
-Shyu, C. J., Lee, S., Ding, X., Keum, J., Tan, E., Lavier, L. L., & Choi, E. (2026). DynEarthSol v2.0: An efficient explicit Lagrangian solver for geodynamics, surface processes, and earthquake-cycle dynamics. *EGUsphere* [preprint, in review for *Solid Earth*]. DOI:[10.5194/egusphere-2026-2922](https://doi.org/10.5194/egusphere-2026-2922)
+> Shyu, C. J., Lee, S., Ding, X., Keum, J., Tan, E., Lavier, L. L., & Choi, E. (2026). DynEarthSol v2.0: An efficient explicit Lagrangian solver for geodynamics, surface processes, and earthquake-cycle dynamics. *EGUsphere* [preprint, in review for *Solid Earth*]. DOI:[10.5194/egusphere-2026-2922](https://doi.org/10.5194/egusphere-2026-2922)
+
+and the original method paper:
+
+> Choi, E., Tan, E., Lavier, L. L., & Calo, V. M. (2013). DynEarthSol2D: An efficient unstructured finite element method to study long-term tectonic deformation. *Journal of Geophysical Research: Solid Earth*, 118(5), 2429–2444. DOI:[10.1002/jgrb.50148](https://doi.org/10.1002/jgrb.50148)
+
+To cite the software itself, use DOI:[10.5281/zenodo.20293557](https://doi.org/10.5281/zenodo.20293557).
+This DOI covers every archived release, both the software (`v2.x.x`) and the
+benchmark datasets (`benchmarks-v2.x.x`), and it opens the list of all
+versions. To cite the exact version you used, pick the matching software
+release from that list, or take its DOI from the
+[releases page](https://github.com/GeoFLAC/DynEarthSol/releases) or from the
+`CITATION.cff` file shipped with that release.
 
 <!-- Check out the `usage`{.interpreted-text role="doc"} section for further
 information, including `installation`{.interpreted-text role="ref"}. -->
