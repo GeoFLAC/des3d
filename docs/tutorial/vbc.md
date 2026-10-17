@@ -7,7 +7,10 @@ title: Velocity boundary conditions (3D)
 
 Each lateral face of a 3D model (`x0`, `x1`, `y0`, `y1`) can be assigned
 an independent velocity boundary condition (VBC) case. The case number is
-set via `bc.vbc_x0`, `bc.vbc_x1`, `bc.vbc_y0`, `bc.vbc_y1`.
+set via `bc.vbc_x0`, `bc.vbc_x1`, `bc.vbc_y0`, `bc.vbc_y1`. For the full
+reference across all six faces, 2D and 3D, and the traction (Neumann) and
+automatic gravity-driven boundary conditions, see
+[Velocity and traction boundary conditions](../usage/boundaryconditions).
 
 | Case | Normal component | Lateral-shear component | Vertical |
 |------|-----------------|------------------------|---------|
