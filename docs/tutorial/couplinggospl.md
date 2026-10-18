@@ -173,8 +173,8 @@ current one at $t_\mathrm{now}$ (`gospl_coupling_frequency` DES steps apart in
 ```
 ![DES3D–goSPL coupling loop](./img/gospl/coupling-loop.svg)
 
-DES3D and GoSPL exchange data in a way inspired by the **ASPECT-FastScape simple
-coupling scheme**:
+DES3D and GoSPL exchange data in a way inspired by the [**ASPECT-FastScape simple
+coupling scheme**](https://onlinelibrary.wiley.com/doi/10.1029/2021TC007166):
 
 1. **DES → GoSPL:** At each coupling event, DES passes time-averaged
    surface velocities to GoSPL. The velocity is $\overline{v} = \Delta
@@ -447,8 +447,8 @@ The [`gospl_driver/examples`](https://github.com/GeoFLAC/DynEarthSol/tree/master
 directory holds a ready-to-run pair of files: a DES config,
 `gaussian-weakzone-3d-with-gospl.cfg`, and its GoSPL YAML,
 `gospl_config_gaussian_weakzone_3D.yml`. The parameters were chosen to match
-an ASPECT + FastScape reference model, so the results are comparable to
-published work. The weak zone's Gaussian along-strike shift (`weakzone_option
+[an ASPECT + FastScape reference model](https://jaykeum.github.io/aspect-fastscape-coupling/docs/), so the results are comparable to
+that work (in review for JGR). The weak zone's Gaussian along-strike shift (`weakzone_option
 = 4`) is explained in [Weak zones](./weakzone#gaussian-along-strike-shift-weakzone_option--4).
 
 | | Setting |
@@ -488,6 +488,11 @@ Things to look for as the run proceeds:
 - a rift valley opening above the weak zone, with uplifted flanks;
 - channels organizing down those flanks as the relief grows;
 - sediment accumulating in the axial low.
+
+### Exercise 1.1: adjust the problem size
+
+If the progress of the example model is found to be too slow on your computing environment, consider reducing the problem size.
+To advance significantly in model time over a reasonable amount of wall clock time, it is recommended to reduce the `y` dimension, originally 80 km, down to 10 km or so, keeping everything else the same. The Gaussian geometry of the weak zone will be lost but the action of the coupled physics will be still visible. 
 
 ### Exercise 2: vary the erodibility
 
