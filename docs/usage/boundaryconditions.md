@@ -4,8 +4,8 @@ sidebar_position: 5
 
 # Velocity and traction boundary conditions {#boundary-conditions}
 
-DES3D's six box faces — `x0`/`x1` (west/east), `y0`/`y1` (south/north, 3D
-only), `z0`/`z1` (bottom/top) — each take an independent boundary condition,
+DES3D's six box faces, `x0`/`x1` (west/east), `y0`/`y1` (south/north, 3D
+only), and `z0`/`z1` (bottom/top), each take an independent boundary condition,
 set entirely in the `[bc]` section. Three systems can act on a face, and
 they compose additively rather than replacing one another:
 
@@ -32,7 +32,7 @@ vbc_x1 = 1
 vbc_val_x1 = 1e-9    # m/s
 ```
 
-`vbc_x0`/`vbc_x1` (and, in 3D, `vbc_y0`/`vbc_y1`) are **lateral faces** —
+`vbc_x0`/`vbc_x1` (and, in 3D, `vbc_y0`/`vbc_y1`) are **lateral faces**:
 their normal is horizontal, and in 3D they distinguish three independent
 components: the normal direction, the in-plane lateral-shear direction, and
 the vertical (z) direction. `vbc_z0`/`vbc_z1` are the **top/bottom faces**
@@ -66,7 +66,7 @@ instead, and it's the lateral-shear component that gets prescribed while
 
 :::caution Types `11` and `13` don't apply here
 `11` and `13` exist only for the slant boundaries (`vbc_n0`–`vbc_n3`,
-below) and are silently ignored — the face stays fully free — if set on
+below) and are silently ignored (the face stays fully free) if set on
 `vbc_x0`, `vbc_x1`, `vbc_y0`, or `vbc_y1`. Unlike `vbc_n0`–`vbc_n3`, these
 six parameters aren't validated at startup, so a typo here doesn't stop
 the run; check that the boundary actually moved as intended.
@@ -74,7 +74,7 @@ the run; check that the boundary actually moved as intended.
 
 :::caution Sign convention: literal axis direction, not inward/outward
 Unlike the slant-boundary values below, `vbc_val_x0`, `vbc_val_x1`, etc. are
-the literal signed velocity along the global axis — not relative to
+the literal signed velocity along the global axis, not relative to
 inward/outward. A positive `vbc_val_x1` moves the east wall further east
 (outward, extension); a positive `vbc_val_x0` moves the west wall further
 *east* too, i.e. **inward** (convergence), since `x0` is already at the
@@ -84,7 +84,7 @@ and a positive one on `x1` precisely because both push outward.
 
 ### Top and bottom faces (`z0`, `z1`)
 
-`vbc_z0`/`vbc_z1` use their own, smaller set of codes — not the lateral
+`vbc_z0`/`vbc_z1` use their own, smaller set of codes, not the lateral
 table above:
 
 | Type | Horizontal component(s) | Normal (z) component |
@@ -113,9 +113,10 @@ transtensional/transpressional setups. See
 [Velocity boundary conditions (3D)](../tutorial/vbc) for a worked example
 with `examples/oblique-rift-3d.cfg`.
 
-### Time-varying velocity (2D only)
+### Time-varying velocity
 
-`x0`/`x1` can ramp through a sequence of rate multipliers over time:
+Any lateral face, `x0`/`x1` and, in 3D, `y0`/`y1`, can ramp through a sequence of
+rate multipliers over time. Each face has its own independent period table:
 
 ```cfg
 [bc]
@@ -123,6 +124,15 @@ num_vbc_period_x0 = 2
 vbc_period_x0_time_in_yr = [1e6, 2e6]   # end time of each period
 vbc_period_x0_ratio = [1., 0.5]         # vbc_val_x0 multiplier during each period
 ```
+
+In 3D, the same three parameters exist for `y0`/`y1`:
+`num_vbc_period_y0`/`y1`, `vbc_period_y0`/`y1_time_in_yr`, `vbc_period_y0`/`y1_ratio`.
+
+:::caution Only the normal-component types are scaled by the period table
+The period table scales the velocity that types `1`, `3`, and `6` prescribe for the
+normal component (also type `7` in 3D). It does not apply to type `4` or `5`'s
+tangential/shear value, which stays at the raw `vbc_val_*`/`vbc_val_*_l` you set.
+:::
 
 ### Depth-varying velocity profile (2D only)
 
@@ -146,7 +156,7 @@ vbc_val_x0_ratio3 = 0.5   # ratio at the bottom
 | Parameter | Effect |
 |---|---|
 | `bottom_shear_zone_thickness` | For `vbc_x0 = 3`, 2D only: ramps the x-velocity linearly to zero within this thickness (km) of the bottom, instead of a step. |
-| `vbc_val_z1_loading_period` | After this much model time, `vbc_z1` is forced to `0` (free) regardless of its configured type — useful for a loading phase followed by free relaxation. |
+| `vbc_val_z1_loading_period` | After this much model time, `vbc_z1` is forced to `0` (free) regardless of its configured type. Useful for a loading phase followed by free relaxation. |
 
 ## Traction (Neumann / stress) boundary conditions
 
@@ -176,7 +186,7 @@ normal component in, and silently applies zero force.
 
 With the type matched to the face, the sign is consistent with ordinary
 stress convention: a **positive** value is tension (pulls the boundary
-outward), a **negative** value is compression (pushes it inward) — on
+outward), a **negative** value is compression (pushes it inward), on
 both the "low" (`x0`/`y0`/`z0`) and "high" (`x1`/`y1`/`z1`) side of each
 axis, since the outward normal itself flips sign between them.
 
@@ -189,12 +199,12 @@ applied there.
 
 With gravity on (`control.gravity != 0`), the **lateral** faces (`x0`,
 `x1`, `y0`, `y1`) automatically receive a lithostatic ("Archimedes")
-support pressure from the exterior column — via `control.ref_pressure_option`
-— whenever their normal is free; otherwise a merely "free" sidewall would
+support pressure from the exterior column (via `control.ref_pressure_option`)
+whenever their normal is free; otherwise a merely "free" sidewall would
 let material flow out under its own weight with nothing pushing back.
 
 `z0` and `z1` work differently: each gets support only if its own flag is
-on, and **nothing at all** — not even the lithostatic default — if that
+on, and **nothing at all** (not even the lithostatic default) if that
 flag is off and the face is otherwise free.
 
 | Face | Support | Controlled by |
@@ -204,15 +214,15 @@ flag is off and the face is otherwise free.
 
 :::caution Winkler and water loading override `vbc_z0`/`vbc_z1`
 If `has_winkler_foundation` is on, `vbc_z0` is forced to `0` (with a
-warning) regardless of what you set — the foundation needs the bottom
-free to supply its own support. The same happens to `vbc_z1` when
+warning) regardless of what you set, because the foundation needs the
+bottom free to supply its own support. The same happens to `vbc_z1` when
 `has_water_loading` is on. Turn the relevant flag off first if you need a
-Dirichlet velocity BC on that face instead — and if you do, remember `z0`/`z1`
+Dirichlet velocity BC on that face instead, and if you do, remember `z0`/`z1`
 then has no automatic support at all, unlike the lateral faces.
 :::
 
 An alternative (or additional) bottom support is a simple elastic
-foundation — a restoring force proportional to each bottom node's total
+foundation: a restoring force proportional to each bottom node's total
 vertical displacement from its initial position:
 
 ```cfg
@@ -222,7 +232,7 @@ elastic_foundation_constant = 1e11   # default
 ```
 
 It is off by default and, unlike Winkler/water loading, does not force
-`vbc_z0` to free — the two can be combined with an explicit Dirichlet
+`vbc_z0` to free; the two can be combined with an explicit Dirichlet
 condition if you choose to.
 
 See [Solution scheme in DES3D](../theory/theory#equation-of-motion) for the
