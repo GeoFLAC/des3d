@@ -73,7 +73,7 @@ Or set PYTHONPATH manually and use the regular executable:
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `surface_process_option` | 0 | Set to **11** to enable GoSPL |
-| `surface_process_gospl_config_file` | — | Path to your GoSPL YAML file |
+| `surface_process_gospl_config_file` | (empty) | Path to your GoSPL YAML file |
 | `gospl_coupling_frequency` | 1 | How often to run GoSPL (every N steps) |
 | `gospl_mesh_resolution` | -1 | Grid spacing in meters (-1 = automatic) |
 | `gospl_initial_topo_amplitude` | 0.0 | Initial random topography (m) |

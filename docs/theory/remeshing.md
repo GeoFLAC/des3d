@@ -56,14 +56,40 @@ temperature), we use linear interpolation of the data from the old mesh
 to evaluate the field at the new nodal location.
 
 For data associated to elements (e.g., stress and strain), DES3D uses
-**Superconvergent Patch Recovery (SPR)** (Zienkiewicz & Zhu, 1992).
-SPR first projects each element's centroid value onto the nodes of its
-patch by fitting a linear polynomial in patch-relative coordinates, then
-evaluates that polynomial at each new nodal position. This produces a
-smooth, higher-order-accurate nodal field that is subsequently
-re-sampled back to the new element centroids. The approach eliminates
-the spurious velocity spikes and checkerboard stress patterns that
-appeared with the earlier nearest-neighbor scheme.
+**Superconvergent Patch Recovery (SPR)** (Zienkiewicz & Zhu, 1992), blended
+with a plain nearest-neighbor (NN) remap, per element, by how elastic that
+element currently is:
+
+- SPR first projects each element's centroid value onto the nodes of its
+  patch by fitting a linear polynomial in patch-relative coordinates, then
+  evaluates that polynomial at each new nodal position. This produces a
+  smooth, higher-order-accurate nodal field that is subsequently
+  re-sampled back to the new element centroids, eliminating the spurious
+  velocity spikes and checkerboard stress patterns that appeared with a
+  plain nearest-neighbor scheme.
+- But SPR's smoothing also relaxes elastic stress that should instead carry
+  over unchanged (a cold, slowly-deforming element's memory of past
+  loading), so each element's stress is blended between its NN-remapped
+  value and its SPR-recovered value by the Deborah number, De = (element
+  Maxwell time) / (time since the last remesh): a high-De (cold, elastic)
+  element keeps its NN stress; a low-De (weak, viscous) element takes the
+  SPR average. The blend is a smoothstep in `log10(De)`, controlled by two
+  parameters:
+
+  | Parameter | Default | Meaning |
+  |---|---|---|
+  | `mesh.remesh_deborah_min` | `1.0` | De at or below which the remeshed stress is purely the SPR recovery. |
+  | `mesh.remesh_deborah_max` | `100.0` | De at or above which the remeshed stress is purely the NN-remapped stress. |
+
+  `remesh_deborah_min` must be positive and less than `remesh_deborah_max`,
+  or the run exits with a config error (see [Exit codes](../usage/run#exit-codes)).
+  Widen the gap to blend more of the domain; narrow it to make the switch
+  sharper.
+- The free surface is pinned to its exact physical condition (zero normal
+  and shear stress) after the blend, rather than relying on SPR's
+  one-sided, less reliable extrapolation there, and an element whose shape
+  and neighbors are unchanged by the remesh keeps its pre-remesh stress
+  bit-exactly rather than being re-interpolated at all.
 
 If a node's patch is geometrically degenerate (e.g., a boundary node
 with fewer neighbours than degrees of freedom), SPR falls back to a

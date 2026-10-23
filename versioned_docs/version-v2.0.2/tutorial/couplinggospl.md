@@ -101,6 +101,31 @@ DES3D ──── surface velocities (Δcoord/Δt) ────► GoSPL
 | `steps` (default) | `gospl_coupling_frequency` | GoSPL runs every N DES steps |
 | `time` | `gospl_coupling_interval_in_yr` | GoSPL runs every T model years |
 
+### Known limitations
+
+- **The coupling interval is a trigger, not a clamp.** In `time` mode,
+  `gospl_coupling_interval_in_yr` only decides *when* coupling fires. The
+  `dt` handed to GoSPL is the time accumulated since the last event, so if
+  DES's adaptive time step exceeds the interval, coupling fires every DES
+  step and GoSPL's step silently becomes DES's `dt`. There is no
+  sub-stepping or truncation back to the nominal interval.
+- **Remeshing between coupling events.** The coupling clock is unaffected
+  by remeshing, and GoSPL's elevation state is not re-seeded from DES
+  afterwards (GoSPL owns the topography). However, the time-averaged
+  velocity only guards against a change in the *number* of surface nodes
+  across a remesh. If a remesh leaves that count unchanged (common when
+  only the interior remeshes), node identity is not verified and the
+  velocity for the next coupling event can difference unrelated nodes.
+  Treat the first coupling event after a remesh with caution.
+- **The GoSPL mesh is fixed at startup.** It is generated once, sized to the
+  DES model's *initial* top surface plus `gospl_mesh_padding` on each side,
+  and never regenerated (on restart an existing mesh file is reused as is).
+  The padding fraction therefore bounds how much lateral extension the DES
+  model can accumulate before its surface approaches the GoSPL mesh
+  boundary, where edge artifacts can reappear. Nothing warns you when this
+  happens, so choose a generous `gospl_mesh_padding` for strongly extensional
+  models.
+
 ## Quick Start
 
 ### Step 1: Enable GoSPL in your configuration
@@ -108,10 +133,10 @@ DES3D ──── surface velocities (Δcoord/Δt) ────► GoSPL
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `surface_process_option` | 0 | Set to **11** to enable GoSPL |
-| `surface_process_gospl_config_file` | — | Path to your GoSPL YAML file |
-| `gospl_coupling_mode` | `steps` | `steps` or `time` — controls what the coupling interval means |
+| `surface_process_gospl_config_file` | (empty) | Path to your GoSPL YAML file |
+| `gospl_coupling_mode` | `steps` | `steps` or `time`, controls what the coupling interval means |
 | `gospl_coupling_frequency` | 1 | GoSPL runs every N DES steps (used when `gospl_coupling_mode = steps`) |
-| `gospl_coupling_interval_in_yr` | — | GoSPL runs every T model years (used when `gospl_coupling_mode = time`) |
+| `gospl_coupling_interval_in_yr` | (empty) | GoSPL runs every T model years (used when `gospl_coupling_mode = time`) |
 | `gospl_velocity_coupling` | `true` | Pass surface velocities to GoSPL for smoother drainage-network evolution |
 | `gospl_mesh_resolution` | -1 | GoSPL grid spacing in meters (-1 = automatic) |
 | `gospl_mesh_padding` | 0.1 | Fractional domain padding for GoSPL mesh (avoids boundary artifacts) |
