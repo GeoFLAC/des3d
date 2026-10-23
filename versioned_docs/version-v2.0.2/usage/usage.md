@@ -27,14 +27,14 @@ Docker image coming soon!
 3.  Python 3.2+
 4.  Numpy for post-processing
 5.  Optional: 
-    1. [MMG](https://github.com/MmgTools/mmg): mesh adaptation library for adaptive remeshing. Bundled as a git submodule — no separate installation required (see below).
+    1. [MMG](https://github.com/MmgTools/mmg): mesh adaptation library for adaptive remeshing. Bundled as a git submodule, no separate installation required (see below).
     2. `Exodus`: For importing a mesh in the *ExodusII* format. Available as a part of
     SEACAS project [https://github.com/gsjaardema/seacas/]
 
 ### Submodules (mmg, nanoflann, knn-bvh)
 
 `mmg`, `nanoflann`, and `knn-bvh` are bundled as git submodules and
-built automatically by `make` — no separate installation or path
+built automatically by `make`; no separate installation or path
 configuration is required. After cloning, initialize them once:
 
 ```console
@@ -81,7 +81,7 @@ If you want to import an `ExodusII` mesh (.exo),
 - set `EXO_INCLUDE` and `EXO_LIB_DIR` in `Makefile` based on the SEACAS installation path.
 
 #### `MMG`
-MMG is bundled as a git submodule and built automatically — no manual
+MMG is bundled as a git submodule and built automatically; no manual
 installation or path configuration is needed. To enable it:
 
 - set `usemmg = 1` (both `ndims=2` and `ndims=3` are supported).
@@ -94,7 +94,7 @@ often ~50% smaller, and viewable directly in ParaView without conversion):
 
 - install HDF5 with your package manager (`brew install hdf5` on macOS,
   `apt install libhdf5-dev` on Debian/Ubuntu, `dnf install hdf5-devel` on
-  Fedora/RHEL) — it is commonly pre-installed already.
+  Fedora/RHEL); it is commonly pre-installed already.
 - set `hdf5 = 1`. `make` locates the include/lib paths itself via
   `pkg-config` and standard install layouts; set `HDF5_INCLUDE_DIR` and
   `HDF5_LIB_DIR` to override.
@@ -125,7 +125,7 @@ package manager. Install them with Homebrew:
 brew install boost libomp
 ```
 
-Then a plain build finds everything on its own — no paths to edit and none
+Then a plain build finds everything on its own, no paths to edit and none
 to pass on the command line:
 
 ```console
@@ -134,7 +134,7 @@ make ndims=2
 
 Boost and OpenMP are searched at the Homebrew prefix matching the machine's
 architecture (`/opt/homebrew` on Apple Silicon, `/usr/local` on Intel), not
-via `PATH` — this matters on a Mac that has ever used both prefixes, where
+via `PATH`; this matters on a Mac that has ever used both prefixes, where
 `PATH` often points at an install of the wrong architecture. If a build picks
 up something unexpected:
 
