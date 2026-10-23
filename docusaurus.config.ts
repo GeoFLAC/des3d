@@ -53,6 +53,13 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           remarkPlugins: [remarkMath],
           rehypePlugins: [[rehypeKatex, {output: 'html'}]],
+          lastVersion: 'current',
+          versions: {
+            current: {
+              label: 'Latest',
+              path: '',
+            },
+          },
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           // editUrl:
@@ -130,6 +137,10 @@ const config: Config = {
           to: '/docs/category/theory',
           position: 'left',
           label: 'Theory',
+        },
+        {
+          type: 'docsVersionDropdown',
+          position: 'right',
         },
         // {to: '/blog', label: 'Blog', position: 'left'},
         // {

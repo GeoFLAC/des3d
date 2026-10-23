@@ -1,0 +1,92 @@
+---
+sidebar_position: 8
+---
+
+# Remeshing
+
+We assess the mesh quality at fixed temporal intervals and use specific
+quality measures to decide whether to keep using the present mesh or
+remesh. For example, if the smallest angle of an element is less than a
+certain prescribed value, we remesh. 
+
+## New mesh creation
+
+The default mode of remeshing is to create a new mesh preserving the old mesh's boundaries.
+The meshing libraries linked during the build are resued: `triangle` for 2D and `tetgen` for 3D.
+To assist the meshing process, DES provides a point set for the meshing libraries to start with.
+However, a group of nodes in the deformed mesh may be removed from the point set if any of the following criteria is met:
+
+- Left outside of the new boundaries when a deformed or displaced boundary is restored to the
+initial configuration
+- Surrounded only by small elements 
+
+Once all criteria are enforced, a final list of nodes is collected and used for constructing a new
+mesh. During the process, new nodes might be inserted into the mesh or the mesh topology changed 
+through edge-flipping (see the figure below) during the triangulation.
+
+<img alt="edge flipping during remeshing" src="./img/edgeflipping.png" width="640"/>
+
+<em>(above) Plastic strain distribution on a mesh before and after remeshing. Solid and dashed white lines are new and old element edges. 
+Pink circles are newly added nodes.</em>
+
+At extreme strain, a highly distorted mesh can have two boundary segments
+meeting at a tiny angle, which sends `triangle`'s Steiner-point insertion
+into a non-terminating splitting loop. The 2D-only parameter
+`mesh.max_steiner_factor` (default `30`) caps the number of Steiner points
+`triangle` may insert during remeshing at `factor × npoints`, bounding this
+runaway; set it `<= 0` to restore the old unlimited behavior. It only
+applies when no area constraint is active, so initial meshing is unaffected.
+
+## Mesh optimization
+
+As described in https://geoflac.github.io/des3d/docs/tutorial/usingmmg, a user can choose link 
+[MMG](https://mmgtools.org) when building DES. MMG performs mesh optimization allowing a metric-based 
+element size variation and the metric itself can be defined in terms of one of the physical variables 
+like accumulated plastic strain.
+
+## Variable mapping from old to new mesh
+
+After the new mesh is created, the boundary
+conditions, derivatives of shape function, and mass matrix have to be
+re-calculated. 
+
+Also, an inter-mesh mapping of variables is performed. 
+For data associated to nodes (e.g., velocity and
+temperature), we use linear interpolation of the data from the old mesh
+to evaluate the field at the new nodal location.
+
+For data associated to elements (e.g., stress and strain), DES3D uses
+**Superconvergent Patch Recovery (SPR)** (Zienkiewicz & Zhu, 1992).
+SPR first projects each element's centroid value onto the nodes of its
+patch by fitting a linear polynomial in patch-relative coordinates, then
+evaluates that polynomial at each new nodal position. This produces a
+smooth, higher-order-accurate nodal field that is subsequently
+re-sampled back to the new element centroids. The approach eliminates
+the spurious velocity spikes and checkerboard stress patterns that
+appeared with the earlier nearest-neighbor scheme.
+
+If a node's patch is geometrically degenerate (e.g., a boundary node
+with fewer neighbours than degrees of freedom), SPR falls back to a
+simple weighted average of the surrounding element centroid values.
+
+> Zienkiewicz, O. C., & Zhu, J. Z. (1992). The superconvergent patch
+> recovery and a posteriori error estimates. Part 1: The recovery
+> technique. *International Journal for Numerical Methods in
+> Engineering*, 33(7), 1331–1364.
+> https://doi.org/10.1002/nme.1620330702
+
+<!-- When most of the deformation is focused in and around a few deformation
+zones like shear bands, most of the elements outside of the zones deform
+only slightly and thus mostly remain unaffected by remeshing. The high
+degree of similarity between the new and old meshes makes projecting the
+fields of variables between the meshes very easy. For nodes and elements
+unaffected by remeshing, which are the majority, a simple injection
+suffices. That is, the data of the nodes and elements of the old mesh
+are mapped onto the nodes and elements which are collocated with them in
+the new mesh. -->
+
+<!-- When deformation is not localized but distributed over a broad region of
+the domain, remeshing might result in a new mesh that is very different
+from the old one. Then, an inter-mesh mapping of variables becomes
+necessary. -->
+
