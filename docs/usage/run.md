@@ -60,10 +60,20 @@ file. DES3D detects the most recent checkpoint automatically.
 The checkpoint and frame file format was bumped from revision 3 to 4.
 A revision (or dimensionality) mismatch between the file and the running
 binary is now a **hard error** with a diagnostic naming the expected and
-actual values — previously it was accepted silently and could be misread.
+actual values, previously it was accepted silently and could be misread.
 This means **checkpoint and frame files written before this change cannot
 be restarted or read by a newer DES3D binary.** Finish or discard runs on
 the old binary before upgrading.
+:::
+
+:::danger Conservative MMG remeshing adds new checkpoint records
+Checkpoints now also carry `nremesh`, `plstrain_remesh`, and, in MMG builds,
+`surface dh` and `refined_elem_size_n` (plus, with `remeshing_option = 13`,
+`side_prof_*`). A checkpoint written before this change does not have these
+records, and restarting from it is a restart-mismatch error (`21`/`22`).
+Finish or discard runs on the old binary before upgrading. See
+[Conservative remeshing](../tutorial/usingmmg#conservative-remeshing-freeze--required-policy)
+for what changed in MMG remeshing itself.
 :::
 
 Frame files (HDF5 and plain binary) now also embed the full `.info` row
@@ -152,7 +162,7 @@ parameter.
 A NaN velocity stops the run with `50` instead of continuing to write frames.
 The run prints a single line summarizing the affected fields, their counts and
 the first bad element and node. A GPU build that finds no device at startup
-exits `52`, after appending its manifest record — see [Provenance](#provenance).
+exits `52`, after appending its manifest record; see [Provenance](#provenance).
 Scripts that test for specific exit statuses need updating: earlier builds used
 `1`, `2`, `10`, `11` and `12` with different meanings.
 
