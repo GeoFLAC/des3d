@@ -39,6 +39,47 @@ export PATH="$(pwd)/node20/bin:$PATH"
 ```
 `yarn --ignore-engines install` bypasses the `package.json` engines check for install, but the Docusaurus CLI itself hard-checks the Node version at build time regardless — the actual binary must be ≥20.
 
+## Versioned docs
+
+This site uses Docusaurus's built-in versioned-docs feature (`versions.json`,
+`versioned_docs/`, `versioned_sidebars/`, plus the `docsVersionDropdown`
+navbar item). There's no magic propagation between them: each version is a
+plain, independent copy of files, nothing is derived from `docs/` at build
+time except the unversioned "Latest" version itself.
+
+- **`docs/` and `sidebars.ts`** are the unversioned source, rendered as
+  "Latest" at the default route (`lastVersion: 'current'`, `path: ''` in
+  `docusaurus.config.ts`). The recurring sync procedure above targets these,
+  as always, since it documents DynEarthSol's current/upcoming state.
+- **`versioned_docs/version-X.Y.Z/` and
+  `versioned_sidebars/version-X.Y.Z-sidebars.json`** are frozen copies for an
+  already-tagged release. Edit them directly, independently of `docs/`.
+- **A brand-new page or section for a feature that didn't exist at an older
+  version's tag** should *not* be added to that version's `versioned_docs/`
+  copy. Its absence there is correct, not a gap to fill. Most sync work only
+  touches `docs/` for exactly this reason.
+- **Judgment call: check the upstream PR's merge date against the nearest
+  already-cut version's tag date.** If a PR merged *before* that tag but
+  wasn't documented in `docs/` until *after* it (this happens: doc-sync
+  lags behind code), the content describes real behavior of that tagged
+  release and belongs in its `versioned_docs/` copy too, not just Latest.
+  Also backport a pure correction (fixing something that was simply wrong,
+  not a behavior change) to every version it's wrong in.
+- **When DynEarthSol actually tags a new release**, once `docs/` is caught
+  up to that release's state via the normal sync procedure, freeze it:
+  ```
+  yarn docusaurus docs:version vX.Y.Z
+  ```
+  This snapshots the current `docs/` + `sidebars.ts` into a new
+  `versioned_docs/version-vX.Y.Z/` and `versioned_sidebars/`, and registers
+  it in `versions.json`. Do this going forward for each real tagged release;
+  it's a one-command snapshot, not the retroactive reconstruction v2.0.0 and
+  v2.0.2 needed (those predated this versioning setup, so their snapshots
+  were manually extracted from the des3d commit closest to each tag's date).
+- Verify with `yarn build` as usual, and grep the generated HTML under each
+  version's route (e.g. `build/docs/vX.Y.Z/...`) for the new content, same as
+  the existing step 8, applied once per affected version.
+
 ## Doc scope discipline
 
 Only document changes with a visible parameter, flag, workflow, or breaking-change surface. Skip internal-only correctness/perf fixes, refactors, and CI changes that don't change what a user of the engine sees or configures.
