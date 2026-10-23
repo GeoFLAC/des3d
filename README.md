@@ -72,8 +72,6 @@ scratch, it's catching up with upstream DynEarthSol changes:
 - Branch from `main`, open a PR, let `test-deploy.yml` verify the build.
   Direct pushes to `main` are technically allowed by branch protection but
   normal changes should go through a PR.
-- Never use em-dashes in prose, use commas, colons, semicolons or
-  parentheses instead.
 - See [CLAUDE.md](./CLAUDE.md) for the full doc-sync procedure, the
   versioned-docs workflow, and known gotchas (Node version, dependency
   resolution overrides, etc.).

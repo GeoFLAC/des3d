@@ -84,6 +84,10 @@ time except the unversioned "Latest" version itself.
 
 Only document changes with a visible parameter, flag, workflow, or breaking-change surface. Skip internal-only correctness/perf fixes, refactors, and CI changes that don't change what a user of the engine sees or configures.
 
+## Writing style
+
+Occasional em-dashes in prose are fine, used sparingly for a genuine parenthetical break. Don't default to one in every other sentence, and prefer ordinary punctuation (commas, colons, semicolons, parentheses) when it reads just as naturally, but there's no need to hunt down and eliminate every em-dash as a matter of policy.
+
 ## Automated notification pipeline
 
 Merges to DynEarthSol no longer require manually running the `gh pr list` scan above to notice them — a cross-repo GitHub Actions pipeline does it automatically:
