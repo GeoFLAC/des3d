@@ -52,3 +52,17 @@ targets.
 Unfortunately, the choice of $c_{1}$ is currently empirical. We
 are working to devise a consistent way of finding the optimal value of
 $c_{1}$.
+
+## Reference speed for global velocity scaling
+
+When `use_global_velocity_scaling` is enabled, the mass-scaled density and
+the elastic time step are limited by an elastic wave speed derived from the
+material moduli. `mass_scaling_reference_speed` selects which modulus sets
+that ceiling:
+
+| Value | Ceiling | Notes |
+|-------|---------|-------|
+| `shear` (default) | $G/\rho$ | Historical behavior. |
+| `bulk` | $K_s/\rho$ | Uses the bulk modulus instead. |
+
+Leaving the option at its default reproduces earlier results.
