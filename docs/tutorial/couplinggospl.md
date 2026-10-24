@@ -115,6 +115,15 @@ Installing locally for DynEarthSol integration...
    make -j4
    ```
 
+:::tip This builds whatever commit is checked out, not a specific release
+A plain clone's `master` branch is typically ahead of the latest tagged release (e.g.
+`v2.0.2`), not that release itself. For a specific, reproducible version, check out
+its tag before building: `git checkout v2.0.2`. The running binary's own startup
+output names exactly what it was built from, e.g.
+`[build][code] rev=v2.0.2-136-gc96c00e, branch=master, ...` means 136 commits past
+`v2.0.2`; see [Provenance](../usage/run#provenance).
+:::
+
 :::tip Check your build
 When the build is successful, you should see the following message:
 ```
@@ -428,6 +437,17 @@ cp ~/DynEarthSol/gospl_driver/examples/* .
 
 The `cp` above seeds the mounted directory with the bundled example — copy in
 your own `.cfg` and GoSPL YAML instead once you have one.
+
+:::tip This builds whatever commit is checked out, not a specific release
+The Dockerfile copies your local working tree as-is; it doesn't pin or fetch a
+specific DynEarthSol version. A plain clone's `master` branch is typically ahead
+of the latest tagged release (e.g. `v2.0.2`), not that release itself. For a
+specific, reproducible version, check out its tag on the host before running
+`./build.sh`: `git checkout v2.0.2`. The running binary's own startup output
+names exactly what it was built from, e.g.
+`[build][code] rev=v2.0.2-136-gc96c00e, branch=master, ...` means 136 commits
+past `v2.0.2`; see [Provenance](../usage/run#provenance).
+:::
 
 ## Worked example: a Gaussian weak zone rift
 
