@@ -143,10 +143,6 @@ ldd dynearthsol3d | grep python                    # linked to Python?
 cat dynearthsol-gospl                              # wrapper script written?
 ```
 
-The build also writes `dynearthsol-gospl`, a wrapper script that sets
-`PYTHONPATH` for you. If it is missing, the build did not complete with
-`use_gospl = 1`.
-
 ## How coupling works
 
 One coupling event, between the previous event at $t_\mathrm{prev}$ and the
