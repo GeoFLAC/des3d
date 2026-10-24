@@ -390,12 +390,12 @@ In this example,
 
 ### Console output
 
-GoSPL's own per-step logging would otherwise bury DES's progress lines — a
-run coupling every 200 steps with DES reporting progress every 200000 steps
-would print roughly 4000 GoSPL lines between two DES progress lines. To keep
-the log readable, DynEarthSol prints the first coupling event in full as a
-setup check, then collapses every coupling event since the last progress
-line into a single summary printed alongside it:
+Left unmitigated, GoSPL's own per-step logging would bury DES's progress
+lines: a run coupling every 200 steps with DES reporting progress every
+200000 steps would print roughly 4000 GoSPL lines between two DES progress
+lines. To keep the log readable, DynEarthSol prints the first coupling
+event in full as a setup check, then collapses every coupling event since
+the last progress line into a single summary printed alongside it:
 
 ```
 GoSPL: 5 couplings over 8.636e+02 yr, dh [-1.866e-04, 1.848e-02] m, net mean +1.095e-04 m, vel (m/yr) ...
