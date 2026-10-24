@@ -429,14 +429,6 @@ cp ~/DynEarthSol/gospl_driver/examples/* .
 The `cp` above seeds the mounted directory with the bundled example — copy in
 your own `.cfg` and GoSPL YAML instead once you have one.
 
-To stop a run started this way, find its container ID and kill it from
-another terminal:
-
-```bash
-docker ps
-docker kill [CONTAINER ID]
-```
-
 ## Worked example: a Gaussian weak zone rift
 
 The [`gospl_driver/examples`](https://github.com/GeoFLAC/DynEarthSol/tree/master/gospl_driver/examples)
