@@ -115,6 +115,15 @@ Installing locally for DynEarthSol integration...
    make -j4
    ```
 
+:::tip This builds whatever commit is checked out, not a specific release
+A plain clone's `master` branch is typically ahead of the latest tagged release (e.g.
+`v2.0.2`), not that release itself. For a specific, reproducible version, check out
+its tag before building: `git checkout v2.0.2`. The running binary's own startup
+output names exactly what it was built from, e.g.
+`[build][code] rev=v2.0.2-136-gc96c00e, branch=master, ...` means 136 commits past
+`v2.0.2`; see [Provenance](../usage/run#provenance).
+:::
+
 :::tip Check your build
 When the build is successful, you should see the following message:
 ```
@@ -142,10 +151,6 @@ conda activate gospl && python -c "import gospl"   # GoSPL importable?
 ldd dynearthsol3d | grep python                    # linked to Python?
 cat dynearthsol-gospl                              # wrapper script written?
 ```
-
-The build also writes `dynearthsol-gospl`, a wrapper script that sets
-`PYTHONPATH` for you. If it is missing, the build did not complete with
-`use_gospl = 1`.
 
 ## How coupling works
 
@@ -394,12 +399,12 @@ In this example,
 
 ### Console output
 
-GoSPL's own per-step logging would otherwise bury DES's progress lines — a
-run coupling every 200 steps with DES reporting progress every 200000 steps
-would print roughly 4000 GoSPL lines between two DES progress lines. To keep
-the log readable, DynEarthSol prints the first coupling event in full as a
-setup check, then collapses every coupling event since the last progress
-line into a single summary printed alongside it:
+Left unmitigated, GoSPL's own per-step logging would bury DES's progress
+lines: a run coupling every 200 steps with DES reporting progress every
+200000 steps would print roughly 4000 GoSPL lines between two DES progress
+lines. To keep the log readable, DynEarthSol prints the first coupling
+event in full as a setup check, then collapses every coupling event since
+the last progress line into a single summary printed alongside it:
 
 ```
 GoSPL: 5 couplings over 8.636e+02 yr, dh [-1.866e-04, 1.848e-02] m, net mean +1.095e-04 m, vel (m/yr) ...
@@ -433,13 +438,16 @@ cp ~/DynEarthSol/gospl_driver/examples/* .
 The `cp` above seeds the mounted directory with the bundled example — copy in
 your own `.cfg` and GoSPL YAML instead once you have one.
 
-To stop a run started this way, find its container ID and kill it from
-another terminal:
-
-```bash
-docker ps
-docker kill [CONTAINER ID]
-```
+:::tip This builds whatever commit is checked out, not a specific release
+The Dockerfile copies your local working tree as-is; it doesn't pin or fetch a
+specific DynEarthSol version. A plain clone's `master` branch is typically ahead
+of the latest tagged release (e.g. `v2.0.2`), not that release itself. For a
+specific, reproducible version, check out its tag on the host before running
+`./build.sh`: `git checkout v2.0.2`. The running binary's own startup output
+names exactly what it was built from, e.g.
+`[build][code] rev=v2.0.2-136-gc96c00e, branch=master, ...` means 136 commits
+past `v2.0.2`; see [Provenance](../usage/run#provenance).
+:::
 
 ## Worked example: a Gaussian weak zone rift
 
