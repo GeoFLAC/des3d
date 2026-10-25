@@ -34,12 +34,15 @@ Before starting, ensure you have:
 - ✅ Python 3 with `numpy` for `2vtk.py`
 - ✅ [ParaView](https://www.paraview.org/) or another VTK viewer
 - ✅ Read [Making a complex mesh with `.poly` file](./usingpolyfile) (needed for Part 2)
-- ⬜ Optional: MMG, for the adaptive-remeshing boxes; see [Adaptive mesh refinement with MMG](./usingmmg)
+- ⬜ Optional: an MMG build (`make ndims=2 usemmg=1`) for the adaptive-remeshing
+  boxes. MMG is a git submodule that `make` fetches and builds for you; see
+  [Adaptive mesh refinement with MMG](./usingmmg)
 
 :::tip Which build?
 The examples in this tutorial are 2D. A 3D build (`make`) runs the same
 physics at a much higher cost. Every `.cfg` here runs on a plain Triangle
-build; the MMG boxes show what changes when you rebuild with `usemmg = 1`.
+build; the MMG boxes show what changes when you rebuild with
+`make ndims=2 usemmg=1`.
 :::
 
 ## How the model works
@@ -106,15 +109,6 @@ faults get finer elements and the quiet far field stays coarse. See
 [Remeshing](../theory/remeshing) and [MMG](./usingmmg).
 
 ## Part 1: Rifting a brittle crust (core complex)
-
-:::caution MMG parts of Part 1 depend on an unmerged pull request
-The stock run and Exercises 1 and 2 work on the current DynEarthSol release
-with the plain Triangle build. The MMG box and Exercise 3 describe the
-adaptive-remeshing parameters of a pull request that is not merged yet
-(`smallest_size` and `largest_size` setting the MMG size band,
-`mmg_metric_refine_coeff`). On the current release those names differ; see
-[Adaptive mesh refinement with MMG](./usingmmg) for the parameters it has today.
-:::
 
 The bundled example
 [`examples/core-complex.cfg`](https://github.com/GeoFLAC/DynEarthSol/blob/master/examples/core-complex.cfg)
@@ -262,13 +256,16 @@ elements after some 140 remeshes.
     220 at 99 kyr. */}
 
 :::tip MMG: same config, adaptive mesh
-Rebuild with `usemmg = 1` and run the same file. The MMG build sizes elements
-from accumulated plastic strain, with the band set by two parameters you
-already have: the largest edge is `resolution × largest_size^(1/2)` and the
-smallest `resolution × (smallest_size × mmg_remesh_defensive_tiny_ratio)^(1/2)`.
-In the run shown below MMG reaches 100 kyr with about 1400 elements and 22
-remeshes against 2000 elements and 136 remeshes for Triangle. The tuned
-variant `core-complex-mmg.cfg` differs from the stock file in these lines:
+Rebuild with `make ndims=2 usemmg=1` and run the same file. The MMG build
+sizes elements from accumulated plastic strain, with the band set by two
+parameters you already have: the largest edge is
+`resolution × largest_size^(1/2)` and the smallest
+`resolution × (smallest_size × mmg_remesh_defensive_tiny_ratio)^(1/2)`.
+Remeshing is conservative: elements that are not yielding, distorted or tiny
+are frozen, so each remesh touches mainly the fault band. In the run shown
+below MMG reaches 100 kyr with about 1400 elements and 22 remeshes against
+2000 elements and 136 remeshes for Triangle. The tuned variant
+`core-complex-mmg.cfg` differs from the stock file in these lines:
 
 ```cfg
 max_time_in_yr = 500000
@@ -283,8 +280,12 @@ surface_diffusivity = 1e-6
 inertial_scaling = 1e4
 ```
 
-Parameters and the plastic-strain metric are explained in
-[Adaptive mesh refinement with MMG](./usingmmg).
+The build is described in [Adaptive mesh refinement with MMG](./usingmmg).
+The full parameter list, with a one-line tuning rule for each, is in the
+`[mesh]` section of
+[`examples/defaults.cfg`](https://github.com/GeoFLAC/DynEarthSol/blob/master/examples/defaults.cfg)
+and in `dynearthsol2d --help`. These parameters are in DynEarthSol `master`
+since [PR #95](https://github.com/GeoFLAC/DynEarthSol/pull/95), October 2026.
 :::
 
 ### Step 3: Visualize
@@ -341,8 +342,9 @@ Erosion unloads the footwall, which keeps the fault active longer.
 
 ### Exercise 3: change the MMG refinement
 
-Requires the MMG build. `mmg_metric_refine_coeff` scales the target element
-volume by `1 / (1 + coeff × plastic strain)`.
+Requires the MMG build (`make ndims=2 usemmg=1`). `mmg_metric_refine_coeff`
+scales the target element volume by `1 / (1 + coeff × plastic strain)`; the
+smallest size it can reach is the `smallest_size` floor from the box above.
 
 | Run | `mmg_metric_refine_coeff` | What you should see |
 |-----|---------------------------|---------------------|
