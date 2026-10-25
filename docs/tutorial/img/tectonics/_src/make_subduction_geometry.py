@@ -24,8 +24,9 @@ a('<defs><clipPath id="main"><rect x="60" y="110" width="784" height="392"/></cl
 a('<g clip-path="url(#main)">')
 # coarse mantle background (region 4) over whole panel
 a(f'<rect x="60" y="{Y(-9):.1f}" width="784" height="400" fill="{C["mantle_f"]}"/>')
-# halo (region 3): polygon 12-8-10-14 (below) and 9-13-15-11 (above) -> draw as one polygon 12,8,9,13,15,11,10,14
-a(f'<polygon points="{pts([12,8,9,13,15,11,10,14])}" fill="{C["halo_f"]}" stroke="{C["mantle"]}" stroke-width="1.5" stroke-dasharray="5 4"/>')
+# halo (region 3): outer boundary per poly segments 2-12, 12-8, 8-9, 9-13, 13-15(via 15), 15-14, 14-12:
+# polygon 12,8,9,13,15,14; the slab (region 2) is drawn on top of it
+a(f'<polygon points="{pts([12,8,9,13,15,14])}" fill="{C["halo_f"]}" stroke="{C["mantle"]}" stroke-width="1.5" stroke-dasharray="5 4"/>')
 # slab (region 2): 8,9,11,10
 a(f'<polygon points="{pts([8,9,11,10])}" fill="{C["crust_f"]}" stroke="{C["crust"]}" stroke-width="2"/>')
 # crust layer (region 1): z -2..-9 across panel
