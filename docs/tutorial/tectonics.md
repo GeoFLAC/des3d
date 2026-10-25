@@ -369,13 +369,12 @@ step.
 
 ## Part 2: Subduction
 
-:::caution Part 2 runs on an unmerged branch
+:::caution Part 2 runs on code under review
 The example below, `examples/subduction.cfg`, and the phase-change engine it
-uses (`phase_change_option = 3`, the virtual-topology grid, `remeshing_option
-= 13`) live on the DynEarthSol branch `feature/virtual-topology`, which will
-be merged into `master` by pull request. Until then, build from that branch.
-Parameter names could still change in review, and the exercise outcomes are
-not yet filled in.
+uses (`phase_change_option = 3` on a virtual-topology marker grid) are
+DynEarthSol [pull request #110](https://github.com/GeoFLAC/DynEarthSol/pull/110),
+open against `master` from the branch `feature/virtual-topology`. Until it
+merges, build from that branch. Parameter names could still change in review.
 :::
 
 The example
@@ -565,8 +564,8 @@ materials; the run stops at input otherwise.
 
 | Transition | Rule | Switch |
 |---|---|---|
-| Mantle → serpentinite | In the antigorite pressure–temperature field (Ulmer & Trommsdorff 1995), shallower than 150 km, and with a grid cell within `serpentinization_thickness` below the marker that holds more than 30 % oceanic crust | `has_serpentinization` (on) |
-| Serpentinite → mantle | Leaves the antigorite field | `has_serpentinization` (on) |
+| Mantle → serpentinite | In the antigorite pressure–temperature field (Ulmer & Trommsdorff 1995), shallower than 150 km, and with a grid cell within `serpentinization_thickness` below the marker that is more than half oceanic crust or sediment | `has_serpentinization` (on) |
+| Serpentinite → mantle | Above 550 °C and outside the antigorite field | `has_serpentinization` (on) |
 | Oceanic crust → eclogite | Past the basalt–eclogite boundary (Hacker 2003); one way | `has_eclogitization` (on) |
 | Hydrous mantle → mantle | Chlorite-out boundary (Grove et al. 2009) | `has_hydrous_mantle_dehydration` (off) |
 | Sediment → sedimentary rock → metasediment → schist | Compaction, then metamorphic thresholds | `has_sediment_metamorphism` (off) |
@@ -576,8 +575,13 @@ instead of the whole mantle. DES keeps a coarse background grid of marker
 materials, the **virtual topology**, with cells of `resolution × vt_size`
 (3 km here). A mantle marker looks down through that grid as far as
 `serpentinization_thickness`, 5 km here, so one cell, and converts if it
-finds a crust-dominant cell. The grid is rebuilt after each remesh and
-reused between them.
+finds a cell that is mostly crust. The grid is built at the start, rebuilt
+after each remesh and carried through checkpoints, so a restart continues
+with the same cells. Two details worth knowing: the reach is counted in
+whole cells, so it can differ from the nominal thickness by up to two
+cells; and the pressure the rules read is the element mean stress, not a
+fixed lithostat, so tectonic over- and underpressure shift the reaction
+boundaries slightly.
 
 The parameters you will change most often:
 
@@ -586,7 +590,7 @@ The parameters you will change most often:
 | `vbc_val_x0` | Convergence rate, m/s |
 | `oceanic_plate_age_in_yr` | Thermal age, hence strength and negative buoyancy, of the incoming plate |
 | `friction_angle0/1` of sediment and serpentinite | Plate-interface strength; controls dip and forearc style |
-| `serpentinization_thickness` | How thick the weak layer above the slab can grow; must be at least one grid cell |
+| `serpentinization_thickness` | How thick the weak layer above the slab can grow, in whole grid cells; must be positive and at least one cell, so "none" is `has_serpentinization = no` |
 | `has_serpentinization`, `has_eclogitization` | Turn each reaction off for a control run |
 | `rho0` of eclogite | Slab pull at depth |
 | `surface_diffusivity` | Trench fill and forearc erosion |
@@ -645,7 +649,7 @@ Things to look for as the run proceeds (the figure is the reference run):
 - **The wedge corner serpentinizes wholesale.** The mantle between the
   overriding plate's crust and the slab top lies within one grid cell of
   crust, so by 2.5 Myr a body 20–25 km thick and 50 km long has converted.
-  This is the geometric rule at work, not a thermal one; Exercise 5 shows
+  This is the geometric rule at work, not a thermal one; Exercise 4 shows
   how `serpentinization_thickness` controls it.
 - **The trench** fills with sediment and the overriding plate's crust bends
   down into it, while the incoming plate at the left wall keeps its three
@@ -654,26 +658,17 @@ Things to look for as the run proceeds (the figure is the reference run):
 {/* TODO (Q30): confirm this description, or replace it with your own reading
     of the run. Numbers are from analysis/examples/376_subduction_tutorial_evolution.py */}
 
-### Exercise 4: plate interface strength
+### Exercise 4: thickness of the serpentinite layer
 
-Sediment and serpentinite are the two materials on the interface, both at a
-friction angle of 3°. Tan et al. (2012) showed that this friction controls
-the dip of the interface and whether a forearc basin and accretionary prism
-form.
+`serpentinization_thickness` sets how far above the slab top mantle can
+convert, counted in 3 km grid cells. It must be positive, so the zero case
+is the rule switched off.
 
-| Run | `friction_angle0/1` of materials 3 and 4 | What you should see |
-|-----|-----------------------------------------|---------------------|
-| Reference | `3` | {/* TODO */} |
-| Intermediate | `10` | {/* TODO */} |
-| Strong coupling | `15` | {/* TODO: steeper interface, deeper trench, less forearc deformation */} |
-
-### Exercise 5: how much serpentinite
-
-| Run | Change | What you should see |
-|-----|--------|---------------------|
-| Control | `has_serpentinization = no` | No weak layer forms; the interface is only as weak as the seed and the sediment |
-| Reference | `serpentinization_thickness = 5e3` | One grid cell above the slab converts |
-| Thicker | `serpentinization_thickness = 10e3` | Two cells; a wider weak channel and larger wedge corner |
+| Run | Thickness | Change | What you should see |
+|-----|-----------|--------|---------------------|
+| None | 0 km | `has_serpentinization = no` | {/* TODO: from pr110-t0 */} |
+| Reference | 5 km | `serpentinization_thickness = 5e3` (one cell) | {/* TODO: from pr110-ref */} |
+| Thick | 10 km | `serpentinization_thickness = 10e3` (two cells) | {/* TODO: from pr110-t10 */} |
 
 Change one parameter at a time, and keep a log of what you changed.
 
@@ -691,7 +686,7 @@ Change one parameter at a time, and keep a log of what you changed.
 | Stops at input: `serpentinization_thickness` too small | 2 | It must be at least one grid cell, `resolution × vt_size` |
 | `remeshing_option 13` refused | 2 | Restored side walls need an MMG build: `make ndims=2 usemmg=1` |
 | Serpentinite appears far from the slab | 2 | The rule has no temperature gate below 150 km; a slab bend can make a whole grid column crust-dominant. Set `serpentinization_crust_margin >= 0` to confine it |
-| Slab does not subduct | 2 | {/* TODO: interface too strong, slab too buoyant; try the Exercise 4 and 5 controls */} |
+| Slab does not subduct | 2 | {/* TODO: interface too strong, slab too buoyant; try the Exercise 4 control without serpentinite */} |
 
 ## Next Steps
 
