@@ -369,89 +369,313 @@ step.
 
 ## Part 2: Subduction
 
-:::caution Part 2 is not finished yet
-This part is a skeleton. The subduction example it describes will ship with
-an upcoming DynEarthSol release; the settings, configuration excerpts, figures
-and exercises below are placeholders until then. Part 1 is complete and runs
-on the current release.
+:::caution Part 2 runs on an unmerged branch
+The example below, `examples/subduction.cfg`, and the phase-change engine it
+uses (`phase_change_option = 3`, the virtual-topology grid, `remeshing_option
+= 13`) live on the DynEarthSol branch `feature/virtual-topology`, which will
+be merged into `master` by pull request. Until then, build from that branch.
+Parameter names could still change in review, and the exercise outcomes are
+not yet filled in.
 :::
 
-{/* TODO: decide which bundled or new example this part uses. Options:
-    (a) a new examples/subduction-2d.cfg + .poly to add upstream,
-    (b) build it from rifting-2d.poly by adding a slab region.
-    Fill the table below once the setup is fixed. */}
+The example
+[`examples/subduction.cfg`](https://github.com/GeoFLAC/DynEarthSol/blob/feature/virtual-topology/examples/subduction.cfg)
+with its mesh file `poly-subduction.poly` pushes an oceanic plate under a
+fixed overriding plate. A short slab is already in the mantle at the start,
+so the plate interface exists from the first step. Two metamorphic reactions
+run on the markers as the slab descends: mantle just above the slab top
+becomes **serpentinite**, a weak and light layer that lubricates the
+interface, and slab crust that sinks past the basalt-to-eclogite boundary
+becomes **eclogite**, dense enough to add slab pull. Everything that was
+missing from Part 1 appears here: several materials, viscous creep, a
+geotherm, a `.poly` geometry, phase changes and material flowing in through
+a side wall.
 
 | | Setting |
 |---|---|
-| Domain | {/* TODO */} |
-| Materials | {/* TODO: oceanic crust, oceanic mantle lithosphere, continental crust, asthenosphere, weak decoupling layer */} |
-| Forcing | {/* TODO: kinematic push on the oceanic side, or free (slab-pull driven) */} |
-| Duration | {/* TODO */} |
-| Rheology | {/* TODO */} |
-| Thermal | {/* TODO: oceanic plate age, continental geotherm */} |
+| Domain | 400 × 160 km, 6 km resolution, a 10 km halo of refined mantle around the slab (`poly-subduction.poly`) |
+| Initial slab | Oceanic crust 7 km thick, from the trench at x = 125–139 km dipping 30° to 40 km depth |
+| Forcing | Left plate pushed at +1e-9 m/s (3.15 cm/yr) into a fixed right wall (`vbc_val_x1 = 0`) |
+| Duration | 5 Myr, a frame every 50 kyr; about 23 min on 6 threads, 5.7 million steps |
+| Rheology | `elasto-visco-plastic`, 10 materials of which 6 are populated; cohesion 40 → 4 MPa and friction 30° → 15° over 0.1 plastic strain; sediment and serpentinite at 3° |
+| Phase changes | `phase_change_option = 3`: serpentinization and eclogitization on, the other rules off |
+| Weak zone | One 30° segment along the slab top (`weakzone_option = 5`), seeding the plate interface |
+| Thermal | Half-space cooling, 80 Myr plate; surface 273 K, mantle 1573 K |
+| Remeshing | MMG required; `remeshing_option = 13` restores the side walls so the incoming plate keeps its layering |
+| Surface | Hillslope diffusion, `surface_diffusivity = 5e-7` m²/s; deposits become sediment |
 
 ### Step 1: Build the initial geometry
 
-A subducting slab needs a pre-existing dipping interface, which the planar
-weak zone of Part 1 cannot provide. Build it with a `.poly` file instead,
-following [Making a complex mesh with `.poly` file](./usingpolyfile).
+A subducting slab needs a pre-existing dipping interface, which a weak zone
+alone cannot supply. `poly-subduction.poly` defines it as a region of oceanic
+crust already inside the mantle, following
+[Making a complex mesh with `.poly` file](./usingpolyfile):
 
-{/* TODO: sketch of the geometry with region numbers; the poly file listing
-    (nodes, segments, regions); which region is which material. Save the
-    sketch to ./img/tectonics/subduction-geometry.svg */}
-
-{/* TODO: uncomment once the figure exists
-![Initial subduction geometry](./img/tectonics/subduction-geometry.svg)
-*/}
-
-{/* TODO: fill in and uncomment
-```poly title="subduction-2d.poly (excerpt)"
 ```
-*/}
+ 0------------------------------------------7  z = 0: top, free surface
+ 1------------------------------------------6  z = -2 km: sediment / crust
+ 2----12--8=====9--13-----------------------5  z = -9 km: crust / mantle
+ |      \  \  0  \   \                      |
+ |       \  10----11   15                   |  10-11: slab end, cut normal to the dip
+ |        \         \ /                     |  12-14: halo below the slab
+ |         14-------/                       |  13-15: halo above the slab
+ |                                          |
+ 3------------------------------------------4  z = -160 km: bottom
+```
+
+| Region | Material | Max element area | What it is |
+|---|---|---|---|
+| 0 | 3, sediment | 4 km² | The top 2 km across the whole domain |
+| 1 | 0, oceanic crust | 8 km² | 2 to 9 km depth across the whole domain |
+| 2 | 0, oceanic crust | 8 km² | The slab, 7 km thick, 30° dip, ending at 34–40 km depth |
+| 3 | 2, mantle | 10 km² | A 10 km halo around the slab, refined so the serpentinite layer is resolved |
+| 4 | 2, mantle | 1000 km² | The rest of the mantle, coarse |
+
+Three things to notice:
+
+- No region holds serpentinite or eclogite. Those materials exist only
+  because the phase-change rules create them.
+- The halo is what makes the example affordable: 6 km elements everywhere
+  except a band where the interface needs them finer.
+- The internal segments are discarded at the first remesh
+  (`is_discarding_internal_segments = yes`). After that the slab is carried
+  by the markers alone, which is why `has_marker_output = yes` is set.
+
+![Initial geometry around the trench: sediment over oceanic crust, the 7 km slab dipping 30° to 40 km depth, the refined mantle halo, and the 3 km virtual-topology grid with the cells above the slab top that turn mantle into serpentinite](./img/tectonics/subduction-geometry.svg)
+
+The grid drawn over the slab is the virtual topology used by the
+serpentinization rule, explained [below](#the-phase-change-rules). Its cells
+are half an element wide, so the one-element-thick slab crust gets its own
+row of crust-dominant cells instead of being averaged with the mantle.
 
 ### Step 2: Walk through the configuration
 
-{/* TODO: what differs from Part 1 — more materials, mattype_mantle,
-    convergent vbc, weak layer along the plate interface, possibly
-    phase_change_option, surface processes. */}
+```cfg title="subduction.cfg (abridged; the file itself is fully commented)"
+[sim]
+modelname = model-subduction
+max_time_in_yr = 5e6
+output_time_interval_in_yr = 50e3
+has_marker_output = yes
 
-{/* TODO: fill in and uncomment
-```cfg title="subduction-2d.cfg (excerpt)"
+[mesh]
+meshing_option = 90
+poly_filename = poly-subduction.poly
+xlength = 400e3
+zlength = 160e3
+resolution = 6e3            # times vt_size = serpentinization grid cell
+smallest_size = 0.04
+quality_check_step_interval = 1000
+min_quality = 0.2
+remeshing_option = 13       # restore the side walls (needs MMG)
+is_discarding_internal_segments = yes
+mmg_hausd_factor = 0.1
+max_boundary_distortion = 1
+mmg_aniso_wall_ratio = 2
+
+[markers]
+init_marker_option = 1
+replenishment_option = 12
+
+[control]
+ref_pressure_option = 1     # PREM
+surface_process_option = 1
+surface_diffusivity = 5e-7
+inertial_scaling = 1e4
+
+[bc]
+surface_temperature = 273
+mantle_temperature = 1573
+vbc_x0 = 1
+vbc_x1 = 1
+vbc_val_x0 = 1e-9           # +x, 3.15 cm/yr
+vbc_val_x1 = 0              # fixed backstop
+has_water_loading = no
+
+[ic]
+weakzone_option = 5
+weakzone_plstrain = 1
+weakzone_num_segments = 1
+weakzone_segments_inclination = [30]
+weakzone_segments_halfwidth   = [0.6]
+weakzone_segments_xcenter     = [0.42]
+weakzone_segments_zcenter     = [0.135625]
+weakzone_segments_depth_min   = [0.000]
+weakzone_segments_depth_max   = [0.19375]
+weakzone_segments_x_min       = [0.275]
+weakzone_segments_x_max       = [0.575]
+oceanic_plate_age_in_yr = 80e6
+
+[mat]
+rheology_type = elasto-visco-plastic
+num_materials = 10
+phase_change_option = 3
+mattype_oceanic_crust = 0
+mattype_continental_crust = 1
+mattype_mantle = 2
+mattype_sediment = 3
+mattype_serpentinite = 4
+mattype_eclogite = 5
+serpentinization_thickness = 5e3
+#                 [ ocean0   cont1    mant2   sed3    serp4   eclg5  ... ]
+rho0            = [ 2880,    2800,    3300,   2400,   3200,   3480,  ... ]
+friction_angle0 = [ 30,      30,      30,     3,      3,      30,    ... ]
+friction_angle1 = [ 15,      15,      15,     3,      3,      15,    ... ]
+pls1            = [ 0.1 ]
+max_viscosity = 1e24
+min_viscosity = 1e19
 ```
-*/}
+
+Section by section, with what is new relative to Part 1:
+
+- **`[sim]`** writes a frame every 50 kyr and the markers with it, since the
+  materials live on the markers once the poly segments are gone.
+- **`[mesh]`** reads the `.poly` file (`meshing_option = 90`).
+  `remeshing_option = 13` restores the left and right walls to their initial
+  positions at every remesh, so the plate entering through the left wall
+  arrives with its sediment-over-crust-over-mantle layering intact. This
+  option needs MMG. `mmg_aniso_wall_ratio = 2` lets the incoming column be
+  carried on elements twice as long normal to the wall as along it.
+- **`[markers]`** `replenishment_option = 12` refills an element that has
+  lost its markers with its own single material, which keeps thin layers
+  from vanishing.
+- **`[control]`** `ref_pressure_option = 1` uses the PREM reference
+  pressure; the phase-change rules read pressure and temperature at the
+  marker's depth below the current free surface. `inertial_scaling = 1e4`
+  lengthens the time step ten times over the default, buying speed at a
+  known cost in accuracy, which the file's comments quantify.
+- **`[bc]`** pushes only the left wall. The right wall is a fixed backstop,
+  so the trench sits still in the model frame and the slab is fed from the
+  left. The two temperatures set the half-space geotherm with the 80 Myr
+  age in `[ic]`.
+- **`[ic]`** seeds the interface with a single 30° plastic weak zone along
+  the slab top, extending a few km into the mantle wedge. Values are
+  fractions of the domain.
+- **`[mat]`** has ten material slots. Six are populated by the initial mesh
+  or the active rules: oceanic crust, continental crust (unused here),
+  mantle, sediment, serpentinite and eclogite. Four more, hydrous mantle,
+  sedimentary rock, metasediment and schist, are the targets of rules that
+  are switched off, so they stay empty. Each `mattype_*` tells the rule
+  engine which slot plays which role.
+
+### The phase-change rules
+
+`phase_change_option = 3` runs every 10 steps over all markers. A rule fires
+only when its switch is on and its source and target are distinct, valid
+materials; the run stops at input otherwise.
+
+| Transition | Rule | Switch |
+|---|---|---|
+| Mantle → serpentinite | In the antigorite pressure–temperature field (Ulmer & Trommsdorff 1995), shallower than 150 km, and with a grid cell within `serpentinization_thickness` below the marker that holds more than 30 % oceanic crust | `has_serpentinization` (on) |
+| Serpentinite → mantle | Leaves the antigorite field | `has_serpentinization` (on) |
+| Oceanic crust → eclogite | Past the basalt–eclogite boundary (Hacker 2003); one way | `has_eclogitization` (on) |
+| Hydrous mantle → mantle | Chlorite-out boundary (Grove et al. 2009) | `has_hydrous_mantle_dehydration` (off) |
+| Sediment → sedimentary rock → metasediment → schist | Compaction, then metamorphic thresholds | `has_sediment_metamorphism` (off) |
+
+The "crust below" test is what makes serpentinization follow the slab
+instead of the whole mantle. DES keeps a coarse background grid of marker
+materials, the **virtual topology**, with cells of `resolution × vt_size`
+(3 km here). A mantle marker looks down through that grid as far as
+`serpentinization_thickness`, 5 km here, so one cell, and converts if it
+finds a crust-dominant cell. The grid is rebuilt after each remesh and
+reused between them.
+
+The parameters you will change most often:
 
 | Parameter | What it sets |
 |-----------|--------------|
-| {/* TODO */} | |
+| `vbc_val_x0` | Convergence rate, m/s |
+| `oceanic_plate_age_in_yr` | Thermal age, hence strength and negative buoyancy, of the incoming plate |
+| `friction_angle0/1` of sediment and serpentinite | Plate-interface strength; controls dip and forearc style |
+| `serpentinization_thickness` | How thick the weak layer above the slab can grow; must be at least one grid cell |
+| `has_serpentinization`, `has_eclogitization` | Turn each reaction off for a control run |
+| `rho0` of eclogite | Slab pull at depth |
+| `surface_diffusivity` | Trench fill and forearc erosion |
+| `max_time_in_yr` | 5 Myr is about 160 km of convergence |
 
 ### Step 3: Run and visualize
 
+Build with MMG, since the restored side walls need it, and run from
+`examples/` so the `.poly` path resolves:
+
 ```bash
-cd DynEarthSol/examples
-OMP_NUM_THREADS=4 ../dynearthsol2d subduction-2d.cfg
-python ../2vtk.py result
+cd DynEarthSol
+make ndims=2 usemmg=1
+cd examples
+OMP_NUM_THREADS=6 ../dynearthsol2d subduction.cfg
 ```
 
-{/* TODO: figure — material/marker field and viscosity at several times.
-    Save to ./img/tectonics/subduction-evolution.png */}
+The full run takes about 23 minutes on 6 threads of a recent laptop, two to
+three times that on an older 4-core machine, with the mesh growing from
+about 2600 to 4500 elements. Output goes to `model-subduction.save.*`; the
+step counter in the log advances about a million steps per 0.9 Myr.
 
-{/* TODO: uncomment once the figure exists
-![Subduction evolution](./img/tectonics/subduction-evolution.png)
-*/}
+:::tip Smoke run first
+Before committing to the full run, set `max_time_in_yr = 500e3` and
+`output_time_interval_in_yr = 25e3`. That is 2 to 3 minutes on 6 threads and
+already shows the serpentinite layer along the slab top and a sediment-filled
+trench, enough to confirm the build, the MMG remeshing and the phase changes
+all work. Then restore the two lines.
+:::
 
-Things to look for as the run proceeds:
+```bash
+python ../2vtk.py model-subduction
+```
 
-{/* TODO: slab bending and dip, trench retreat or advance, forearc
-    deformation, mantle wedge flow, remeshing events and marker preservation. */}
+Open `model-subduction.*.vtu` in ParaView. Fields to look at:
+
+- **material** on the markers, to see serpentinite and eclogite appear
+- **plastic strain**, the plate interface and any forearc faults
+- **viscosity**, the cold slab against the weak wedge
+- **temperature**, the slab's thermal anomaly and the heated wedge corner
+
+![Material (left) and viscosity with isotherms (right) at 0.5, 1, 2.5 and 5 Myr: the slab sinks from 45 to about 125 km depth, serpentinite (purple) lines the slab top and fills the wedge corner, eclogite (red) appears at the slab tip after 1 Myr](./img/tectonics/subduction-evolution.png)
+
+Things to look for as the run proceeds (the figure is the reference run):
+
+- **Serpentinite from the first frame.** The slab is already in place, so
+  mantle just above its top converts at once: about 500 markers by 0.5 Myr,
+  3400 by 5 Myr. On the viscosity panels this layer sits at the 10¹⁹ Pa s
+  floor and is the weakest material in the model.
+- **Eclogite only after about 1 Myr.** The first markers appear at the slab
+  tip once it has sunk past roughly 55 km; by 5 Myr the deepest 30 km of the
+  slab is eclogite.
+- **The slab tip** reaches 45 km at 0.5 Myr, 85 km at 2.5 Myr and about 125
+  km at 5 Myr, keeping a dip of 30–35° on its way down. The cold core stays
+  at the 10²⁴ Pa s viscosity cap and drags the isotherms down with it.
+- **The wedge corner serpentinizes wholesale.** The mantle between the
+  overriding plate's crust and the slab top lies within one grid cell of
+  crust, so by 2.5 Myr a body 20–25 km thick and 50 km long has converted.
+  This is the geometric rule at work, not a thermal one; Exercise 5 shows
+  how `serpentinization_thickness` controls it.
+- **The trench** fills with sediment and the overriding plate's crust bends
+  down into it, while the incoming plate at the left wall keeps its three
+  layers thanks to the restored wall.
+
+{/* TODO (Q30): confirm this description, or replace it with your own reading
+    of the run. Numbers are from analysis/examples/376_subduction_tutorial_evolution.py */}
 
 ### Exercise 4: plate interface strength
 
-{/* TODO: vary the weak layer friction angle; too strong → coupling, no
-    subduction; too weak → ... */}
+Sediment and serpentinite are the two materials on the interface, both at a
+friction angle of 3°. Tan et al. (2012) showed that this friction controls
+the dip of the interface and whether a forearc basin and accretionary prism
+form.
 
-### Exercise 5: convergence rate and slab age
+| Run | `friction_angle0/1` of materials 3 and 4 | What you should see |
+|-----|-----------------------------------------|---------------------|
+| Reference | `3` | {/* TODO */} |
+| Intermediate | `10` | {/* TODO */} |
+| Strong coupling | `15` | {/* TODO: steeper interface, deeper trench, less forearc deformation */} |
 
-{/* TODO */}
+### Exercise 5: how much serpentinite
+
+| Run | Change | What you should see |
+|-----|--------|---------------------|
+| Control | `has_serpentinization = no` | No weak layer forms; the interface is only as weak as the seed and the sediment |
+| Reference | `serpentinization_thickness = 5e3` | One grid cell above the slab converts |
+| Thicker | `serpentinization_thickness = 10e3` | Two cells; a wider weak channel and larger wedge corner |
+
+Change one parameter at a time, and keep a log of what you changed.
 
 ## Troubleshooting
 
@@ -463,8 +687,11 @@ Things to look for as the run proceeds:
 | Strain stays diffuse, no single fault | 1 | {/* TODO: pls1 too large or weakzone_plstrain too small */} |
 | Fault dies and a new one forms | 1 | {/* TODO: slow softening or thick layer; Lavier et al. 2000 */} |
 | Time step collapses (very small `dt`) | 2 | {/* TODO: dt is Maxwell-limited, dt ≈ 0.5 min_viscosity / shear_modulus; raise min_viscosity */} |
-| Everything sinks or rises at the start | 2 | {/* TODO: isostasy_adjustment_time_in_yr, reference density, ref_pressure_option */} |
-| Slab does not subduct | 2 | {/* TODO: interface too strong, slab too buoyant */} |
+| Stops at input with a `mattype_*` message | 2 | Each active rule needs its source and target set to distinct, valid materials; check the `mattype_*` lines against `num_materials` |
+| Stops at input: `serpentinization_thickness` too small | 2 | It must be at least one grid cell, `resolution × vt_size` |
+| `remeshing_option 13` refused | 2 | Restored side walls need an MMG build: `make ndims=2 usemmg=1` |
+| Serpentinite appears far from the slab | 2 | The rule has no temperature gate below 150 km; a slab bend can make a whole grid column crust-dominant. Set `serpentinization_crust_margin >= 0` to confine it |
+| Slab does not subduct | 2 | {/* TODO: interface too strong, slab too buoyant; try the Exercise 4 and 5 controls */} |
 
 ## Next Steps
 
