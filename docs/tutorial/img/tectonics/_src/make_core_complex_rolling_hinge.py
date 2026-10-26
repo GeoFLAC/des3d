@@ -1,4 +1,5 @@
-"""Generate ../core-complex-rolling-hinge.svg: animated setup and rolling hinge for core-complex.cfg.
+"""Generate ../core-complex-rolling-hinge.svg: the rolling-hinge mechanism, animated, with the timing of
+core-complex.cfg. Setup annotations live in core-complex-setup.svg, not here.
 
 Four keyframes in km are morphed by SMIL <animate> on path "d" attributes, so every
 keyframe path must keep the same point count. Run: python3 make_core_complex_rolling_hinge.py
@@ -52,7 +53,7 @@ def opac(i):  # visible during segment i (6 keyTimes, 5 segments)
 
 
 captions = [
-    "t = 0: a pre-softened seed sits in the lower half of the layer",
+    "t = 0: a pre-softened seed in the lower half of a brittle layer being pulled apart",
     "the fault cuts to the surface; the hanging wall drops, the footwall rises",
     "the footwall keeps rising and the fault starts to rotate",
     "rolling hinge: the fault flattens as the footwall is exhumed",
@@ -62,11 +63,11 @@ times = ["0 kyr", "0 → 25 kyr", "25 → 60 kyr", "60 → 100 kyr", "100 kyr"]
 
 s = []
 a = s.append
-a('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 460" width="960" height="460" role="img" aria-label="Core-complex setup and rolling hinge: a 100 by 10 km brittle layer is pulled apart at both walls; a pre-softened seed fault dipping 60 degrees cuts to the surface, the hanging wall drops into a basin, the footwall rises and the fault rotates to a gentle dip as it is exhumed">')
+a('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 460" width="960" height="460" role="img" aria-label="The rolling hinge: a brittle layer is pulled apart at both walls; a pre-softened seed fault cuts to the surface, the hanging wall drops into a basin, the footwall rises and the fault rotates to a gentle dip as it is exhumed">')
 a('<style>text{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}</style>')
 a('<defs><marker id="ab" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#6B7280"/></marker></defs>')
 a('<rect width="960" height="460" rx="16" fill="#F7F6F2"/>')
-a('<text x="480" y="36" text-anchor="middle" font-size="22" font-weight="700" fill="#374151">core-complex.cfg: setup and rolling hinge</text>')
+a('<text x="480" y="36" text-anchor="middle" font-size="22" font-weight="700" fill="#374151">the rolling hinge</text>')
 for i in range(5):
     a(f'<text x="80" y="70" font-size="16" fill="#374151" opacity="0">{captions[i]}<animate attributeName="opacity" values="{opac(i)}" keyTimes="{KT}" calcMode="discrete" dur="{DUR}" repeatCount="indefinite"/></text>')
 for i in range(5):
@@ -75,21 +76,11 @@ a(f'<path fill="#CFE0F0" stroke="#2F6FB0" stroke-width="2" stroke-linejoin="roun
 a(f'<path fill="#CFE0F0" stroke="#2F6FB0" stroke-width="2" stroke-linejoin="round" d="{fw(K[0])}">{anim("d", fw)}</path>')
 a(f'<path fill="none" stroke="#E8A33D" stroke-opacity="0.45" stroke-linecap="round" stroke-linejoin="round" stroke-width="0" d="{fault(K[0])}">{anim("d", fault)}<animate attributeName="stroke-width" values="0;0;6;11;15;15" keyTimes="{KT}" dur="{DUR}" repeatCount="indefinite"/></path>')
 a(f'<path fill="none" stroke="#B5651D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" d="{fault(K[0])}">{anim("d", fault)}</path>')
-a(f'<text x="{X(50)+14:.0f}" y="{Y(-7.5)+5:.0f}" font-size="14" fill="#B5651D" opacity="0">weak-zone seed, 60° dip<animate attributeName="opacity" values="1;0;0;0;0;0" keyTimes="{KT}" calcMode="discrete" dur="{DUR}" repeatCount="indefinite"/></text>')
 a(f'<text x="{X(22):.0f}" y="{Y(-5)+5:.0f}" text-anchor="middle" font-size="16" fill="#2F6FB0">hanging wall</text>')
 a(f'<text x="{X(80):.0f}" y="{Y(-5)+5:.0f}" text-anchor="middle" font-size="16" fill="#2F6FB0">footwall</text>')
-a(f'<text x="{X(14):.0f}" y="{Y(0)-10:.0f}" font-size="14" fill="#6B7280">free surface, hillslope diffusion</text>')
-a(f'<text x="480" y="{Y(-10)+52:.0f}" text-anchor="middle" font-size="14" fill="#6B7280">Winkler foundation: lithostatic support, free to move vertically; remeshing restores it to 10 km depth</text>')
 a(f'<path d="M62 {Y(-2.5):.0f} L14 {Y(-2.5):.0f}" stroke="#6B7280" stroke-width="3" marker-end="url(#ab)" fill="none"/>')
 a(f'<path d="M898 {Y(-2.5):.0f} L946 {Y(-2.5):.0f}" stroke="#6B7280" stroke-width="3" marker-end="url(#ab)" fill="none"/>')
-a(f'<text x="38" y="{Y(-2.5)+26:.0f}" text-anchor="middle" font-size="13" fill="#374151">3.15 cm/yr</text>')
-a(f'<text x="922" y="{Y(-2.5)+26:.0f}" text-anchor="middle" font-size="13" fill="#374151">3.15 cm/yr</text>')
-a(f'<text x="38" y="{Y(-2.5)+44:.0f}" text-anchor="middle" font-size="12" fill="#6B7280">vbc_val_x0</text>')
-a(f'<text x="922" y="{Y(-2.5)+44:.0f}" text-anchor="middle" font-size="12" fill="#6B7280">vbc_val_x1</text>')
-for xk, lab in [(0, "0"), (50, "50 km"), (100, "100 km")]:
-    a(f'<path d="M{X(xk):.0f} {Y(-10)+4:.0f} L{X(xk):.0f} {Y(-10)+12:.0f}" stroke="#6B7280" stroke-width="2"/>')
-    a(f'<text x="{X(xk):.0f}" y="{Y(-10)+28:.0f}" text-anchor="middle" font-size="13" fill="#374151">{lab}</text>')
-a('<text x="480" y="446" text-anchor="middle" font-size="13" fill="#6B7280">10 km brittle layer, vertical exaggeration 2×, elasto-plastic with cohesion softening (see the previous figure)</text>')
+a('<text x="480" y="446" text-anchor="middle" font-size="13" fill="#6B7280">a 10 km brittle layer with cohesion softening; vertical exaggeration 2×, times as in core-complex.cfg</text>')
 a('</svg>')
 out = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'core-complex-rolling-hinge.svg')
 open(out, "w").write("\n".join(s) + "\n")

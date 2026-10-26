@@ -1,9 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 460" width="960" height="460" role="img" aria-label="Core-complex setup and rolling hinge: a 100 by 10 km brittle layer is pulled apart at both walls; a pre-softened seed fault dipping 60 degrees cuts to the surface, the hanging wall drops into a basin, the footwall rises and the fault rotates to a gentle dip as it is exhumed">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 460" width="960" height="460" role="img" aria-label="The rolling hinge: a brittle layer is pulled apart at both walls; a pre-softened seed fault cuts to the surface, the hanging wall drops into a basin, the footwall rises and the fault rotates to a gentle dip as it is exhumed">
 <style>text{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}</style>
 <defs><marker id="ab" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#6B7280"/></marker></defs>
 <rect width="960" height="460" rx="16" fill="#F7F6F2"/>
-<text x="480" y="36" text-anchor="middle" font-size="22" font-weight="700" fill="#374151">core-complex.cfg: setup and rolling hinge</text>
-<text x="80" y="70" font-size="16" fill="#374151" opacity="0">t = 0: a pre-softened seed sits in the lower half of the layer<animate attributeName="opacity" values="1;0;0;0;0;0" keyTimes="0;0.12;0.32;0.58;0.86;1" calcMode="discrete" dur="14s" repeatCount="indefinite"/></text>
+<text x="480" y="36" text-anchor="middle" font-size="22" font-weight="700" fill="#374151">the rolling hinge</text>
+<text x="80" y="70" font-size="16" fill="#374151" opacity="0">t = 0: a pre-softened seed in the lower half of a brittle layer being pulled apart<animate attributeName="opacity" values="1;0;0;0;0;0" keyTimes="0;0.12;0.32;0.58;0.86;1" calcMode="discrete" dur="14s" repeatCount="indefinite"/></text>
 <text x="80" y="70" font-size="16" fill="#374151" opacity="0">the fault cuts to the surface; the hanging wall drops, the footwall rises<animate attributeName="opacity" values="0;1;0;0;0;0" keyTimes="0;0.12;0.32;0.58;0.86;1" calcMode="discrete" dur="14s" repeatCount="indefinite"/></text>
 <text x="80" y="70" font-size="16" fill="#374151" opacity="0">the footwall keeps rising and the fault starts to rotate<animate attributeName="opacity" values="0;0;1;0;0;0" keyTimes="0;0.12;0.32;0.58;0.86;1" calcMode="discrete" dur="14s" repeatCount="indefinite"/></text>
 <text x="80" y="70" font-size="16" fill="#374151" opacity="0">rolling hinge: the fault flattens as the footwall is exhumed<animate attributeName="opacity" values="0;0;0;1;0;0" keyTimes="0;0.12;0.32;0.58;0.86;1" calcMode="discrete" dur="14s" repeatCount="indefinite"/></text>
@@ -17,22 +17,9 @@
 <path fill="#CFE0F0" stroke="#2F6FB0" stroke-width="2" stroke-linejoin="round" d="M506.8 200.0 L530.0 200.0 L635.0 200.0 L860.0 200.0 L860.0 360.0 L463.2 360.0 L485.0 280.0 Z"><animate attributeName="d" values="M506.8 200.0 L530.0 200.0 L635.0 200.0 L860.0 200.0 L860.0 360.0 L463.2 360.0 L485.0 280.0 Z;M506.8 200.0 L530.0 200.0 L635.0 200.0 L860.0 200.0 L860.0 360.0 L463.2 360.0 L485.0 280.0 Z;M500.8 196.8 L526.2 188.8 L620.0 196.8 L866.0 200.0 L866.0 360.0 L457.2 360.0 L479.0 280.0 Z;M500.0 193.6 L530.0 176.0 L620.0 192.0 L874.2 200.0 L874.2 360.0 L440.0 360.0 L470.0 283.2 Z;M500.0 195.2 L533.8 166.4 L627.5 190.4 L884.0 200.0 L884.0 360.0 L421.2 360.0 L458.8 289.6 Z;M500.0 195.2 L533.8 166.4 L627.5 190.4 L884.0 200.0 L884.0 360.0 L421.2 360.0 L458.8 289.6 Z" keyTimes="0;0.12;0.32;0.58;0.86;1" dur="14s" repeatCount="indefinite"/></path>
 <path fill="none" stroke="#E8A33D" stroke-opacity="0.45" stroke-linecap="round" stroke-linejoin="round" stroke-width="0" d="M463.2 360.0 L485.0 280.0 L485.0 280.0 L485.0 280.0"><animate attributeName="d" values="M463.2 360.0 L485.0 280.0 L485.0 280.0 L485.0 280.0;M463.2 360.0 L485.0 280.0 L485.0 280.0 L485.0 280.0;M457.2 360.0 L479.0 280.0 L500.8 196.8 L507.5 193.6;M440.0 360.0 L470.0 283.2 L500.0 193.6 L526.2 177.6;M421.2 360.0 L458.8 289.6 L500.0 195.2 L530.0 168.0;M421.2 360.0 L458.8 289.6 L500.0 195.2 L530.0 168.0" keyTimes="0;0.12;0.32;0.58;0.86;1" dur="14s" repeatCount="indefinite"/><animate attributeName="stroke-width" values="0;0;6;11;15;15" keyTimes="0;0.12;0.32;0.58;0.86;1" dur="14s" repeatCount="indefinite"/></path>
 <path fill="none" stroke="#B5651D" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" d="M463.2 360.0 L485.0 280.0 L485.0 280.0 L485.0 280.0"><animate attributeName="d" values="M463.2 360.0 L485.0 280.0 L485.0 280.0 L485.0 280.0;M463.2 360.0 L485.0 280.0 L485.0 280.0 L485.0 280.0;M457.2 360.0 L479.0 280.0 L500.8 196.8 L507.5 193.6;M440.0 360.0 L470.0 283.2 L500.0 193.6 L526.2 177.6;M421.2 360.0 L458.8 289.6 L500.0 195.2 L530.0 168.0;M421.2 360.0 L458.8 289.6 L500.0 195.2 L530.0 168.0" keyTimes="0;0.12;0.32;0.58;0.86;1" dur="14s" repeatCount="indefinite"/></path>
-<text x="499" y="325" font-size="14" fill="#B5651D" opacity="0">weak-zone seed, 60° dip<animate attributeName="opacity" values="1;0;0;0;0;0" keyTimes="0;0.12;0.32;0.58;0.86;1" calcMode="discrete" dur="14s" repeatCount="indefinite"/></text>
 <text x="275" y="285" text-anchor="middle" font-size="16" fill="#2F6FB0">hanging wall</text>
 <text x="710" y="285" text-anchor="middle" font-size="16" fill="#2F6FB0">footwall</text>
-<text x="215" y="190" font-size="14" fill="#6B7280">free surface, hillslope diffusion</text>
-<text x="480" y="412" text-anchor="middle" font-size="14" fill="#6B7280">Winkler foundation: lithostatic support, free to move vertically; remeshing restores it to 10 km depth</text>
 <path d="M62 240 L14 240" stroke="#6B7280" stroke-width="3" marker-end="url(#ab)" fill="none"/>
 <path d="M898 240 L946 240" stroke="#6B7280" stroke-width="3" marker-end="url(#ab)" fill="none"/>
-<text x="38" y="266" text-anchor="middle" font-size="13" fill="#374151">3.15 cm/yr</text>
-<text x="922" y="266" text-anchor="middle" font-size="13" fill="#374151">3.15 cm/yr</text>
-<text x="38" y="284" text-anchor="middle" font-size="12" fill="#6B7280">vbc_val_x0</text>
-<text x="922" y="284" text-anchor="middle" font-size="12" fill="#6B7280">vbc_val_x1</text>
-<path d="M110 364 L110 372" stroke="#6B7280" stroke-width="2"/>
-<text x="110" y="388" text-anchor="middle" font-size="13" fill="#374151">0</text>
-<path d="M485 364 L485 372" stroke="#6B7280" stroke-width="2"/>
-<text x="485" y="388" text-anchor="middle" font-size="13" fill="#374151">50 km</text>
-<path d="M860 364 L860 372" stroke="#6B7280" stroke-width="2"/>
-<text x="860" y="388" text-anchor="middle" font-size="13" fill="#374151">100 km</text>
-<text x="480" y="446" text-anchor="middle" font-size="13" fill="#6B7280">10 km brittle layer, vertical exaggeration 2×, elasto-plastic with cohesion softening (see the previous figure)</text>
+<text x="480" y="446" text-anchor="middle" font-size="13" fill="#6B7280">a 10 km brittle layer with cohesion softening; vertical exaggeration 2×, times as in core-complex.cfg</text>
 </svg>

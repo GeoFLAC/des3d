@@ -136,6 +136,8 @@ and the fault surface flattens into a dome. This is the rolling-hinge
 mechanism of metamorphic core complexes (Lavier, Buck & Poliakov 1999), and
 it is the fastest way to see every ingredient of a DES tectonic run.
 
+![Animated sketch of the rolling hinge: a pre-softened seed in a stretching brittle layer cuts to the surface, the hanging wall drops into a basin, the footwall rises, and the fault flattens into a dome as it is exhumed](./img/tectonics/core-complex-rolling-hinge.svg)
+
 | | Setting |
 |---|---|
 | Domain | 100 × 10 km, 1 km resolution refined in the central 40 km (`meshing_option = 2`, `refined_zonex = [0.3, 0.7]`) |
@@ -146,7 +148,7 @@ it is the fastest way to see every ingredient of a DES tectonic run.
 | Surface | Hillslope diffusion, `surface_diffusivity = 1e-7` m²/s |
 | Thermal | Isothermal, 273 K |
 
-![Animated sketch of the core-complex run: the 100 by 10 km layer is pulled apart at both walls, the 60° seed fault cuts to the surface, the hanging wall drops into a basin, the footwall rises and the fault flattens into a dome](./img/tectonics/core-complex-rolling-hinge.svg)
+![Initial geometry and mesh of core-complex.cfg: the 100 by 10 km layer, a 1 km element in the refined zone between 30 and 70 km against elements of about 3 km outside it, the planar weak-zone seed dipping 60° in the lower half of the layer under x = 50 km, the wall velocities, the free surface and the Winkler bottom, with the parameter names that set each](./img/tectonics/core-complex-setup.svg)
 
 ### Step 1: Walk through the configuration
 
