@@ -37,8 +37,10 @@ case takes minutes on a laptop; the second takes hours.
 This tutorial follows the ones before it in this section and uses what they
 cover. Before starting, ensure you have:
 
-- ✅ DynEarthSol compiled in 2D (`make ndims=2`); see [Build](../usage/usage.md)
-  and [Running DES3D](../usage/run.md)
+- ✅ DynEarthSol compiled in 2D with MMG, `make ndims=2 usemmg=1`; see
+  [Build](../usage/usage.md) and [Running DES3D](../usage/run.md). MMG is a
+  git submodule that `make` fetches and builds for you; the build is described
+  in [Adaptive mesh refinement with MMG](./usingmmg.md)
 - ✅ Python 3 with `numpy` for `2vtk.py`, and
   [ParaView](https://www.paraview.org/) or another VTK viewer; see
   [Visualizing outputs](../usage/visualize.md)
@@ -46,9 +48,6 @@ cover. Before starting, ensure you have:
   reads its slab geometry from one
 - ✅ Read [Weak zones](./weakzone.md): Part 1 seeds a fault with a planar weak
   zone and Part 2 the plate interface with a segment one
-- ⬜ Optional: an MMG build (`make ndims=2 usemmg=1`) for the adaptive-remeshing
-  boxes and Exercise 2. MMG is a git submodule that `make` fetches and builds
-  for you; see [Adaptive mesh refinement with MMG](./usingmmg.md)
 
 [Velocity boundary conditions (3D)](./vbc.md) and
 [Rate-and-state friction](./rate-state-friction.mdx) are not needed here: both
@@ -57,10 +56,12 @@ next tutorial, [Coupling with GoSPL](./couplinggospl.md), adds surface processes
 to models like these.
 
 :::tip Which build?
-The examples in this tutorial are 2D. A 3D build (`make`) runs the same
-physics at a much higher cost. Every `.cfg` here runs on a plain Triangle
-build; the MMG boxes show what changes when you rebuild with
-`make ndims=2 usemmg=1`.
+Both examples are 2D; a 3D build (`make`) runs the same physics at a much
+higher cost. Part 1 runs on either build: a plain Triangle build
+(`make ndims=2`) remeshes uniformly, an MMG build refines along the fault,
+and the MMG box in Part 1 says what changes. Part 2 needs the MMG build,
+because its restored side walls (`remeshing_option = 13`) are only available
+with MMG. If you build once, build with `usemmg=1`.
 :::
 
 ## How the model works
@@ -283,29 +284,16 @@ some 140 remeshes. Remeshing is under 0.1 % of the wall time either way; the
 time step, not the mesh, is the cost.
 
 :::tip MMG: same config, adaptive mesh
-Rebuild with `make ndims=2 usemmg=1` and run the same file. The MMG build
-sizes elements from accumulated plastic strain, with the band set by two
-parameters you already have: the largest edge is
-`resolution × largest_size^(1/2)` and the smallest
-`resolution × (smallest_size × mmg_remesh_defensive_tiny_ratio)^(1/2)`.
-Remeshing is conservative: elements that are not yielding, distorted or tiny
-are frozen, so each remesh touches mainly the fault band. In the run shown
-below MMG reaches 100 kyr with about 1400 elements and 22 remeshes against
-2000 elements and 136 remeshes for Triangle. The tuned variant
-`core-complex-mmg.cfg` differs from the stock file in these lines:
-
-```cfg
-max_time_in_yr = 500000
-output_time_interval_in_yr = 10000
-largest_size = 4            # MMG hmax = 2 km
-smallest_size = 0.04        # MMG hmin = 0.245 km at the default tiny ratio 1.5
-quality_check_step_interval = 2000
-min_quality = 0.2
-max_boundary_distortion = 0.2
-mmg_hausd_factor = 0.01
-surface_diffusivity = 1e-6
-inertial_scaling = 1e4
-```
+Rebuild with `make ndims=2 usemmg=1` and run the same file; nothing in the
+config changes. The MMG build sizes elements from accumulated plastic strain,
+within a band set by two parameters the file already has: the largest edge
+is `resolution × largest_size^(1/2)` and the smallest
+`resolution × (smallest_size × mmg_remesh_defensive_tiny_ratio)^(1/2)`,
+3.2 km and 0.12 km here. Remeshing is conservative: elements that are not
+yielding, distorted or tiny are frozen, so each remesh touches mainly the
+fault band. The runs shown below are MMG runs; to 100 kyr they end with
+about 1400 elements after 24 remeshes, against about 2000 elements and 140
+remeshes for the Triangle build of the same file.
 
 The build is described in [Adaptive mesh refinement with MMG](./usingmmg.md).
 The full parameter list, with a one-line tuning rule for each, is in the
@@ -359,7 +347,7 @@ Things to look for as the run proceeds:
 | Run | `surface_diffusivity` | What you should see at 100 kyr |
 |-----|-----------------------|-------------------------------|
 | Reference | `1e-7` | Sharp footwall crest 2.2 km high, basin 1.7 km deep, 3.9 km of relief |
-| Stock MMG file | `1e-6` | The same structure a little smoothed: crest 1.8 km, basin 1.4 km, 3.2 km of relief |
+| Moderate | `1e-6` | The same structure a little smoothed: crest 1.8 km, basin 1.4 km, 3.2 km of relief |
 | Strong erosion | `1e-5` | Relief capped at 1.6 km from 40 kyr on; the crest is planed to 1 km and the basin filled to 0.6 km while the fault keeps slipping |
 
 ![Surface diffusivity 1e-7, 1e-6 and 1e-5 at 100 kyr: passive horizons of initial depth in 1 km bands with the fault band shaded, then the surface profiles, relief against time, and the initial depth of the rock now at the surface](./img/tectonics/core-complex-diffusivity.png)
