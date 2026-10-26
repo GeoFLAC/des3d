@@ -408,40 +408,57 @@ the horizons are worth drawing. Each run took 5 to 12 minutes on 6 threads.
 
 ### Exercise 2: change how small the elements may get
 
-Requires the MMG build (`make ndims=2 usemmg=1`). `smallest_size` is the
-area of the smallest allowed element relative to one of edge `resolution`.
-With MMG it sets the floor of the refinement band,
+Requires the MMG build (`make ndims=2 usemmg=1`). Two parameters decide how
+fine the mesh becomes along the fault. `smallest_size` is the area of the
+smallest allowed element relative to one of edge `resolution`: with MMG it
+sets the floor of the refinement band,
 `resolution × (smallest_size × mmg_remesh_defensive_tiny_ratio)^(1/2)`, and
-for every remesher it sets the tiny-element trigger: an element compressed
-below `smallest_size` of its nominal area forces a remesh. Both scale with
+for every remesher it sets the tiny-element trigger, an element compressed
+below `smallest_size` of its nominal area forcing a remesh. Both scale with
 its square root, so a factor of 100 in `smallest_size` is a factor of 10 in
-element edge.
+element edge. `mmg_metric_refine_coeff` is the target: MMG aims for an
+element area of the initial one divided by `1 + coeff × plastic strain`, so
+at the default 5 an element at a plastic strain of 4 is asked to shrink to a
+fifth of its initial edge. The mesh can only be as fine as the target asks
+and the floor allows.
 
 | Run | `smallest_size` | Smallest MMG element | What you should see |
 |-----|-----------------|----------------------|---------------------|
-| No refinement | `1` | 1.2 km, the resolution itself | The mesh stays at about 720 elements; the fault is a diffuse band three or four 1 km elements wide and its plastic strain tops out at 1.8 instead of 3.9; relief 3.4 km instead of 3.9; the run takes 68 s |
-| Stock | `0.01` | 0.12 km | The band refines by up to ten times along the fault: about 1400 elements after 24 remeshes, plastic strain up to 3.9, a sharp fault; 12 min |
-| Very fine | `0.001` | 0.04 km | Almost the same mesh as the stock run: 1330 elements, smallest edge 0.12 km, plastic strain up to 3.5. The band does not get finer, because the refinement target, not the floor, limits it. The run takes 16 min, a third longer, with 60 % more steps |
+| No refinement | `1` | 1.2 km | A diffuse band 3 km wide that never sharpens; the run takes a tenth of the time |
+| Stock | `0.01` | 0.12 km | A sharp fault, about 1400 elements; 12 min |
+| Very fine | `0.001` | 0.04 km | The same mesh as stock, since the target rather than the floor limits refinement; 60 % more steps for nothing |
+| Very fine, stronger target | `0.001` with `mmg_metric_refine_coeff = 10` | 0.04 km | Now the band refines: 1630 elements, half again as many in the band |
 
-![smallest_size 1, the stock 0.01 and 0.001 at 100 kyr: plastic strain on the mesh for each, then element count and maximum plastic strain against time](./img/tectonics/core-complex-smallest-size.png)
+![smallest_size 1, the stock 0.01, 0.001, and 0.001 with a doubled refinement coefficient at 100 kyr: plastic strain on the mesh for each](./img/tectonics/core-complex-smallest-size.png)
 
-All three rows were run. Going up to `smallest_size = 1` costs resolution:
+All four rows were run. Going up to `smallest_size = 1` costs resolution:
 the fault still forms in the same place and the surface still domes, but
 the band cannot be narrower than the elements it runs through, so the strain
 is spread over a 3 km wide zone and the fault never sharpens. The time step
 is seven times longer, since it follows the smallest element, and the whole
 run takes a tenth of the time.
 
-Going down to `0.001` buys nothing. The smallest element in the stock run is
-0.15 km, above the 0.12 km floor, because MMG's target size along the fault
-is set by `mmg_metric_refine_coeff`, which shrinks an element to about a
-fifth of its initial edge at a plastic strain of 4. Lowering the floor below
-that target cannot refine the band further. What it does change is the
-tiny-element trigger: squeezed elements may now shrink to a third of the
-size before a remesh repairs them, so the time step falls and the run needs
-60 % more steps for the same result. The lesson is that `smallest_size`
-caps the refinement from below, and the useful range is where that cap
-binds; past it, lowering it only costs time.
+Going down to `0.001` alone buys nothing. The smallest element in the stock
+run is 0.15 km, above the 0.12 km floor, so the floor was not what stopped
+the refinement; the target was. Lowering the floor further cannot refine the
+band, and what it does change is the tiny-element trigger: squeezed elements
+may now shrink to a third of the size before a remesh repairs them, so the
+time step falls and the run needs 60 % more steps for the same result.
+
+Raising the target as well, `mmg_metric_refine_coeff = 10`, is what makes
+the lower floor useful. The band now holds 580 elements instead of 350, at a
+median edge of 0.29 km instead of 0.38, and the smallest element reaches
+0.10 km, still above the 0.04 km floor. The fault is drawn more sharply and
+the maximum plastic strain is a little higher, 4.1 against 3.9.
+
+![The same four runs: final surface topography, then element count and maximum plastic strain against time, and the elements of each run at 100 kyr split by plastic strain](./img/tectonics/core-complex-smallest-size-series.png)
+
+The surface itself hardly notices: the three refined runs end with the same crest and
+basin to within 0.2 km, and only the unrefined run is lower and broader. The
+lesson is that the two parameters work as a pair: the target asks for refinement
+where plastic strain accumulates, the floor caps how far it may go, and
+moving one without the other changes the cost of the run more than its
+result.
 
 Change one parameter at a time, and keep a log of what you changed.
 
