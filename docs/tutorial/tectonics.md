@@ -15,7 +15,7 @@ run them as they are and then modify one ingredient at a time.
 Both cases move material a long way under divergent or convergent forcing.
 Deformation localizes where plastic strain accumulates, and with MMG remeshing
 the mesh is refined there, so faults stay sharp as the model runs. The first
-case takes minutes on a laptop; the second takes hours.
+case takes minutes on a laptop; the second about half an hour.
 
 ## What you will learn
 
@@ -31,6 +31,25 @@ case takes minutes on a laptop; the second takes hours.
   material and velocity
 - How to diagnose a run that stops in a remeshing failure and carry it on
   from a checkpoint with a changed parameter
+
+The two parts are meant to be read in order. Part 1 is the smallest model
+that shows a DES fault: one material, no temperature, a box mesh, a planar
+seed, three run steps. Part 2 keeps that skeleton and adds one ingredient at
+a time:
+
+| Ingredient | Part 1: core complex | Part 2: subduction |
+|---|---|---|
+| Geometry | A box, refined in the middle by the config | A `.poly` file with a slab already in the mantle |
+| Materials | One | Six populated, four reserved for phase-change products |
+| Rheology | Elasto-plastic | Elasto-visco-plastic with a geotherm |
+| Seed | One planar weak zone | One dipping segment along the slab top |
+| Walls | Both pulled apart | One pushed in, one fixed; material flows in through the wall |
+| Phase changes | None | Serpentinization and eclogitization on a marker grid |
+| Remeshing | Bottom restored | Bottom and side walls restored, which needs MMG |
+| Run time, 6 threads | 12 minutes to 100 kyr | 23 minutes to 5 Myr |
+
+Each part has the same four steps, geometry, configuration, run, and what to
+look for, followed by exercises that change one parameter at a time.
 
 ## Prerequisites
 
@@ -76,6 +95,7 @@ viscous creep with `elasto-visco-plastic`.
 | Plastic (Mohr–Coulomb, strain softening) | Brittle faulting | `cohesion0/1`, `friction_angle0/1`, `dilation_angle0/1`, `pls0/1` | Parts 1 and 2 |
 | Viscous (power-law creep) | Ductile flow where it is hot | `visc_exponent`, `visc_coefficient`, `visc_activation_energy`, `min_viscosity`, `max_viscosity` | Part 2 only |
 | Temperature | Viscosity through creep; density through `alpha` | `temperature_option`, `oceanic_plate_age_in_yr`, `surface_temperature`, `mantle_temperature` | Part 2 only |
+| Phase changes | Marker material conversion at pressure–temperature boundaries | `phase_change_option`, `mattype_*`, `has_serpentinization`, `has_eclogitization` | Part 2 only |
 
 ### Strain softening
 
@@ -112,8 +132,10 @@ Part 1 is isothermal. Part 2 sets an initial geotherm by half-space cooling
 (`temperature_option = 0`, `oceanic_plate_age_in_yr`), and temperature then
 evolves by conduction and advection. It feeds back into the viscosity through
 the creep law, which is what makes the deep slab and the mantle wedge flow.
-
-{/* TODO: one sentence each on temperature_option 1-3 for continental geotherms. */}
+The other options are for continents: 1 is a linear continental gradient
+over `lithospheric_thickness`, 2 adds the equilibrium of crustal radiogenic
+heating, 3 puts an adiabatic mantle under the continental gradient, and 90
+reads a temperature grid from a file.
 
 ### Remeshing and markers
 
@@ -149,9 +171,19 @@ it is the fastest way to see every ingredient of a DES tectonic run.
 | Surface | Hillslope diffusion, `surface_diffusivity = 1e-7` m²/s |
 | Thermal | Isothermal, 273 K |
 
+### Step 1: The initial geometry and mesh
+
+Part 1 needs no mesh file. The box, its refinement and the seed fault are all
+set in the config: `meshing_option = 2` meshes a rectangle at `resolution`
+between `refined_zonex = [0.3, 0.7]`, 30 to 70 km, and lets elements grow to
+`largest_size` times the area outside, about 3 km on an edge. The seed is a
+planar weak zone through (50 km, 0) dipping 60° toward −x, 1.2 km wide and
+confined to the lower half of the layer, where it is given a plastic strain
+equal to `pls1` so it starts fully softened.
+
 ![Initial geometry and mesh of core-complex.cfg: the 100 by 10 km layer, a 1 km element in the refined zone between 30 and 70 km against elements of about 3 km outside it, the planar weak-zone seed dipping 60° in the lower half of the layer under x = 50 km, the wall velocities, the free surface and the Winkler bottom, with the parameter names that set each](./img/tectonics/core-complex-setup.svg)
 
-### Step 1: Walk through the configuration
+### Step 2: The configuration
 
 ```cfg title="core-complex.cfg"
 [sim]
@@ -257,11 +289,11 @@ The parameters you will change most often:
 | `vbc_val_x0`, `vbc_val_x1` | Extension rate at each wall, m/s |
 | `resolution`, `refined_zonex` | Element size and where it is fine |
 
-### Step 2: Run
+### Step 3: Run
 
 ```bash
 cd DynEarthSol/examples
-OMP_NUM_THREADS=4 ../dynearthsol2d core-complex.cfg
+OMP_NUM_THREADS=6 ../dynearthsol2d core-complex.cfg
 ```
 
 As shipped the file stops at 50 kyr, which is enough to see the fault break
@@ -283,17 +315,18 @@ needs about the same number of steps but ends with about 2000 elements after
 some 140 remeshes. Remeshing is under 0.1 % of the wall time either way; the
 time step, not the mesh, is the cost.
 
-:::tip MMG: same config, adaptive mesh
-Rebuild with `make ndims=2 usemmg=1` and run the same file; nothing in the
-config changes. The MMG build sizes elements from accumulated plastic strain,
-within a band set by two parameters the file already has: the largest edge
-is `resolution × largest_size^(1/2)` and the smallest
-`resolution × (smallest_size × mmg_remesh_defensive_tiny_ratio)^(1/2)`,
-3.2 km and 0.12 km here. Remeshing is conservative: elements that are not
-yielding, distorted or tiny are frozen, so each remesh touches mainly the
-fault band. The runs shown below are MMG runs; to 100 kyr they end with
-about 1400 elements after 24 remeshes, against about 2000 elements and 140
-remeshes for the Triangle build of the same file.
+:::tip With and without MMG
+The runs shown below use the MMG build from the prerequisites. The same file
+also runs on a plain Triangle build (`make ndims=2`); nothing in the config
+changes. The difference is in how the mesh is rebuilt. MMG sizes elements
+from accumulated plastic strain, within a band set by two parameters the file
+already has: the largest edge is `resolution × largest_size^(1/2)` and the
+smallest `resolution × (smallest_size × mmg_remesh_defensive_tiny_ratio)^(1/2)`,
+3.2 km and 0.12 km here, and it is conservative, freezing elements that are
+not yielding, distorted or tiny so that each remesh touches mainly the fault
+band. Triangle rebuilds the whole mesh at the initial sizes. To 100 kyr the
+MMG run ends with about 1400 elements after 24 remeshes, the Triangle run
+with about 2000 after some 140.
 
 The build is described in [Adaptive mesh refinement with MMG](./usingmmg.md).
 The full parameter list, with a one-line tuning rule for each, is in the
@@ -303,7 +336,7 @@ and in `dynearthsol2d --help`. These parameters are in DynEarthSol `master`
 since [PR #95](https://github.com/GeoFLAC/DynEarthSol/pull/95), October 2026.
 :::
 
-### Step 3: Visualize
+### Step 4: What to look for
 
 ```bash
 python ../2vtk.py result3
@@ -311,10 +344,10 @@ python ../2vtk.py result3
 
 Open `result3.*.vtu` in ParaView. Fields to look at:
 
-- **plastic strain** — the fault, and whether it stays one band
-- **surface topography** — footwall uplift and hanging-wall basin
-- **strain rate** — where slip is happening now, as opposed to where it has happened
-- **the mesh itself** — how element size tracks the fault after remeshing
+- **plastic strain**, the fault, and whether it stays one band
+- **surface topography**, footwall uplift and hanging-wall basin
+- **strain rate**, where slip is happening now, as opposed to where it has happened
+- **the mesh itself**, how element size tracks the fault after remeshing
 
 ![Core-complex run with MMG at 25, 50, 75 and 100 kyr: plastic strain on the mesh with the surface drawn (left), log10 strain rate with velocity arrows (right), then the surface profiles at the four times and relief and fault-band dip against time](./img/tectonics/core-complex-evolution.png)
 
@@ -326,20 +359,20 @@ row quantifies the rolling hinge: the fault band steepens to 50° while it
 breaks through, then rotates steadily to 35° by 100 kyr as relief grows to
 3.9 km.
 
-Things to look for as the run proceeds:
+Things to look for as the run proceeds (the figure is the reference run):
 
-- the seed fault cuts up to the surface within the first 10 kyr and the
-  footwall starts to rise; the velocity arrows show the footwall moving up
-  and to the right while the hanging wall slides left;
-- by 50 kyr the surface has a footwall crest of 1.3 km near x = 54 km and a
-  basin of 1.4 km near x = 50 km, 2.7 km of relief; by 100 kyr the crest is
-  2.2 km at x = 56 km and the relief 3.9 km;
-- the fault rotates to a shallower dip as it is exhumed, from about 46° at
-  25 kyr to 35° at 100 kyr; the band of high plastic strain curves from steep
-  at depth to gentle near the surface, and its exhumed upper part drapes the
-  footwall dome;
-- after a remesh the elements along the fault are smaller than in the far
-  field if you use MMG, and uniform if you use Triangle; the MMG run grows
+- **Breakthrough.** The seed fault cuts up to the surface within the first
+  10 kyr and the footwall starts to rise; the velocity arrows show the
+  footwall moving up and to the right while the hanging wall slides left.
+- **Relief.** By 50 kyr the surface has a footwall crest of 1.3 km near
+  x = 54 km and a basin of 1.4 km near x = 50 km, 2.7 km of relief; by
+  100 kyr the crest is 2.2 km at x = 56 km and the relief 3.9 km.
+- **The rolling hinge.** The fault rotates to a shallower dip as it is
+  exhumed, from about 46° at 25 kyr to 35° at 100 kyr; the band of high
+  plastic strain curves from steep at depth to gentle near the surface, and
+  its exhumed upper part drapes the footwall dome.
+- **The mesh.** After a remesh the elements along the fault are smaller than
+  in the far field with MMG, and uniform with Triangle; the MMG run grows
   from 720 to about 1400 elements over 100 kyr.
 
 ### Exercise 1: change the surface diffusivity
@@ -373,19 +406,42 @@ gone. Read them together with the surface panels:
 That is why relief alone is a poor measure of what a fault has done, and why
 the horizons are worth drawing. Each run took 5 to 12 minutes on 6 threads.
 
-### Exercise 2: change the MMG refinement
+### Exercise 2: change how small the elements may get
 
-Requires the MMG build (`make ndims=2 usemmg=1`). `mmg_metric_refine_coeff`
-scales the target element volume by `1 / (1 + coeff × plastic strain)`; the
-smallest size it can reach is the `smallest_size` floor from the box above.
+Requires the MMG build (`make ndims=2 usemmg=1`). `smallest_size` is the
+area of the smallest allowed element relative to one of edge `resolution`.
+With MMG it sets the floor of the refinement band,
+`resolution × (smallest_size × mmg_remesh_defensive_tiny_ratio)^(1/2)`, and
+for every remesher it sets the tiny-element trigger: an element compressed
+below `smallest_size` of its nominal area forces a remesh. Both scale with
+its square root, so a factor of 100 in `smallest_size` is a factor of 10 in
+element edge.
 
-| Run | `mmg_metric_refine_coeff` | What you should see |
-|-----|---------------------------|---------------------|
-| No plastic refinement | `0` | Elements stay at their initial size; the shear band is a few elements wide |
-| Default | `5` | Band refined toward `smallest_size`; element count grows with the fault |
-| Aggressive | `20` | Narrower band, more elements, shorter `dt`, longer run |
+| Run | `smallest_size` | Smallest MMG element | What you should see |
+|-----|-----------------|----------------------|---------------------|
+| No refinement | `1` | 1.2 km, the resolution itself | The mesh stays at about 720 elements; the fault is a diffuse band three or four 1 km elements wide and its plastic strain tops out at 1.8 instead of 3.9; relief 3.4 km instead of 3.9; the run takes 68 s |
+| Stock | `0.01` | 0.12 km | The band refines by up to ten times along the fault: about 1400 elements after 24 remeshes, plastic strain up to 3.9, a sharp fault; 12 min |
+| Very fine | `0.001` | 0.04 km | Almost the same mesh as the stock run: 1330 elements, smallest edge 0.12 km, plastic strain up to 3.5. The band does not get finer, because the refinement target, not the floor, limits it. The run takes 16 min, a third longer, with 60 % more steps |
 
-Compare the element count and step count in `result3.info` across the three.
+![smallest_size 1, the stock 0.01 and 0.001 at 100 kyr: plastic strain on the mesh for each, then element count and maximum plastic strain against time](./img/tectonics/core-complex-smallest-size.png)
+
+All three rows were run. Going up to `smallest_size = 1` costs resolution:
+the fault still forms in the same place and the surface still domes, but
+the band cannot be narrower than the elements it runs through, so the strain
+is spread over a 3 km wide zone and the fault never sharpens. The time step
+is seven times longer, since it follows the smallest element, and the whole
+run takes a tenth of the time.
+
+Going down to `0.001` buys nothing. The smallest element in the stock run is
+0.15 km, above the 0.12 km floor, because MMG's target size along the fault
+is set by `mmg_metric_refine_coeff`, which shrinks an element to about a
+fifth of its initial edge at a plastic strain of 4. Lowering the floor below
+that target cannot refine the band further. What it does change is the
+tiny-element trigger: squeezed elements may now shrink to a third of the
+size before a remesh repairs them, so the time step falls and the run needs
+60 % more steps for the same result. The lesson is that `smallest_size`
+caps the refinement from below, and the useful range is where that cap
+binds; past it, lowering it only costs time.
 
 Change one parameter at a time, and keep a log of what you changed.
 
@@ -436,7 +492,7 @@ a side wall.
 | Remeshing | MMG required; `remeshing_option = 13` restores the side walls so the incoming plate keeps its layering |
 | Surface | Hillslope diffusion, `surface_diffusivity = 5e-7` m²/s; deposits become sediment |
 
-### Step 1: Build the initial geometry
+### Step 1: The initial geometry and mesh
 
 A subducting slab needs a pre-existing dipping interface, which a weak zone
 alone cannot supply. `poly-subduction.poly` defines it as a region of oceanic
@@ -480,7 +536,7 @@ serpentinization rule, explained [below](#the-phase-change-rules). Its cells
 are half an element wide, so the one-element-thick slab crust gets its own
 row of crust-dominant cells instead of being averaged with the mantle.
 
-### Step 2: Walk through the configuration
+### Step 2: The configuration
 
 ```cfg title="subduction.cfg (abridged; the file itself is fully commented)"
 [sim]
@@ -589,7 +645,7 @@ Section by section, with what is new relative to Part 1:
   are switched off, so they stay empty. Each `mattype_*` tells the rule
   engine which slot plays which role.
 
-### The phase-change rules
+#### The phase-change rules
 
 `phase_change_option = 3` runs every 10 steps over all markers. A rule fires
 only when its switch is on and its source and target are distinct, valid
@@ -629,15 +685,13 @@ The parameters you will change most often:
 | `surface_diffusivity` | Trench fill and forearc erosion |
 | `max_time_in_yr` | 5 Myr is about 160 km of convergence |
 
-### Step 3: Run and visualize
+### Step 3: Run
 
-Build with MMG, since the restored side walls need it, and run from
-`examples/` so the `.poly` path resolves:
+Run from `examples/` so the `.poly` path resolves. The MMG build from the
+prerequisites is required here, since the restored side walls need it:
 
 ```bash
-cd DynEarthSol
-make ndims=2 usemmg=1
-cd examples
+cd DynEarthSol/examples
 OMP_NUM_THREADS=6 ../dynearthsol2d subduction.cfg
 ```
 
@@ -653,6 +707,8 @@ already shows the serpentinite layer along the slab top and a sediment-filled
 trench, enough to confirm the build, the MMG remeshing and the phase changes
 all work. Then restore the two lines.
 :::
+
+### Step 4: What to look for
 
 ```bash
 python ../2vtk.py model-subduction
@@ -715,7 +771,7 @@ the element count by only a few tens, because the conservative MMG mode
 freezes elements that are not yielding, distorted or tiny. Remeshing takes
 under 1 % of the wall time; the phase changes take 4 %.
 
-### Exercise 3: thickness of the serpentinite layer
+### Exercise 3: change the thickness of the serpentinite layer
 
 `serpentinization_thickness` sets how far above the slab top mantle can
 convert, counted in 3 km grid cells. It must be positive, so the zero case
@@ -796,14 +852,15 @@ Change one parameter at a time, and keep a log of what you changed.
 
 ## Troubleshooting
 
-{/* TODO: collect real messages as they come up. Candidates below. */}
+The rows marked "observed" come from runs made for this tutorial; the
+others are the usual causes.
 
 | Symptom | Part | Cause and fix |
 |---------|------|---------------|
-| Run stops with a mesh-quality error | both | {/* TODO: lower min_quality, more frequent quality_check_step_interval, or smaller resolution; with MMG, mmg_hausd_factor */} |
-| Strain stays diffuse, no single fault | 1 | {/* TODO: pls1 too large or weakzone_plstrain too small */} |
-| Fault dies and a new one forms | 1 | {/* TODO: slow softening or thick layer; Lavier et al. 2000 */} |
-| Time step collapses (very small `dt`) | 2 | {/* TODO: dt is Maxwell-limited, dt ≈ 0.5 min_viscosity / shear_modulus; raise min_viscosity */} |
+| `[DES exit 41] mesh generation` after an MMG error | both | MMG could not rebuild the mesh, usually at a boundary that a storm of remeshes has degraded. Read the triggers of the last remeshes in the log; if one boundary dominates, lower `max_boundary_distortion` so it is corrected in smaller steps (observed, see the troubleshooting case) |
+| Strain stays diffuse, no single fault | 1 | The band cannot be narrower than its elements: `smallest_size` too large (observed at 1, Exercise 2) or `resolution` too coarse. Or softening is too slow: `pls1` large, or `weakzone_plstrain` below `pls1` so the seed is not pre-softened |
+| Fault dies and a new one forms | 1 | Slow softening or a thick layer favours several short-lived faults over one long-lived one; lower `pls1` or thin the layer (Lavier, Buck & Poliakov 2000) |
+| Time step shrinks and the run slows | both | `dt` follows the smallest element; the mesh has refined more than you want. Raise `smallest_size` or lower `mmg_metric_refine_coeff` (observed: 0.017 yr at the stock 0.01 against 0.11 yr at 1) |
 | Stops at input with a `mattype_*` message | 2 | Each active rule needs its source and target set to distinct, valid materials; check the `mattype_*` lines against `num_materials` |
 | Stops at input: `serpentinization_thickness` too small | 2 | It must be at least one grid cell, `resolution × vt_size` |
 | `remeshing_option 13` refused | 2 | Restored side walls need an MMG build: `make ndims=2 usemmg=1` |
@@ -818,6 +875,25 @@ Change one parameter at a time, and keep a log of what you changed.
 - Go to 3D with `oblique-rift-3d.cfg` and `conjugate-faults-3d.cfg`; see
   [Velocity boundary conditions (3D)](./vbc.md) and [Weak zones](./weakzone.md)
 
-{/* TODO: add a references bullet — Choi et al. 2013 (DES paper), Lavier,
-    Buck & Poliakov 1999 and 2000 (core complex), Tan et al. 2012 (interface
-    friction), Hacker 1996, Ulmer & Trommsdorff 1995. */}
+## References
+
+- Choi, E., Tan, E., Lavier, L. L. & Calo, V. M. (2013). DynEarthSol2D: an
+  efficient unstructured finite element method to study long-term tectonic
+  deformation. *J. Geophys. Res. Solid Earth*, 118, 2429–2444.
+- Lavier, L. L., Buck, W. R. & Poliakov, A. N. B. (1999). Self-consistent
+  rolling-hinge model for the evolution of large-offset low-angle normal
+  faults. *Geology*, 27, 1127–1130.
+- Lavier, L. L., Buck, W. R. & Poliakov, A. N. B. (2000). Factors
+  controlling normal fault offset in an ideal brittle layer. *J. Geophys.
+  Res.*, 105, 23431–23442.
+- Tan, E., Lavier, L. L., Van Avendonk, H. J. A. & Heuret, A. (2012). The
+  role of frictional strength on plate coupling at the subduction interface.
+  *Geochem. Geophys. Geosyst.*, 13, Q10006.
+- Hacker, B. R., Abers, G. A. & Peacock, S. M. (2003). Subduction factory 1:
+  theoretical mineralogy, densities, seismic wave speeds, and H₂O contents.
+  *J. Geophys. Res.*, 108, 2029.
+- Ulmer, P. & Trommsdorff, V. (1995). Serpentine stability to mantle depths
+  and subduction-related magmatism. *Science*, 268, 858–861.
+- Grove, T. L., Till, C. B., Lesher, E., Chatterjee, N., Médard, E. &
+  Gaetani, G. A. (2009). The role of H₂O in subduction zone magmatism.
+  *Annu. Rev. Earth Planet. Sci.*, 37, 503–520.
