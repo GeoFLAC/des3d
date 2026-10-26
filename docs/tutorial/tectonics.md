@@ -261,17 +261,24 @@ cd DynEarthSol/examples
 OMP_NUM_THREADS=4 ../dynearthsol2d core-complex.cfg
 ```
 
+As shipped the file stops at 50 kyr, which is enough to see the fault break
+through and the footwall start to rise. The figures below run to 100 kyr,
+when the dome is fully formed; to reproduce them, change one line:
+
+```cfg
+max_time_in_yr = 100000
+```
+
 The log prints one line per `output_time_interval_in_yr` with the step count,
 model time and `dt`, and a `remeshing` notice whenever the mesh is rebuilt.
 Output goes to `result3.save.*` and `result3.info` in the working directory.
 
-Cost on a laptop core: the stock run reaches 50 kyr in a few minutes. To 100
-kyr the Triangle build takes about 5.7 million steps and ends with about 2000
-elements after some 140 remeshes.
-
-{/* TODO: confirm wall time for the 50 kyr stock run and the 100 kyr run on
-    one and four threads; numbers above are from analysis/examples/218 and
-    220 at 99 kyr. */}
+Cost on a laptop: the stock 50 kyr run takes a few minutes. To 100 kyr the
+MMG build took 12 minutes on 6 threads while another run shared the machine,
+7.0 million steps, 24 remeshes, 720 to about 1400 elements. The Triangle build
+needs about the same number of steps but ends with about 2000 elements after
+some 140 remeshes. Remeshing is under 0.1 % of the wall time either way; the
+time step, not the mesh, is the cost.
 
 :::tip MMG: same config, adaptive mesh
 Rebuild with `make ndims=2 usemmg=1` and run the same file. The MMG build
@@ -319,33 +326,62 @@ Open `result3.*.vtu` in ParaView. Fields to look at:
 - **strain rate** — where slip is happening now, as opposed to where it has happened
 - **the mesh itself** — how element size tracks the fault after remeshing
 
-{/* TODO: figure from the MMG run — 4 panels of plastic strain on the mesh at
-    25, 50, 75, 100 kyr, zoomed to x = 30–70 km, surface drawn. Start from
-    analysis/examples/218_core_complex_mmg_ab.py. Save to
-    ./img/tectonics/core-complex-plstrain.png
-![Plastic strain and mesh during core-complex formation](./img/tectonics/core-complex-plstrain.png)
-*/}
+![Core-complex run with MMG at 25, 50, 75 and 100 kyr: plastic strain on the mesh with the surface drawn (left), log10 strain rate with velocity arrows (right), then the surface profiles at the four times and relief and fault-band dip against time](./img/tectonics/core-complex-evolution.png)
+
+The left column is where slip has accumulated and how the mesh follows it;
+the right column is where slip is happening now. They differ: at 50 kyr the
+strain rate shows a second, antithetic band under the footwall at x = 60–70
+km that never gains enough plastic strain to show on the left. The bottom
+row quantifies the rolling hinge: the fault band steepens to 50° while it
+breaks through, then rotates steadily to 35° by 100 kyr as relief grows to
+3.9 km.
 
 Things to look for as the run proceeds:
 
-- the seed fault cuts up to the surface within the first few kyr and the
-  footwall starts to rise;
-- by about 50 kyr the surface has an uplifted footwall near x = 55 km and a
-  basin near x = 48 km, about 2 km of relief in total;
-- the fault rotates to a shallower dip as it is exhumed; the band of high
-  plastic strain curves from steep at depth to gentle near the surface;
+- the seed fault cuts up to the surface within the first 10 kyr and the
+  footwall starts to rise; the velocity arrows show the footwall moving up
+  and to the right while the hanging wall slides left;
+- by 50 kyr the surface has a footwall crest of 1.3 km near x = 54 km and a
+  basin of 1.4 km near x = 50 km, 2.7 km of relief; by 100 kyr the crest is
+  2.2 km at x = 56 km and the relief 3.9 km;
+- the fault rotates to a shallower dip as it is exhumed, from about 46° at
+  25 kyr to 35° at 100 kyr; the band of high plastic strain curves from steep
+  at depth to gentle near the surface, and its exhumed upper part drapes the
+  footwall dome;
 - after a remesh the elements along the fault are smaller than in the far
-  field if you use MMG, and uniform if you use Triangle.
+  field if you use MMG, and uniform if you use Triangle; the MMG run grows
+  from 720 to about 1400 elements over 100 kyr.
 
 ### Exercise 1: change the surface diffusivity
 
-| Run | `surface_diffusivity` | What you should see |
-|-----|-----------------------|---------------------|
-| Reference | `1e-7` | Sharp footwall crest, basin preserved |
-| Stock MMG file | `1e-6` | {/* TODO */} |
-| Strong erosion | `1e-5` | Footwall planed off as it rises; more exhumation from depth per unit of extension |
+| Run | `surface_diffusivity` | What you should see at 100 kyr |
+|-----|-----------------------|-------------------------------|
+| Reference | `1e-7` | Sharp footwall crest 2.2 km high, basin 1.7 km deep, 3.9 km of relief |
+| Stock MMG file | `1e-6` | The same structure a little smoothed: crest 1.8 km, basin 1.4 km, 3.2 km of relief |
+| Strong erosion | `1e-5` | Relief capped at 1.6 km from 40 kyr on; the crest is planed to 1 km and the basin filled to 0.6 km while the fault keeps slipping |
 
-Erosion unloads the footwall, which keeps the fault active longer.
+![Surface diffusivity 1e-7, 1e-6 and 1e-5 at 100 kyr: passive horizons of initial depth in 1 km bands with the fault band shaded, then the surface profiles, relief against time, and the initial depth of the rock now at the surface](./img/tectonics/core-complex-diffusivity.png)
+
+The coloured bands are passive horizons: every node carries its initial
+position through remeshing in the `coord0` field, so contouring the initial
+depth on the present mesh shows where each layer of the original crust has
+gone. Read them together with the surface panels:
+
+- **The fault is the same in all three runs.** The band dips 42° at 50 kyr
+  and 35° at 100 kyr and reaches a plastic strain of 3.9 whatever the
+  diffusivity. Diffusion acts on the surface only.
+- **So is the exhumation.** Rock from 8 km depth has risen to 3.9 km below the
+  surface at x = 48 km in all three, the horizons under the dome are bent
+  the same way, and the rock exposed at the surface came from 1.4 to 2.1 km in
+  every run. The fault sets how far the footwall rises; erosion does not add
+  to it here.
+- **What changes is the topography.** At 1e-5 m²/s the relief stops growing
+  at 40 kyr because the crest is planed as fast as the fault lifts it and
+  the debris fills the basin. The same exhumation then shows as a low dome
+  rather than a sharp crest.
+
+That is why relief alone is a poor measure of what a fault has done, and why
+the horizons are worth drawing. Each run took 5 to 12 minutes on 6 threads.
 
 ### Exercise 2: change the MMG refinement
 
