@@ -621,7 +621,7 @@ Open `model-subduction.*.vtu` in ParaView. Fields to look at:
 - **viscosity**, the cold slab against the weak wedge
 - **temperature**, the slab's thermal anomaly and the heated wedge corner
 
-![Material (left) and viscosity with isotherms (right) at 0.5, 1, 2.5 and 5 Myr, cropped to the slab: the tip sinks from 49 to 126 km depth, serpentinite (purple) lines the slab top and fills the wedge corner, eclogite (red) grows from the slab tip](./img/tectonics/subduction-evolution.png)
+![Material with velocity arrows (left) and viscosity with isotherms (right) at 0.5, 1, 2.5 and 5 Myr, cropped to the slab: the tip sinks from 49 to 126 km depth, serpentinite (purple) lines the slab top and fills the wedge corner, eclogite (red) grows from the slab tip](./img/tectonics/subduction-evolution.png)
 
 Things to look for as the run proceeds (the figure is the reference run):
 
@@ -646,6 +646,31 @@ Things to look for as the run proceeds (the figure is the reference run):
 
 {/* Numbers are from the PR #110 head run pr110-ref (analysis/examples/376). */}
 
+#### How the mesh keeps up
+
+![Mesh size and remeshing of the reference run: elements grow from 2603 to 4625 over 206 remeshes, split by plastic strain with each remesh marked by its trigger, and the cumulative remesh count by trigger](./img/tectonics/subduction-remeshing.png)
+
+The mesh nearly doubles over the run, and the left panel shows where the
+new elements go. Elements with no plastic strain fall from 2600 to about
+1900 as the deforming band widens into them, and they stay coarse at a
+median of 4.7 km. Fully softened elements, those past `pls1 = 0.1`, grow from
+none to about 2100, 44 % of the mesh, at a median size of 2.0 km against the
+6 km resolution and the 1.5 km MMG floor. That is the MMG metric at work:
+`mmg_metric_refine_coeff` shrinks the target size where plastic strain has
+accumulated, along the plate interface and in the wedge, and nowhere else.
+
+The 206 remeshes have three triggers, each checked every
+`quality_check_step_interval` steps. A **tiny element** is one whose area has
+dropped below `smallest_size` times the resolution squared. **Low quality** is
+an element quality below `min_quality`, 0.2 here. **Bottom drift** is a bottom
+node more than `max_boundary_distortion` times `resolution`, 6 km here, from
+the 160 km base. The first two are the ordinary triggers and fire throughout.
+Bottom drift dominates the first 2 Myr while the slab tip sinks through the
+lower mantle and the Winkler bottom adjusts, then fades. Each remesh moves
+the element count by only a few tens, because the conservative MMG mode
+freezes elements that are not yielding, distorted or tiny. Remeshing takes
+under 1 % of the wall time; the phase changes take 4 %.
+
 ### Exercise 3: thickness of the serpentinite layer
 
 `serpentinization_thickness` sets how far above the slab top mantle can
@@ -654,11 +679,11 @@ is the rule switched off.
 
 | Run | Thickness | Change | What you should see |
 |-----|-----------|--------|---------------------|
-| None | 0 km | `has_serpentinization = no` | The interface locks. The slab tip stalls near 75 km from 2 Myr on and the slab necks off; both plates thicken and buckle, relief reaches ±7 km, and the run ends at 3.45 Myr in a remeshing failure at the inflow wall |
+| None | 0 km | `has_serpentinization = no` | The interface locks. The slab tip stalls near 80 km from 2 Myr on and the slab necks off; both plates thicken and buckle, relief reaches ±7 km, and the run ends at 3.45 Myr in a remeshing failure at the inflow wall (see the troubleshooting case below) |
 | Reference | 5 km | `serpentinization_thickness = 5e3` (one cell) | Steady subduction to 125 km at 5 Myr; trench 6 km deep at 2 Myr, recovering to 4 km; about 3100 serpentinite and 400 eclogite markers |
 | Thick | 10 km | `serpentinization_thickness = 10e3` (two cells) | Half again as much serpentinite (4600 markers) in a wedge body that reaches further down the slab; trench 1.5 km shallower throughout; slab tip 120 km; 40 % fewer eclogite markers |
 
-![Serpentinite layer none, 5 km and 10 km, all at 3.4 Myr, the last frame the run without serpentinite reached: material and phase-change markers per run, then slab-tip depth, trench depth and marker counts against time to 5 Myr](./img/tectonics/subduction-serp-thickness.png)
+![Serpentinite layer none, 5 km and 10 km across the whole 400 km domain at 3.4 Myr, the last frame the run without serpentinite reached: material, phase-change markers and velocity arrows per run, then slab-tip depth, trench depth and marker counts against time to 5 Myr](./img/tectonics/subduction-serp-thickness.png)
 
 What the comparison shows:
 
@@ -683,6 +708,46 @@ scatter is unknown. The locking of the 0 km case is robust, since it starts
 by 1 Myr and grows; the 1.5 km trench difference between 5 and 10 km should
 be read as suggestive until a perturbed twin bounds it.
 
+### Troubleshooting case: carrying on the run that locked up
+
+The 0 km run above stops at 3.45 Myr with
+
+```
+[DES exit 41] mesh generation
+```
+
+after MMG reports that it cannot compute a boundary normal at a tiny element
+on the inflow wall, 96 km deep. The log before the failure shows what led to
+it: of the last 40 remeshes, 34 were triggered by bottom nodes drifting more
+than `max_boundary_distortion × resolution` = 6 km from the 160 km base,
+because the stacked plates load the Winkler bottom unevenly. Each of those
+remeshes flattens the base back by up to 6 km in one go, and the mesh near the
+wall degrades a little further each time until MMG gives up.
+
+The run can be carried on from its last good checkpoint, frame 60 at 3.0 Myr,
+with the base corrected in smaller steps:
+
+```cfg
+is_restarting = yes
+restarting_from_modelname = model-subduction
+restarting_from_frame = 60
+max_boundary_distortion = 0.5     # 3 km instead of 6
+```
+
+With that one change the restart runs through to 5 Myr, remeshing 58 times in
+the remaining 2 Myr, 51 of them still bottom-drift triggers, but each
+correcting half as much. The physics does not change: the slab stays stalled
+near 80 km, the trench stays near 7 km deep and the plates keep buckling.
+Only the mesh survives.
+
+![The restarted run at 5 Myr, and trench depth and remesh count of the run as shipped against its restart with the halved boundary-distortion limit](./img/tectonics/subduction-restart-fix.png)
+
+Two cautions. Pick a restart frame that is not a remesh step, since a
+checkpoint written on one is not bit-recoverable. And a single restart that
+survives does not prove the parameter was the cure, because a restart is a new
+realization of a chaotic run; a control restart with the original setting
+would be needed for that.
+
 Change one parameter at a time, and keep a log of what you changed.
 
 ## Troubleshooting
@@ -699,7 +764,7 @@ Change one parameter at a time, and keep a log of what you changed.
 | Stops at input: `serpentinization_thickness` too small | 2 | It must be at least one grid cell, `resolution × vt_size` |
 | `remeshing_option 13` refused | 2 | Restored side walls need an MMG build: `make ndims=2 usemmg=1` |
 | Serpentinite appears far from the slab | 2 | The rule has no temperature gate below 150 km; a slab bend can make a whole grid column crust-dominant. Set `serpentinization_crust_margin >= 0` to confine it |
-| Slab stalls, plates thicken, then a remeshing error | 2 | The interface is too strong: this is the `has_serpentinization = no` case of Exercise 3. Check `mattype_serpentinite` is set and the sediment and serpentinite friction angles are low |
+| Slab stalls, plates thicken, then `[DES exit 41] mesh generation` | 2 | The interface is too strong: this is the `has_serpentinization = no` case of Exercise 3. Check `mattype_serpentinite` is set and the sediment and serpentinite friction angles are low. To carry such a run on anyway, restart from the last checkpoint with `max_boundary_distortion` halved to 0.5 |
 
 ## Next Steps
 
