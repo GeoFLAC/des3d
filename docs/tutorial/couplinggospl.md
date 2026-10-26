@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 8
 title: Coupling with GoSPL
 description: Learn how to couple DynEarthSol with GoSPL for landscape evolution modeling
 ---
