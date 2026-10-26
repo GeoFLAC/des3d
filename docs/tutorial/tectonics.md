@@ -4,6 +4,8 @@ title: Tectonic rifting and subduction
 description: Set up, run and interpret rifting and subduction models with DynEarthSol
 ---
 
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # Tectonic rifting and subduction
 
 This tutorial walks through two classic long-term tectonic models with
@@ -50,6 +52,16 @@ a time:
 
 Each part has the same four steps, geometry, configuration, run, and what to
 look for, followed by exercises that change one parameter at a time.
+
+:::tip Workshop package
+For a 90-minute class, download the <a href={useBaseUrl('/downloads/des-tectonics/DES-Tectonics-Tutorial.zip')}>tutorial package</a>:
+a Jupyter notebook that plots every figure of this page from DES output, the
+configs of both parts and all exercise variants behind a one-command launcher
+(`./run.sh <case>`), and trimmed reference results of every run so the plots
+work before, or without, your own runs. Its
+`resources/SETUP.md` has a shorter build recipe than the pages linked below,
+and its README has the class schedule.
+:::
 
 ## Prerequisites
 
