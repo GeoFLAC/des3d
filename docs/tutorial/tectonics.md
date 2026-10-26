@@ -319,18 +319,7 @@ Things to look for as the run proceeds:
 - after a remesh the elements along the fault are smaller than in the far
   field if you use MMG, and uniform if you use Triangle.
 
-### Exercise 1: change the dip of the seed fault
-
-| Run | `weakzone_inclination` | What you should see |
-|-----|------------------------|---------------------|
-| Reference | `-60` | One fault dipping toward −x, footwall on the +x side |
-| Shallower | `-45` | {/* TODO: run and describe */} |
-| Mirrored | `60` | The same structure mirrored: footwall on the −x side |
-
-A seed closer to the optimal Coulomb dip for 30° friction (about 60°) is
-taken up most readily; a seed far from it may be abandoned for a new fault.
-
-### Exercise 2: change the surface diffusivity
+### Exercise 1: change the surface diffusivity
 
 | Run | `surface_diffusivity` | What you should see |
 |-----|-----------------------|---------------------|
@@ -340,7 +329,7 @@ taken up most readily; a seed far from it may be abandoned for a new fault.
 
 Erosion unloads the footwall, which keeps the fault active longer.
 
-### Exercise 3: change the MMG refinement
+### Exercise 2: change the MMG refinement
 
 Requires the MMG build (`make ndims=2 usemmg=1`). `mmg_metric_refine_coeff`
 scales the target element volume by `1 / (1 + coeff × plastic strain)`; the
@@ -395,7 +384,7 @@ a side wall.
 | Domain | 400 × 160 km, 6 km resolution, a 10 km halo of refined mantle around the slab (`poly-subduction.poly`) |
 | Initial slab | Oceanic crust 7 km thick, from the trench at x = 125–139 km dipping 30° to 40 km depth |
 | Forcing | Left plate pushed at +1e-9 m/s (3.15 cm/yr) into a fixed right wall (`vbc_val_x1 = 0`) |
-| Duration | 5 Myr, a frame every 50 kyr; about 23 min on 6 threads, 5.7 million steps |
+| Duration | 5 Myr, a frame every 50 kyr; about 23 min alone on 6 threads, 31 min when two runs share the machine; 5.8 million steps |
 | Rheology | `elasto-visco-plastic`, 10 materials of which 6 are populated; cohesion 40 → 4 MPa and friction 30° → 15° over 0.1 plastic strain; sediment and serpentinite at 3° |
 | Phase changes | `phase_change_option = 3`: serpentinization and eclogitization on, the other rules off |
 | Weak zone | One 30° segment along the slab top (`weakzone_option = 5`), seeding the plate interface |
@@ -632,33 +621,32 @@ Open `model-subduction.*.vtu` in ParaView. Fields to look at:
 - **viscosity**, the cold slab against the weak wedge
 - **temperature**, the slab's thermal anomaly and the heated wedge corner
 
-![Material (left) and viscosity with isotherms (right) at 0.5, 1, 2.5 and 5 Myr: the slab sinks from 45 to about 125 km depth, serpentinite (purple) lines the slab top and fills the wedge corner, eclogite (red) appears at the slab tip after 1 Myr](./img/tectonics/subduction-evolution.png)
+![Material (left) and viscosity with isotherms (right) at 0.5, 1, 2.5 and 5 Myr, cropped to the slab: the tip sinks from 49 to 126 km depth, serpentinite (purple) lines the slab top and fills the wedge corner, eclogite (red) grows from the slab tip](./img/tectonics/subduction-evolution.png)
 
 Things to look for as the run proceeds (the figure is the reference run):
 
 - **Serpentinite from the first frame.** The slab is already in place, so
-  mantle just above its top converts at once: about 500 markers by 0.5 Myr,
-  3400 by 5 Myr. On the viscosity panels this layer sits at the 10¹⁹ Pa s
+  mantle just above its top converts at once: about 450 markers by 0.5 Myr,
+  3100 by 5 Myr. On the viscosity panels this layer sits at the 10¹⁹ Pa s
   floor and is the weakest material in the model.
-- **Eclogite only after about 1 Myr.** The first markers appear at the slab
-  tip once it has sunk past roughly 55 km; by 5 Myr the deepest 30 km of the
-  slab is eclogite.
-- **The slab tip** reaches 45 km at 0.5 Myr, 85 km at 2.5 Myr and about 125
+- **Eclogite starts at the slab tip.** A few dozen markers have converted by
+  0.5 Myr, where the tip sits near 50 km; the count grows to about 400 by
+  5 Myr, when the deepest 30 km of the slab is eclogite.
+- **The slab tip** reaches 50 km at 0.5 Myr, 90 km at 2.5 Myr and about 125
   km at 5 Myr, keeping a dip of 30–35° on its way down. The cold core stays
   at the 10²⁴ Pa s viscosity cap and drags the isotherms down with it.
 - **The wedge corner serpentinizes wholesale.** The mantle between the
   overriding plate's crust and the slab top lies within one grid cell of
   crust, so by 2.5 Myr a body 20–25 km thick and 50 km long has converted.
-  This is the geometric rule at work, not a thermal one; Exercise 4 shows
+  This is the geometric rule at work, not a thermal one; Exercise 3 shows
   how `serpentinization_thickness` controls it.
 - **The trench** fills with sediment and the overriding plate's crust bends
   down into it, while the incoming plate at the left wall keeps its three
   layers thanks to the restored wall.
 
-{/* TODO (Q30): confirm this description, or replace it with your own reading
-    of the run. Numbers are from analysis/examples/376_subduction_tutorial_evolution.py */}
+{/* Numbers are from the PR #110 head run pr110-ref (analysis/examples/376). */}
 
-### Exercise 4: thickness of the serpentinite layer
+### Exercise 3: thickness of the serpentinite layer
 
 `serpentinization_thickness` sets how far above the slab top mantle can
 convert, counted in 3 km grid cells. It must be positive, so the zero case
@@ -666,9 +654,34 @@ is the rule switched off.
 
 | Run | Thickness | Change | What you should see |
 |-----|-----------|--------|---------------------|
-| None | 0 km | `has_serpentinization = no` | {/* TODO: from pr110-t0 */} |
-| Reference | 5 km | `serpentinization_thickness = 5e3` (one cell) | {/* TODO: from pr110-ref */} |
-| Thick | 10 km | `serpentinization_thickness = 10e3` (two cells) | {/* TODO: from pr110-t10 */} |
+| None | 0 km | `has_serpentinization = no` | The interface locks. The slab tip stalls near 75 km from 2 Myr on and the slab necks off; both plates thicken and buckle, relief reaches ±7 km, and the run ends at 3.45 Myr in a remeshing failure at the inflow wall |
+| Reference | 5 km | `serpentinization_thickness = 5e3` (one cell) | Steady subduction to 125 km at 5 Myr; trench 6 km deep at 2 Myr, recovering to 4 km; about 3100 serpentinite and 400 eclogite markers |
+| Thick | 10 km | `serpentinization_thickness = 10e3` (two cells) | Half again as much serpentinite (4600 markers) in a wedge body that reaches further down the slab; trench 1.5 km shallower throughout; slab tip 120 km; 40 % fewer eclogite markers |
+
+![Serpentinite layer none, 5 km and 10 km, all at 3.4 Myr, the last frame the run without serpentinite reached: material and phase-change markers per run, then slab-tip depth, trench depth and marker counts against time to 5 Myr](./img/tectonics/subduction-serp-thickness.png)
+
+What the comparison shows:
+
+- **The weak layer is what makes this model subduct.** Without it the
+  sediment seed alone cannot keep the interface slipping; convergence goes
+  into thickening and buckling the plates, the slab stops descending and tears
+  below the overriding plate, and the mesh at the thickened inflow wall
+  eventually defeats the remesher. The failure message, `[DES exit 41] mesh
+  generation` after an MMG normal-vector error, is the symptom, not the cause.
+- **A thicker layer lubricates more.** With two cells the trench is shallower
+  by about 1.5 km for the whole run, the forearc high is lower, and the
+  wedge-corner body is larger. The slab tip ends 6 km shallower.
+- **Eclogite responds indirectly.** The 10 km run has 245 eclogite markers at
+  5 Myr against 414 in the reference. The rule did not change; the thicker
+  weak layer keeps the slab crust shallower and warmer where it would
+  otherwise cross the reaction boundary.
+- **Time step and cost barely change**: 5.7 to 5.8 million steps for all
+  three, about 23 minutes alone on 6 threads.
+
+No run was repeated with a tiny perturbation, so the size of the chaotic
+scatter is unknown. The locking of the 0 km case is robust, since it starts
+by 1 Myr and grows; the 1.5 km trench difference between 5 and 10 km should
+be read as suggestive until a perturbed twin bounds it.
 
 Change one parameter at a time, and keep a log of what you changed.
 
@@ -686,7 +699,7 @@ Change one parameter at a time, and keep a log of what you changed.
 | Stops at input: `serpentinization_thickness` too small | 2 | It must be at least one grid cell, `resolution × vt_size` |
 | `remeshing_option 13` refused | 2 | Restored side walls need an MMG build: `make ndims=2 usemmg=1` |
 | Serpentinite appears far from the slab | 2 | The rule has no temperature gate below 150 km; a slab bend can make a whole grid column crust-dominant. Set `serpentinization_crust_margin >= 0` to confine it |
-| Slab does not subduct | 2 | {/* TODO: interface too strong, slab too buoyant; try the Exercise 4 control without serpentinite */} |
+| Slab stalls, plates thicken, then a remeshing error | 2 | The interface is too strong: this is the `has_serpentinization = no` case of Exercise 3. Check `mattype_serpentinite` is set and the sediment and serpentinite friction angles are low |
 
 ## Next Steps
 
