@@ -1,5 +1,5 @@
 ---
-sidebar_position: 6
+sidebar_position: 7
 title: Tectonic rifting and subduction
 description: Set up, run and interpret rifting and subduction models with DynEarthSol
 ---
@@ -20,23 +20,41 @@ case takes minutes on a laptop; the second takes hours.
 ## What you will learn
 
 - How a DES `.cfg` file is organized and which sections matter for tectonics
-- How Mohr–Coulomb plasticity with strain softening produces faults
-- How to seed deformation with a weak zone and drive it with velocity boundary conditions
-- How remeshing keeps a Lagrangian mesh usable, and what MMG adds
-- How to build a layered or slab-shaped initial geometry with a `.poly` file
-- How to read the output: plastic strain, topography, viscosity, temperature
+- How Mohr–Coulomb plasticity with strain softening produces faults, and how
+  a weak zone and the wall velocities decide where and how fast
+- How a slab-shaped initial geometry is built with a `.poly` file
+- How marker phase changes add serpentinite and eclogite as the slab descends,
+  and what the virtual-topology grid does for them
+- How remeshing keeps a Lagrangian mesh usable, what triggers it, and how MMG
+  refines along the faults and the plate interface
+- How to read the output: plastic strain, topography, viscosity, temperature,
+  material and velocity
+- How to diagnose a run that stops in a remeshing failure and carry it on
+  from a checkpoint with a changed parameter
 
 ## Prerequisites
 
-Before starting, ensure you have:
+This tutorial follows the ones before it in this section and uses what they
+cover. Before starting, ensure you have:
 
-- ✅ DynEarthSol compiled in 2D (`make ndims=2`); see [Build](../usage/usage)
-- ✅ Python 3 with `numpy` for `2vtk.py`
-- ✅ [ParaView](https://www.paraview.org/) or another VTK viewer
-- ✅ Read [Making a complex mesh with `.poly` file](./usingpolyfile) (needed for Part 2)
+- ✅ DynEarthSol compiled in 2D (`make ndims=2`); see [Build](../usage/usage.md)
+  and [Running DES3D](../usage/run.md)
+- ✅ Python 3 with `numpy` for `2vtk.py`, and
+  [ParaView](https://www.paraview.org/) or another VTK viewer; see
+  [Visualizing outputs](../usage/visualize.md)
+- ✅ Read [Making a complex mesh with `.poly` file](./usingpolyfile.md): Part 2
+  reads its slab geometry from one
+- ✅ Read [Weak zones](./weakzone.md): Part 1 seeds a fault with a planar weak
+  zone and Part 2 the plate interface with a segment one
 - ⬜ Optional: an MMG build (`make ndims=2 usemmg=1`) for the adaptive-remeshing
-  boxes. MMG is a git submodule that `make` fetches and builds for you; see
-  [Adaptive mesh refinement with MMG](./usingmmg)
+  boxes and Exercise 2. MMG is a git submodule that `make` fetches and builds
+  for you; see [Adaptive mesh refinement with MMG](./usingmmg.md)
+
+[Velocity boundary conditions (3D)](./vbc.md) and
+[Rate-and-state friction](./rate-state-friction.mdx) are not needed here: both
+examples are 2D with steady wall velocities and no earthquake cycles. The
+next tutorial, [Coupling with GoSPL](./couplinggospl.md), adds surface processes
+to models like these.
 
 :::tip Which build?
 The examples in this tutorial are 2D. A 3D build (`make`) runs the same
@@ -76,7 +94,7 @@ location of localization is uncontrolled and depends on mesh noise. A weak
 zone is a region given an initial plastic strain `weakzone_plstrain`, which
 pre-softens it and pins the first fault. Part 1 uses a planar seed
 (`weakzone_option = 1`), Part 2 a dipping multi-segment one. The other shapes
-are described in [Weak zones](./weakzone).
+are described in [Weak zones](./weakzone.md).
 
 ### Driving deformation: velocity boundary conditions
 
@@ -106,7 +124,7 @@ fields onto it. `remeshing_option = 11` restores the bottom boundary to its
 initial depth. Markers carry material identity across remeshes. With MMG the
 rebuild is adaptive: elements are sized from accumulated plastic strain, so
 faults get finer elements and the quiet far field stays coarse. See
-[Remeshing](../theory/remeshing) and [MMG](./usingmmg).
+[Remeshing](../theory/remeshing.md) and [MMG](./usingmmg.md).
 
 ## Part 1: Rifting a brittle crust (core complex)
 
@@ -211,7 +229,7 @@ Section by section:
   remesh.
 - **`[control]`** turns on surface diffusion and sets the mass scaling.
   `inertial_scaling` is the factor by which density is inflated to lengthen
-  the elastic time step; see [Mass scaling](../theory/massscaling). With no
+  the elastic time step; see [Mass scaling](../theory/massscaling.md). With no
   viscosity in play, this parameter and the element size set `dt`.
 - **`[bc]`** pulls the two walls apart at 3.15 cm/yr each. The `vbc_y*`
   lines matter only in 3D. Water loading is off because the surface starts at
@@ -280,7 +298,7 @@ surface_diffusivity = 1e-6
 inertial_scaling = 1e4
 ```
 
-The build is described in [Adaptive mesh refinement with MMG](./usingmmg).
+The build is described in [Adaptive mesh refinement with MMG](./usingmmg.md).
 The full parameter list, with a one-line tuning rule for each, is in the
 `[mesh]` section of
 [`examples/defaults.cfg`](https://github.com/GeoFLAC/DynEarthSol/blob/master/examples/defaults.cfg)
@@ -350,7 +368,7 @@ Change one parameter at a time, and keep a log of what you changed.
 `core-complex.cfg` has no mantle, no temperature and no viscosity.
 [`examples/rifting-2d.cfg`](https://github.com/GeoFLAC/DynEarthSol/blob/master/examples/rifting-2d.cfg)
 adds all three: a 500 × 150 km crust-over-mantle lithosphere read from a
-`.poly` file (the one used in [Making a complex mesh](./usingpolyfile)),
+`.poly` file (the one used in [Making a complex mesh](./usingpolyfile.md)),
 `elasto-visco-plastic` rheology, a 100 Myr half-space geotherm and a Gaussian
 weak zone. It runs for 2 Myr at 6 km resolution. Everything in Part 2 that
 is new relative to Part 1 appears there first, so it is a good intermediate
@@ -397,7 +415,7 @@ a side wall.
 A subducting slab needs a pre-existing dipping interface, which a weak zone
 alone cannot supply. `poly-subduction.poly` defines it as a region of oceanic
 crust already inside the mantle, following
-[Making a complex mesh with `.poly` file](./usingpolyfile):
+[Making a complex mesh with `.poly` file](./usingpolyfile.md):
 
 ```
  0------------------------------------------7  z = 0: top, free surface
@@ -683,7 +701,7 @@ is the rule switched off.
 | Reference | 5 km | `serpentinization_thickness = 5e3` (one cell) | Steady subduction to 125 km at 5 Myr; trench 6 km deep at 2 Myr, recovering to 4 km; about 3100 serpentinite and 400 eclogite markers |
 | Thick | 10 km | `serpentinization_thickness = 10e3` (two cells) | Half again as much serpentinite (4600 markers) in a wedge body that reaches further down the slab; trench 1.5 km shallower throughout; slab tip 120 km; 40 % fewer eclogite markers |
 
-![Serpentinite layer none, 5 km and 10 km across the whole 400 km domain at 3.4 Myr, the last frame the run without serpentinite reached: material, phase-change markers and velocity arrows per run, then slab-tip depth, trench depth and marker counts against time to 5 Myr](./img/tectonics/subduction-serp-thickness.png)
+![Serpentinite layer none, 5 km and 10 km across the whole 400 km domain, the 5 km and 10 km runs at 5 Myr and the run without serpentinite at 3.4 Myr where it stopped: material, phase-change markers and velocity arrows per run, then slab-tip depth, trench depth and marker counts against time to 5 Myr](./img/tectonics/subduction-serp-thickness.png)
 
 What the comparison shows:
 
@@ -769,10 +787,10 @@ Change one parameter at a time, and keep a log of what you changed.
 ## Next Steps
 
 - Copy the example files to start your own model, rather than writing configs from scratch
-- Add surface processes with [GoSPL coupling](./couplinggospl)
-- Refine the mesh around faults with [MMG](./usingmmg)
+- Add surface processes with [GoSPL coupling](./couplinggospl.md)
+- Refine the mesh around faults with [MMG](./usingmmg.md)
 - Go to 3D with `oblique-rift-3d.cfg` and `conjugate-faults-3d.cfg`; see
-  [Velocity boundary conditions (3D)](./vbc) and [Weak zones](./weakzone)
+  [Velocity boundary conditions (3D)](./vbc.md) and [Weak zones](./weakzone.md)
 
 {/* TODO: add a references bullet — Choi et al. 2013 (DES paper), Lavier,
     Buck & Poliakov 1999 and 2000 (core complex), Tan et al. 2012 (interface
