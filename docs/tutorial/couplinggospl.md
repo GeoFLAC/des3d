@@ -107,10 +107,10 @@ Installing locally for DynEarthSol integration...
 4. Set `ndims = 3`, which is **required** for the GoSPL coupling.
 5. Set `usemmg = 1`, which is **recommended**: MMG mesh optimization during
    remeshing (see [Adaptive mesh refinement with MMG](./usingmmg)).
-6. Build **outside** the gospl environment, which keeps the compiler off
-   conda's libraries:
+6. Build with any conda environment active or none; it doesn't matter unless
+   that environment has its own Boost or compilers ahead of the system ones.
+   `make config` prints what was actually picked up:
    ```bash
-   conda deactivate   # if any environment is active
    make clean
    make -j4
    ```
@@ -187,8 +187,10 @@ coupling scheme**](https://onlinelibrary.wiley.com/doi/10.1029/2021TC007166):
    displacement of each surface node since the *previous* coupling event and
    $\Delta t$ is the model time elapsed since then. Time-averaging filters
    out quasi-dynamic inertial oscillations that would otherwise perturb
-   GoSPL's drainage network. The first event has no previous event, so it
-   uses the instantaneous velocity. ![Time-averaged surface velocity](./img/gospl/velocity-averaging.svg)
+   GoSPL's drainage network. The first coupling event, and the first one
+   after any remesh, has no valid previous displacement to average over, so
+   it uses the instantaneous velocity instead.
+   ![Time-averaged surface velocity](./img/gospl/velocity-averaging.svg)
 2. **GoSPL → DES:** GoSPL advances by $\Delta t$: it applies the
    velocities (horizontal advection and vertical uplift), river incision and
    hillslope diffusion, and returns an elevation change $\Delta h$ at
@@ -239,15 +241,16 @@ readable.
   step and GoSPL's step silently becomes DES's `dt`. There is no
   sub-stepping or truncation back to the nominal interval.
 - **Remeshing between coupling events.** The coupling clock is unaffected
-  by remeshing: Coupling occurs at the set schedule whether remeshing occurrs
-  during a coupled interval or not. GoSPL's elevation state is not re-seeded 
-  from DES afterwards: i.e., GoSPL owns thetopography. When remeshing occurs
-  and changes the surface node number, the average velocity cannot be computed 
-  and the instantaneous velocity is used instead. If a remesh leaves that count 
-  unchanged (uncommon but possible when only the interior remeshes), node 
-  identity is not verified and the velocity for the next coupling event can 
-  difference unrelated nodes. So, treat the first coupling event after a remesh 
-  with caution. 
+  by remeshing: coupling occurs at the set schedule whether remeshing occurs
+  during a coupled interval or not. GoSPL's elevation state is not re-seeded
+  from DES afterwards, i.e. GoSPL owns the topography. Remeshing renumbers
+  the nodes, so the coupling event right after any remesh uses the
+  instantaneous velocity instead of the time-averaged one, even if the
+  remesh happened to leave the surface node count unchanged, where comparing
+  node counts alone would otherwise miss the renumbering and difference
+  unrelated nodes. The log line names the case: `GoSPL: instantaneous
+  velocity at t=... yr: remeshed since the last coupling (surface nodes
+  N0 -> N1[, same count])`.
 - **The GoSPL mesh is fixed at startup.** It is generated once, sized to the
   DES model's *initial* top surface plus `gospl_mesh_padding` on each side,
   and never regenerated (on restart an existing mesh file is reused as is).
