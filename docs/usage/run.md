@@ -152,6 +152,7 @@ The first digit is the category (`1x` is yours to fix, `2x` the environment,
 | `30` / `31` | Unsupported in this `NDIMS` / library not built in |
 | `40` / `41` / `42` | Triangle or TetGen / MMG / mesh quality or topology |
 | `50` / `51` / `52` | NaN or non-finite value / marker or geometry lookup / resource exhausted |
+| `53` | GoSPL coupling step failed |
 | `60` / `61` | Assertion violated / unreachable branch |
 
 Errors in the configuration file stop the run with `10` or `11` and a message
@@ -163,6 +164,9 @@ A NaN velocity stops the run with `50` instead of continuing to write frames.
 The run prints a single line summarizing the affected fields, their counts and
 the first bad element and node. A GPU build that finds no device at startup
 exits `52`, after appending its manifest record; see [Provenance](#provenance).
+A failed GoSPL coupling step (built with `usegospl=1`) stops the run with
+`53` instead of silently dropping that interval's erosion; see
+[Coupling with GoSPL](../tutorial/couplinggospl).
 Scripts that test for specific exit statuses need updating: earlier builds used
 `1`, `2`, `10`, `11` and `12` with different meanings.
 

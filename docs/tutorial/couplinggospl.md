@@ -95,7 +95,7 @@ Installing locally for DynEarthSol integration...
 
 ### Build DynEarthSol with GoSPL support
 
-1. Set `use_gospl = 1` in Makefile.
+1. Set `usegospl = 1` in Makefile.
 2. Set `GOSPL_EXT_DIR` if `gospl_extensions` isn't at the default
    `$(HOME)/opt/gospl_extensions`: e.g., `GOSPL_EXT_DIR = $(HOME)/opt/gospl_extensions`.
    Edit it in the Makefile, pass it on the `make` command line, or `export` it
@@ -544,22 +544,25 @@ avoid depending on the working directory, use an absolute path:
 surface_process_gospl_config_file = /full/path/to/gospl_config.yml
 ```
 
-### Intermittent PETSc error
+### GoSPL step failed (exit code 53)
 
 ```
 Error in run_and_get_erosion: error code 77
 [0] Unexpected state: bad hmax in TSAdaptChoose()
-Error: GoSPL run_and_get_erosion failed
 ```
 
-**Cause:** a floating-point edge case in PETSc's adaptive time stepper inside
-GoSPL's marine deposition solver. The run recovers: DynEarthSol skips applying
-erosion for that one step.
+Any failed coupling step, this PETSc error included, stops the run with
+[exit code `53`](../usage/run#exit-codes) rather than skipping that step and
+continuing: a failed call leaves GoSPL's surface already partly advanced, so
+retrying or ignoring the failed interval would apply it twice.
 
-**Avoiding it:** if sea level is well below the model surface, marine
-deposition is inactive anyway. Set `seadepo: false` in the GoSPL YAML to skip
-that code path entirely. Do this only when sea level is far below the surface,
-as it is in the worked example.
+This particular PETSc error was a round-off edge case in GoSPL's hillslope
+and marine-deposition solvers' adaptive time stepper, tripped by the ~1 ulp
+overshoot of the coupling interval's end time. It's fixed in
+`gospl_extensions` (`create_enhanced_model()` now sets
+`ts_exact_final_time = interpolate`); a plain `git clone` of
+`gospl_extensions` per [Install gospl_extensions](#install-gospl_extensions)
+already includes the fix.
 
 ### Simulation runs slowly
 
