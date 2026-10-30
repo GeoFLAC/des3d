@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 916" width="1000" height="916" role="img" aria-label="Three model geometries with two decollements: a lower one along the base from the pushing wall to xa and an upper one at 1.5 to 2.5 km depth from xb to the right wall; an 8 km gap, a 2 km overlap and a 14 km overlap">
+<style>text{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}</style>
+<defs><marker id="ap" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#C2410C"/></marker><marker id="ag" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#6B7280"/></marker></defs>
+<rect width="1000" height="916" rx="16" fill="#F7F6F2"/>
+<text x="500.0" y="38" text-anchor="middle" font-size="21" font-weight="700" fill="#374151">ramp-*.poly: two decollements, three arrangements</text>
+<text x="500.0" y="64" text-anchor="middle" font-size="14" fill="#6B7280">40 × 5 km, vertical exaggeration 2×; both decollements 1 km thick, friction 1°; pushed from the left as before</text>
+<text x="110" y="106" font-size="16" font-weight="700" fill="#374151">Gap of 8 km (xa = 12, xb = 20)</text>
+<rect x="110.0" y="120.0" width="760.0" height="190.0" fill="#E9D9B8" stroke="#9A7B3F"/>
+<rect x="110.0" y="272.0" width="228.0" height="38.0" fill="#BFD3E6" stroke="#2F6FB0" stroke-width="1.5"/>
+<rect x="490.0" y="177.0" width="380.0" height="38.0" fill="#BFD3E6" stroke="#2F6FB0" stroke-width="1.5"/>
+<text x="224.0" y="296.0" text-anchor="middle" font-size="13" fill="#2F6FB0">lower decollement</text>
+<text x="680.0" y="201.0" text-anchor="middle" font-size="13" fill="#2F6FB0">upper decollement</text>
+<line x1="338.0" y1="310.0" x2="338.0" y2="330.0" stroke="#6B7280" stroke-dasharray="3 3"/>
+<text x="338.0" y="344.0" text-anchor="middle" font-size="13" font-weight="600" fill="#6B7280">xa = 12 km</text>
+<line x1="490.0" y1="177.0" x2="490.0" y2="157.0" stroke="#6B7280" stroke-dasharray="3 3"/>
+<text x="490.0" y="153.0" text-anchor="middle" font-size="13" font-weight="600" fill="#6B7280">xb = 20 km</text>
+<line x1="50.0" y1="215.0" x2="104.0" y2="215.0" stroke="#C2410C" stroke-width="3" marker-end="url(#ap)"/>
+<line x1="110.0" y1="120.0" x2="110.0" y2="310.0" stroke="#C2410C" stroke-width="3"/>
+<line x1="892.0" y1="120.0" x2="892.0" y2="177.0" stroke="#6B7280" marker-start="url(#ag)" marker-end="url(#ag)"/>
+<text x="898.0" y="153.5" font-size="12" fill="#6B7280">1.5 km</text>
+<line x1="892.0" y1="177.0" x2="892.0" y2="215.0" stroke="#6B7280" marker-start="url(#ag)" marker-end="url(#ag)"/>
+<text x="898.0" y="201.0" font-size="12" fill="#6B7280">1 km</text>
+<line x1="892.0" y1="215.0" x2="892.0" y2="272.0" stroke="#6B7280" marker-start="url(#ag)" marker-end="url(#ag)"/>
+<text x="898.0" y="248.5" font-size="12" fill="#6B7280">1.5 km</text>
+<line x1="892.0" y1="272.0" x2="892.0" y2="310.0" stroke="#6B7280" marker-start="url(#ag)" marker-end="url(#ag)"/>
+<text x="898.0" y="296.0" font-size="12" fill="#6B7280">1 km</text>
+<text x="110" y="368" font-size="16" font-weight="700" fill="#374151">Overlap of 2 km (xa = 16, xb = 14)</text>
+<rect x="110.0" y="382.0" width="760.0" height="190.0" fill="#E9D9B8" stroke="#9A7B3F"/>
+<rect x="110.0" y="534.0" width="304.0" height="38.0" fill="#BFD3E6" stroke="#2F6FB0" stroke-width="1.5"/>
+<rect x="376.0" y="439.0" width="494.0" height="38.0" fill="#BFD3E6" stroke="#2F6FB0" stroke-width="1.5"/>
+<text x="262.0" y="558.0" text-anchor="middle" font-size="13" fill="#2F6FB0">lower decollement</text>
+<text x="623.0" y="463.0" text-anchor="middle" font-size="13" fill="#2F6FB0">upper decollement</text>
+<line x1="414.0" y1="572.0" x2="414.0" y2="592.0" stroke="#6B7280" stroke-dasharray="3 3"/>
+<text x="414.0" y="606.0" text-anchor="middle" font-size="13" font-weight="600" fill="#6B7280">xa = 16 km</text>
+<line x1="376.0" y1="439.0" x2="376.0" y2="419.0" stroke="#6B7280" stroke-dasharray="3 3"/>
+<text x="376.0" y="415.0" text-anchor="middle" font-size="13" font-weight="600" fill="#6B7280">xb = 14 km</text>
+<line x1="50.0" y1="477.0" x2="104.0" y2="477.0" stroke="#C2410C" stroke-width="3" marker-end="url(#ap)"/>
+<line x1="110.0" y1="382.0" x2="110.0" y2="572.0" stroke="#C2410C" stroke-width="3"/>
+<text x="110" y="630" font-size="16" font-weight="700" fill="#374151">Overlap of 14 km (xa = 26, xb = 12)</text>
+<rect x="110.0" y="644.0" width="760.0" height="190.0" fill="#E9D9B8" stroke="#9A7B3F"/>
+<rect x="110.0" y="796.0" width="494.0" height="38.0" fill="#BFD3E6" stroke="#2F6FB0" stroke-width="1.5"/>
+<rect x="338.0" y="701.0" width="532.0" height="38.0" fill="#BFD3E6" stroke="#2F6FB0" stroke-width="1.5"/>
+<text x="357.0" y="820.0" text-anchor="middle" font-size="13" fill="#2F6FB0">lower decollement</text>
+<text x="604.0" y="725.0" text-anchor="middle" font-size="13" fill="#2F6FB0">upper decollement</text>
+<line x1="604.0" y1="834.0" x2="604.0" y2="854.0" stroke="#6B7280" stroke-dasharray="3 3"/>
+<text x="604.0" y="868.0" text-anchor="middle" font-size="13" font-weight="600" fill="#6B7280">xa = 26 km</text>
+<line x1="338.0" y1="701.0" x2="338.0" y2="681.0" stroke="#6B7280" stroke-dasharray="3 3"/>
+<text x="338.0" y="677.0" text-anchor="middle" font-size="13" font-weight="600" fill="#6B7280">xb = 12 km</text>
+<line x1="50.0" y1="739.0" x2="104.0" y2="739.0" stroke="#C2410C" stroke-width="3" marker-end="url(#ap)"/>
+<line x1="110.0" y1="644.0" x2="110.0" y2="834.0" stroke="#C2410C" stroke-width="3"/>
+</svg>

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" width="1000" height="500" role="img" aria-label="Initial setup of the wedge models: a 40 by 4 km box, a 3 km brittle layer over a 1 km decollement, pushed from the left wall at 5 cm/yr with the push tapering to zero across the decollement, a free-slip right wall, a no-slip base and a free surface with hillslope diffusion">
+<style>text{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}</style>
+<defs>
+<marker id="ap" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#C2410C"/></marker>
+<marker id="ag" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#6B7280"/></marker>
+<pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#6B7280" stroke-width="1.5"/></pattern>
+</defs>
+<rect width="1000" height="500" rx="16" fill="#F7F6F2"/>
+<text x="500.0" y="40" text-anchor="middle" font-size="22" font-weight="700" fill="#374151">wedge-phi1.cfg / wedge-phi5.cfg: initial geometry and boundary conditions</text>
+<rect x="200.0" y="120.0" width="660.0" height="148.5" fill="#E9D9B8" stroke="#9A7B3F" stroke-width="1.2"/>
+<rect x="200.0" y="268.5" width="660.0" height="49.5" fill="#BFD3E6" stroke="#2F6FB0" stroke-width="1.2"/>
+<text x="563.0" y="181.875" text-anchor="middle" font-size="17" font-weight="600" fill="#374151">brittle layer, material 0</text>
+<text x="563.0" y="205.875" text-anchor="middle" font-size="15" fill="#374151">friction 30° → 15°, cohesion 4 → 0.4 MPa over plastic strain 0 → 0.1</text>
+<text x="563.0" y="299.25" text-anchor="middle" font-size="15" font-weight="600" fill="#2F6FB0">decollement, material 1: friction 1° (phi1) or 5° (phi5), same cohesion</text>
+<text x="860.0" y="108.0" text-anchor="end" font-size="14" fill="#6B7280">free surface, hillslope diffusion (surface_diffusivity = 1e-6 m²/s)</text>
+<rect x="200.0" y="318.0" width="660.0" height="12" fill="url(#hatch)"/>
+<text x="530.0" y="352.0" text-anchor="middle" font-size="14" fill="#6B7280">no-slip base: vx = vz = 0 (vbc_z0 = 3)</text>
+<circle cx="867.0" cy="144.75" r="6" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+<circle cx="867.0" cy="194.25" r="6" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+<circle cx="867.0" cy="243.75" r="6" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+<circle cx="867.0" cy="293.25" r="6" fill="none" stroke="#6B7280" stroke-width="1.5"/>
+<line x1="874.0" y1="120.0" x2="874.0" y2="318.0" stroke="#6B7280" stroke-width="2"/>
+<text x="884.0" y="199.2" font-size="14" fill="#6B7280">free slip</text>
+<text x="884.0" y="217.2" font-size="14" fill="#6B7280">vx = 0</text>
+<text x="884.0" y="235.2" font-size="13" fill="#6B7280">(vbc_x1 = 1)</text>
+<line x1="200.0" y1="120.0" x2="200.0" y2="318.0" stroke="#C2410C" stroke-width="3"/>
+<line x1="124.0" y1="132.4" x2="196.0" y2="132.4" stroke="#C2410C" stroke-width="2.4" marker-end="url(#ap)"/>
+<line x1="124.0" y1="169.5" x2="196.0" y2="169.5" stroke="#C2410C" stroke-width="2.4" marker-end="url(#ap)"/>
+<line x1="124.0" y1="206.6" x2="196.0" y2="206.6" stroke="#C2410C" stroke-width="2.4" marker-end="url(#ap)"/>
+<line x1="124.0" y1="243.8" x2="196.0" y2="243.8" stroke="#C2410C" stroke-width="2.4" marker-end="url(#ap)"/>
+<line x1="124.0" y1="268.5" x2="196.0" y2="268.5" stroke="#C2410C" stroke-width="2.4" marker-end="url(#ap)"/>
+<line x1="147.1" y1="284.8" x2="196.0" y2="284.8" stroke="#C2410C" stroke-width="2.4" marker-end="url(#ap)"/>
+<line x1="170.9" y1="301.7" x2="196.0" y2="301.7" stroke="#C2410C" stroke-width="2.4" marker-end="url(#ap)"/>
+<polyline points="124.0,120.0 124.0,268.5 194.0,318.0" fill="none" stroke="#C2410C" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="159.0" y="90.0" text-anchor="middle" font-size="15" font-weight="600" fill="#C2410C">5 cm/yr</text>
+<text x="159.0" y="108.0" text-anchor="middle" font-size="13" fill="#C2410C">vz = 0 on the wall</text>
+<line x1="200.0" y1="382.0" x2="860.0" y2="382.0" stroke="#6B7280" stroke-width="1.2" marker-start="url(#ag)" marker-end="url(#ag)"/>
+<text x="530.0" y="376.0" text-anchor="middle" font-size="14" fill="#6B7280">xlength = 40 km</text>
+<line x1="80.0" y1="120.0" x2="80.0" y2="268.5" stroke="#6B7280" stroke-width="1.2" marker-start="url(#ag)" marker-end="url(#ag)"/>
+<text x="74.0" y="199.25" text-anchor="end" font-size="14" fill="#6B7280">3 km</text>
+<line x1="80.0" y1="268.5" x2="80.0" y2="318.0" stroke="#6B7280" stroke-width="1.2" marker-start="url(#ag)" marker-end="url(#ag)"/>
+<text x="74.0" y="298.25" text-anchor="end" font-size="14" fill="#6B7280">1 km</text>
+<text x="500.0" text-anchor="middle" y="422.0" font-size="14" fill="#374151">The push tapers linearly to 0 over the lowest bottom_shear_zone_thickness = 1 km, so the wall meets the</text>
+<text x="500.0" text-anchor="middle" y="444.0" font-size="14" fill="#374151">fixed base without a velocity jump. The wall foot then lags its top; remeshing_option = 12 makes the wall</text>
+<text x="500.0" text-anchor="middle" y="466.0" font-size="14" fill="#374151">vertical again at every remesh. Vertical exaggeration 3×; uniform mesh, resolution = 250 m.</text>
+</svg>
