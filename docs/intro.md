@@ -28,6 +28,17 @@ release from that list, or take its DOI from the
 [releases page](https://github.com/GeoFLAC/DynEarthSol/releases) or from the
 `CITATION.cff` file shipped with that release.
 
+:::tip Using an AI assistant to get oriented
+If you're new to DES3D, one effective way to get started is working through
+model setup with an AI coding assistant. Point it at this documentation site
+and any background papers relevant to your problem, then describe the
+tectonic scenario you want to model in plain language, geometry, timing,
+boundary conditions, the processes involved, and iterate on the resulting
+`.cfg` file together. Treat its output as a draft to check against this
+manual and your own understanding of the parameters, not a substitute for
+either.
+:::
+
 <!-- Check out the `usage`{.interpreted-text role="doc"} section for further
 information, including `installation`{.interpreted-text role="ref"}. -->
 
