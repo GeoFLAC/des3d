@@ -43,10 +43,10 @@ lower, wider wedge.
   [Build](../usage/usage.md) and [Running DES3D](../usage/run.md). The MMG
   build does not support `remeshing_option = 12` yet: its first remesh
   corrupts the mesh (see [Troubleshooting](#troubleshooting))
-- ✅ A DynEarthSol version that includes the `remeshing_option = 12` fix
-  ("fix: remeshing_option 12 deletes nodes only in the cut-off sliver").
-  Without it each remesh deletes interior nodes, the mesh coarsens and no
-  discrete thrusts form
+- ✅ A DynEarthSol version that includes
+  [PR #113](https://github.com/GeoFLAC/DynEarthSol/pull/113), which fixes
+  `remeshing_option = 12`. Without it each remesh deletes interior nodes, the
+  mesh coarsens and no discrete thrusts form
 - ✅ Python 3 with `numpy` and `matplotlib` for the plots, and optionally
   [ParaView](https://www.paraview.org/) with `2vtk.py`; see
   [Visualizing outputs](../usage/visualize.md)
@@ -219,8 +219,8 @@ Section by section:
   `inertial_scaling`, which with the element size sets the step count (see
   above).
 - **`[bc]`** pushes the left wall, tapered across the decollement, against a
-  free-slip right wall over a no-slip base. Despite what `--help` says,
-  `bottom_shear_zone_thickness` is in metres. The Winkler foundation is off
+  free-slip right wall over a no-slip base. `bottom_shear_zone_thickness` is in
+  metres (`--help` said km before PR #113). The Winkler foundation is off
   because the base is fixed, and water loading is off because the surface
   stays above sea level.
 - **`[ic]`** makes two horizontal layers. `mattype_layer_depths` is a fraction
@@ -402,7 +402,7 @@ All rows were observed while building this tutorial.
 | Symptom | Cause and fix |
 |---------|---------------|
 | After the first remesh, `dt` jumps to about 5e5 yr and the run ends at once, with `prepare_interpolation` warnings | `remeshing_option = 12` with an MMG build (`usemmg=1`). It is not supported with MMG; build with `make ndims=2` |
-| The node count drops by half at the first remesh and plastic strain is spread over the whole wedge, with no discrete thrusts | A DynEarthSol without the `remeshing_option = 12` fix: each remesh deletes interior nodes. Update DynEarthSol |
+| The node count drops by half at the first remesh and plastic strain is spread over the whole wedge, with no discrete thrusts | A DynEarthSol without [PR #113](https://github.com/GeoFLAC/DynEarthSol/pull/113): each remesh deletes interior nodes. Update DynEarthSol |
 | `Error: tangled mesh (post-remesh): boundary segments ... cross` on the pushing wall | The push was tapered with `vbc_x1 = 1` and the `vbc_val_x1_ratio*` table, which leaves the vertical velocity of the wall free; the wall folds over itself in the decollement. Push from the left wall with `vbc_x0 = 3`, which fixes it |
 | `dt` falls tenfold within 60 kyr, with `size of element ... too small` near the base of the pushing wall | `remeshing_option = 11` instead of 12: the sliver under the slanted wall foot is never cut off, and its elements keep shrinking |
 | Strain diffuse even with the fix | The mesh is too coarse: thrusts need several elements across the 3 km layer. Keep `resolution` at 250 or below; with Triangle, `resolution` 250 gives edges of about 360 m |
