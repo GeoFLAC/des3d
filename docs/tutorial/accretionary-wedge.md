@@ -373,7 +373,8 @@ instead of 200.
 ## Step 3: What to look for
 
 ```bash
-DES_DIR=/path/to/DynEarthSol python3 wedge_figures.py . .
+export DES_DIR=/path/to/DynEarthSol   # where wedge_figures.py finds Dynearthsol.py
+python3 wedge_figures.py . .
 ```
 
 This writes the three figures below from the output in the current directory
@@ -451,6 +452,7 @@ Copy `wedge-phi1.cfg` to `wedge-phi3.cfg`, set `modelname = wedge-phi3` and
 the decollement angles to 3, and run it. Then compare all three:
 
 ```bash
+export DES_DIR=/path/to/DynEarthSol
 python3 wedge_figures.py compare basal.png "wedge-phi1:φb = 1°" \
     "wedge-phi3:φb = 3°" "wedge-phi5:φb = 5°"
 ```
@@ -576,6 +578,7 @@ fold.
 for c in gap8 ov2 ov14; do
     OMP_NUM_THREADS=4 /path/to/DynEarthSol/dynearthsol2d ramp-$c.cfg
 done
+export DES_DIR=/path/to/DynEarthSol
 python3 wedge_figures.py sections ramp.png 8,16 "ramp-gap8:gap of 8 km" \
     "ramp-ov2:overlap of 2 km" "ramp-ov14:overlap of 14 km"
 ```
