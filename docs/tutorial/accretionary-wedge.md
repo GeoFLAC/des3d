@@ -1,5 +1,5 @@
 ---
-sidebar_position: 5.5
+sidebar_position: 1.5
 title: Convergent wedges and basal friction
 description: The geology of convergent wedges, and a fold-and-thrust wedge over a weak decollement modelled with two basal friction angles in DynEarthSol
 ---
