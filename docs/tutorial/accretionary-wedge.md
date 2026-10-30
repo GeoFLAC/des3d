@@ -1,30 +1,25 @@
 ---
 sidebar_position: 5.5
-title: Accretionary wedge and basal friction
-description: Build a fold-and-thrust wedge over a weak decollement and compare two basal friction angles with DynEarthSol
+title: Convergent wedges and basal friction
+description: The geology of convergent wedges, and a fold-and-thrust wedge over a weak decollement modelled with two basal friction angles in DynEarthSol
 ---
 
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-# Accretionary wedge and basal friction
+# Convergent wedges and basal friction
 
-This tutorial builds a fold-and-thrust belt, or accretionary wedge: a brittle
-layer pushed against a backstop, sliding on a weak decollement. It runs the
-same model twice, with a basal friction angle of 1° and of 5°, and compares
-how the wedge grows. The setup is a small version of the models of
+This tutorial builds a convergent wedge, the fold-and-thrust belt or
+accretionary prism that grows where plates converge: a brittle layer pushed
+against a backstop, sliding on a weak decollement. It runs the same model
+twice, with a basal friction angle of 1° and of 5°, and compares how the
+wedge grows. The setup is a small version of the models of
 Lee, Tan & Chang (2024), cut down so that each run takes about 5 minutes on
-4 threads.
-
-Shortening thickens the layer next to the backstop until the wedge is steep
-enough to push its base forward over the decollement. Then a new thrust breaks
-in the undeformed layer ahead of it, and the wedge grows by adding another
-thrust slice. How steep "steep enough" is depends on how strong the base is
-relative to the wedge: this is the critical taper of Davis, Suppe & Dahlen
-(1983). A weaker base needs a lower taper, so the same shortening builds a
-lower, wider wedge.
+4 threads. The first section explains the geology the model stands for.
 
 ## What you will learn
 
+- What convergent wedges are and where they form, what the backstop and the
+  decollement are, and why basal friction sets the shape of a wedge
 - How to set up a layered brittle model with `mattype_option = 1`, no mesh
   file needed
 - How to push one wall over a fixed base without a velocity jump at the
@@ -34,8 +29,6 @@ lower, wider wedge.
   how to make a model cheap enough for a laptop
 - How to read thrust sequences from plastic strain and strain rate, and how
   basal friction sets the width and height of the wedge
-- How to measure the wedge front from the faults rather than from the
-  topography
 
 ## Prerequisites
 
@@ -62,6 +55,96 @@ The two configs and the plotting script are here:
 The two configs differ only in `modelname` and the decollement friction angle.
 :::
 
+## Convergent wedges in nature
+
+### Where they form
+
+Where two plates converge, the sedimentary rock on the lower plate is
+scraped off, shortened and stacked into a wedge that is thick at the back and
+thin at the front. This happens in two settings:
+
+- **Accretionary wedges**, or accretionary prisms, at subduction zones: trench
+  and ocean-floor sediments are scraped off the subducting plate and added to
+  the front of the overriding plate. Examples are the Nankai margin of SW
+  Japan, Cascadia, Barbados and the Makran, mostly under the sea.
+- **Fold-and-thrust belts** at the front of mountain belts: the strata of a
+  continental margin or a foreland basin are pushed ahead of the rising
+  mountains. Examples are the Western Foothills of Taiwan, the Zagros of Iran
+  and the Sub-Andes, and, no longer active, the Canadian Rockies and the
+  Valley and Ridge of the Appalachians.
+
+Mechanically the two are the same. Both are *thin-skinned*: the shortening is
+confined to the sedimentary cover above a fault, and the basement under that
+fault moves on undeformed. Dahlen (1990) compares a wedge to the sand or snow
+in front of a moving bulldozer.
+
+### Backstop and decollement
+
+![Anatomy of a convergent wedge: a backstop pushes a wedge of sedimentary rock over a weak decollement; forethrusts and a backthrust cut the wedge, the surface slopes at alpha and the decollement dips at beta; below, a narrow steep wedge over a strong decollement and a wide low wedge over salt](./img/wedge/wedge-anatomy.svg)
+
+- **The backstop** is the stronger body behind the wedge that pushes it and
+  passes on the plate convergence. In an accretionary wedge it is the crust
+  of the overriding plate, often its volcanic arc, or the older and more
+  lithified inner part of the prism; in a fold-and-thrust belt it is the
+  metamorphic and crystalline core of the mountain belt, the hinterland. In
+  Taiwan it is the Philippine Sea plate with the Luzon arc. In a sandbox
+  experiment it is the moving wall, and in this tutorial it is the model's
+  left wall.
+- **The decollement**, or basal detachment, is the fault at the base of the
+  wedge on which it slides over the basement. It follows the weakest layer in
+  the sequence: shale or mudstone whose pore-fluid pressure approaches the
+  weight of the rock above it, or evaporites (rock salt, gypsum). How strong
+  it is, its friction, is what this tutorial varies.
+- **Inside the wedge**, most of the shortening is taken up by *forethrusts*,
+  which dip toward the backstop and carry rock toward the foreland. Fewer
+  *backthrusts* dip the other way. A forethrust and a backthrust rooted at the
+  same point of the decollement lift a *pop-up* between them. New thrusts
+  usually break at the front, ahead of the older ones, and the frontmost
+  active thrust is the *deformation front*.
+
+### Critical taper
+
+The wedge's shape is measured by its taper: the slope α of its surface plus
+the dip β of the decollement. Pushed from behind, the wedge shortens and
+thickens until the taper reaches a critical value. A wedge at critical taper
+is on the verge of failure everywhere, slides on its base as a whole, and
+grows by adding new material at its front while keeping its shape (Davis,
+Suppe & Dahlen 1983; Dahlen 1990). The critical taper is set by how strong
+the decollement is compared with the rock of the wedge: the weaker the base,
+the lower the taper, and the wider a wedge built from the same amount of
+shortening.
+
+Two active wedges show the range:
+
+- **Taiwan**, a young collision of the Luzon arc with the margin of China, has
+  α ≈ 3° and β ≈ 6° (Davis et al. 1983); the dip of its base is known from
+  seismic profiles and deep wells drilled for oil. In the wells, pore-fluid
+  pressure is two-thirds of the weight of the rock above, and its base has
+  an effective friction coefficient of 0.12 to 0.20, a friction angle of
+  about 7° to 11° (Dahlen 1990). Fast erosion balances the inflow of new
+  material, so the mountain belt keeps a steady width of about 90 km.
+  Forethrusts dominate.
+- **The Zagros** in the Fars region of Iran slides on the Hormuz salt. Salt
+  flows at a stress of only about 1 MPa, whatever its depth. Wedges over salt
+  have a total taper of about 1°, and broad, symmetric folds with no dominant sense of
+  vergence, because the largest compressive stress is almost parallel to the
+  base (Davis & Engelder 1985; Dahlen 1990).
+
+![Shaded relief of Taiwan and the Fars arc of the Zagros, each with a swath profile of topography across the wedge at the same scale: Taiwan rises about 2.3° over some 60 km, the Fars about 0.5° over more than 220 km](./img/wedge/wedge-examples.png)
+
+The profiles are drawn at the same scale with the backstop on the left, as in
+the model. Taiwan rises to 2.5 km within about 60 km of where its topography
+starts, a mean surface slope of 2.3°; the Fars climbs 2 km over more than
+220 km, 0.5°. The swath mean smooths the topography, so it gives a slightly
+lower slope than the 3° of Davis et al. In the Fars map, the elongated ridges
+are individual anticlines over the salt, and folding continues offshore under
+the Persian Gulf.
+
+This tutorial's model is a much simplified wedge. Its backstop is the left
+wall, its decollement a 1 km layer at a constant depth (β = 0), and it varies
+only the decollement's friction: 5° is still weaker than Taiwan's base, and 1°
+approaches a salt decollement.
+
 ## How the model works
 
 | | Lee, Tan & Chang (2024) | This tutorial |
@@ -70,8 +153,8 @@ The two configs differ only in `modelname` and the decollement friction angle.
 | Brittle layer | 3, 6, 9 or 15 km | 3 km |
 | Decollement | 1 km | 1 km |
 | Push | 5 cm/yr, 100 km over 2 Myr | 5 cm/yr, 10 km over 200 kyr |
-| Basal friction | 1° and 3° | 1° and 5° (3° is Exercise 1) |
-| Surface diffusivity | 1e-6 and 1e-5 m²/s | 1e-6 m²/s (1e-5 is Exercise 2) |
+| Basal friction | 1° and 3° | 1° and 5° (3° is the exercise) |
+| Surface diffusivity | 1e-6 and 1e-5 m²/s | 1e-6 m²/s |
 | Run time | hours | about 5 minutes per run on 4 threads |
 
 The materials are the paper's. The brittle layer softens from a friction
@@ -125,7 +208,16 @@ the run takes about 900 000, because MMG refines the faults to elements as
 small as 80 m. The cost is set by three choices: shortening, `inertial_scaling`
 and how small elements may get (`resolution` and `smallest_size`). The DES
 default `inertial_scaling = 1e5` would need 30 million steps; this tutorial
-uses 3e3 and checks the result against 1e4 in Exercise 3.
+uses 3e3.
+
+Is 3e3 enough for a quasi-static solution? DES solves the dynamic equations
+with the density scaled up, and a smaller `inertial_scaling` lets inertia
+matter more. Rerun with 1e4 to 100 kyr (3.4 times the steps) and the wedge is
+the same to within 0.3 km of width and 0.1 km of height; the one difference is
+that the second thrust breaks 10 kyr earlier, in the same place. When a
+thrust nucleates is sensitive to small differences like this one, where it
+breaks and the shape of the wedge are not, so do not read a 10 kyr difference
+in thrust timing between two runs as a result.
 
 ## Step 1: The configuration
 
@@ -341,7 +433,7 @@ front is stuck and pauses after each jump, when the push goes into the new
 thrust slice. At 1° the jumps are bigger and the height lower; that is the
 critical taper at work, a weaker base giving a lower taper.
 
-## Exercise 1: the paper's 3°
+## Exercise: the paper's 3°
 
 Copy `wedge-phi1.cfg` to `wedge-phi3.cfg`, set `modelname = wedge-phi3` and
 the decollement angles to 3, and run it. Then compare all three:
@@ -366,50 +458,6 @@ just before 200 kyr it breaks a third thrust, at the same time as the 1° wedge.
 difference in basal friction shows up as whether one more thrust has formed or
 not. That is why the main comparison uses 5°: over this short a run, 3° and
 1° end up looking alike. In the paper's 100 km runs, 1° and 3° differ clearly.
-
-## Exercise 2: stronger erosion
-
-Set `surface_diffusivity = 1e-5`, the paper's other value, in both configs
-(and change `modelname` so the runs do not overwrite each other).
-
-![Plastic strain at 200 kyr for both basal friction angles with surface diffusivity 1e-6 and 1e-5 m²/s, and wedge width and maximum elevation against shortening](./img/wedge/wedge-diffusivity.png)
-
-| Run | Width at 200 kyr | Height at 200 kyr |
-|-----|------------------|-------------------|
-| φb = 1°, κ = 1e-6 | 26.0 km | 2.2 km |
-| φb = 1°, κ = 1e-5 | 15.2 km | 2.3 km |
-| φb = 5°, κ = 1e-6 | 15.6 km | 2.8 km |
-| φb = 5°, κ = 1e-5 | 14.2 km | 2.4 km |
-
-Erosion takes material off the top of the wedge and spreads it as an apron in
-front of the toe. The apron makes the topography look wider, which is why the
-width here is measured from the thrusts and not from where the surface starts
-to rise. Measured from the thrusts, both wedges are *narrower* with erosion.
-By keeping the taper below critical, erosion delays the next thrust: at 5° the
-second one breaks at 90 kyr instead of 80, and at 1° the third one has not
-broken by 200 kyr. The 5° wedge is also 0.4 km lower. With erosion this strong,
-the two basal frictions end up only 1 km apart in width and 0.1 km in height,
-against 10 km and 0.6 km without it: over 10 km of shortening, erosion hides
-most of the difference that basal friction makes.
-
-## Exercise 3: is `inertial_scaling = 3e3` small enough?
-
-DES reaches a quasi-static solution by solving the dynamic equations with the
-density scaled up, and `inertial_scaling` controls how far. A smaller value is
-cheaper but lets inertia matter more. Rerun `wedge-phi1.cfg` with
-`inertial_scaling = 1e4` and `max_time_in_yr = 100000`. It takes 3.4 times as
-many steps, 1.45 million against 432 000 to 100 kyr.
-
-![Plastic strain at 100 kyr with inertial_scaling 3e3 and 1e4, and wedge width and maximum elevation against shortening](./img/wedge/wedge-scaling.png)
-
-Up to 60 kyr the two runs are the same to within 0.3 km of width and 0.03 km
-of height. Then the second thrust breaks 10 kyr earlier at 1e4, at 70 kyr
-instead of 80, but in the same place: 17.2 against 17.3 km from the wall. At
-100 kyr the structure is the same and the heights differ by 0.1 km. When a new
-thrust nucleates is sensitive to small differences, including this one, while
-where it breaks and the shape of the wedge are not. Do not read a 10 kyr
-difference in when a thrust breaks between two runs as a result unless it
-survives a change of `inertial_scaling`.
 
 ## Troubleshooting
 
@@ -440,9 +488,14 @@ All rows were observed while building this tutorial.
   belts and accretionary wedges. *J. Geophys. Res.*, 88, 1153–1172.
 - Dahlen, F. A. (1990). Critical taper model of fold-and-thrust belts and
   accretionary wedges. *Annu. Rev. Earth Planet. Sci.*, 18, 55–99.
+- Davis, D. M. & Engelder, T. (1985). The role of salt in fold-and-thrust
+  belts. *Tectonophysics*, 119, 67–88.
 - Lee, F.-Y., Tan, E. & Chang, E. T.-Y. (2024). Numerical modeling of
   fault-and-thrust belt stress evolution. *Front. Earth Sci.*, 12, 1415139.
   [doi:10.3389/feart.2024.1415139](https://doi.org/10.3389/feart.2024.1415139)
+- Ryan, W. B. F. et al. (2009). Global Multi-Resolution Topography synthesis.
+  *Geochem. Geophys. Geosyst.*, 10, Q03014. Topography in the maps above,
+  from [GMRT](https://www.gmrt.org), CC BY 4.0.
 - Choi, E., Tan, E., Lavier, L. L. & Calo, V. M. (2013). DynEarthSol2D: an
   efficient unstructured finite element method to study long-term tectonic
   deformation. *J. Geophys. Res. Solid Earth*, 118, 2429–2444.
