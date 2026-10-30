@@ -1,5 +1,5 @@
 ---
-sidebar_position: 7
+sidebar_position: 5
 title: Tectonic rifting and subduction
 description: Set up, run and interpret rifting and subduction models with DynEarthSol
 ---
