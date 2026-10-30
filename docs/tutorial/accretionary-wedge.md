@@ -12,7 +12,7 @@ This tutorial builds a fold-and-thrust belt, or accretionary wedge: a brittle
 layer pushed against a backstop, sliding on a weak decollement. It runs the
 same model twice, with a basal friction angle of 1° and of 5°, and compares
 how the wedge grows. The setup is a small version of the models of
-Lee, Tan & Chang (2024), cut down so that each run takes about 4 minutes on
+Lee, Tan & Chang (2024), cut down so that each run takes about 5 minutes on
 4 threads.
 
 Shortening thickens the layer next to the backstop until the wedge is steep
@@ -39,14 +39,14 @@ lower, wider wedge.
 
 ## Prerequisites
 
-- ✅ DynEarthSol compiled in 2D **without** MMG, `make ndims=2`; see
-  [Build](../usage/usage.md) and [Running DES3D](../usage/run.md). The MMG
-  build does not support `remeshing_option = 12` yet: its first remesh
-  corrupts the mesh (see [Troubleshooting](#troubleshooting))
+- ✅ DynEarthSol compiled in 2D with MMG, `make ndims=2 usemmg=1`; see
+  [Build](../usage/usage.md), [Running DES3D](../usage/run.md) and
+  [Adaptive mesh refinement with MMG](./usingmmg.md). MMG refines the mesh
+  along the faults as they form
 - ✅ A DynEarthSol version that includes
-  [PR #113](https://github.com/GeoFLAC/DynEarthSol/pull/113), which fixes
-  `remeshing_option = 12`. Without it each remesh deletes interior nodes, the
-  mesh coarsens and no discrete thrusts form
+  [PR #113](https://github.com/GeoFLAC/DynEarthSol/pull/113), which makes
+  `remeshing_option = 12` work. Without it the first MMG remesh scatters the
+  mesh (see [Troubleshooting](#troubleshooting))
 - ✅ Python 3 with `numpy` and `matplotlib` for the plots, and optionally
   [ParaView](https://www.paraview.org/) with `2vtk.py`; see
   [Visualizing outputs](../usage/visualize.md)
@@ -72,7 +72,7 @@ The two configs differ only in `modelname` and the decollement friction angle.
 | Push | 5 cm/yr, 100 km over 2 Myr | 5 cm/yr, 10 km over 200 kyr |
 | Basal friction | 1° and 3° | 1° and 5° (3° is Exercise 1) |
 | Surface diffusivity | 1e-6 and 1e-5 m²/s | 1e-6 m²/s (1e-5 is Exercise 2) |
-| Run time | hours | about 4 minutes per run on 4 threads |
+| Run time | hours | about 5 minutes per run on 4 threads |
 
 The materials are the paper's. The brittle layer softens from a friction
 angle of 30° to 15° and a cohesion of 4 to 0.4 MPa over a plastic strain of
@@ -121,8 +121,8 @@ steps ≈ 2 × shortening × inertial_scaling / (smallest element height)
 ```
 
 Here that is 2 × 10 km × 3000 / 150 m = 400 000 steps on the initial mesh;
-the run takes about a million, because remeshing leaves some elements smaller
-than that. The cost is set by three choices: shortening, `inertial_scaling`
+the run takes about 900 000, because MMG refines the faults to elements as
+small as 80 m. The cost is set by three choices: shortening, `inertial_scaling`
 and how small elements may get (`resolution` and `smallest_size`). The DES
 default `inertial_scaling = 1e5` would need 30 million steps; this tutorial
 uses 3e3 and checks the result against 1e4 in Exercise 3.
@@ -207,14 +207,15 @@ Section by section:
 
 - **`[sim]`** runs 200 kyr, 10 km of shortening at 5 cm/yr, with a frame every
   10 kyr, 0.5 km of shortening.
-- **`[mesh]`** builds a uniform 40 × 4 km mesh. With Triangle, `resolution`
-  is not the element edge: the area limit is 1.5 × `resolution`², and these
-  settings give 2778 elements with a median edge of 364 m. Triangle
-  remeshing never refines, so the initial mesh is the finest the run will
-  have; it ends with 3474 elements and a median edge of 321 m.
-  `smallest_size = 0.2` remeshes when an element is squeezed below 0.2 of the
-  area of an equilateral triangle with edge `resolution`, which keeps `dt`
-  from collapsing.
+- **`[mesh]`** builds a uniform 40 × 4 km mesh. `resolution` is not the
+  element edge: the initial area limit is 1.5 × `resolution`², and these
+  settings give 2778 elements with a median edge of 364 m. At each remesh MMG
+  refines where plastic strain accumulates, between the sizes `largest_size`
+  and `smallest_size` allow. By 200 kyr the 1° run has 5850 elements: those
+  in the faults (plastic strain above 1) have a median edge of 179 m, the
+  rest 267 m. `smallest_size = 0.2` also remeshes when an element is squeezed
+  below 0.2 of the area of an equilateral triangle with edge `resolution`,
+  which keeps `dt` from collapsing.
 - **`[control]`** turns on hillslope diffusion of the surface and sets
   `inertial_scaling`, which with the element size sets the step count (see
   above).
@@ -249,12 +250,21 @@ OMP_NUM_THREADS=4 /path/to/DynEarthSol/dynearthsol2d wedge-phi1.cfg
 OMP_NUM_THREADS=4 /path/to/DynEarthSol/dynearthsol2d wedge-phi5.cfg
 ```
 
-On an 8-core desktop (Intel i7-10700) each run took 4 minutes alone on 4
-threads, about a million steps and 130 to 180 remeshes; two at once on 4
-threads each took 5 minutes. On a 4-core laptop, run them one after the
+On an 8-core desktop (Intel i7-10700) the 1° run took 4.6 minutes alone on 4
+threads, about 890 000 steps and 105 remeshes; the two at once on 4 threads
+each took 5.5 minutes. On a 4-core laptop, run them one after the
 other, or both at once with `OMP_NUM_THREADS=2`. The log prints a line every
 100 000 steps, an `Output #` line every 10 kyr, and a `Remeshing starts` line
 at every remesh. Output goes to `wedge-phi1.save.*` and `wedge-phi5.save.*`.
+
+:::tip Without MMG
+The same configs run on a plain Triangle build (`make ndims=2`). Triangle
+remeshing does not refine, so the faults stay as wide as the initial elements
+and the run is about 15 % faster. The wedges come out alike: at 200 kyr,
+24.4 km wide and 2.0 km high at 1°, 15.7 km and 2.7 km at 5°, against 26.0
+and 2.2, 15.6 and 2.8 with MMG. The third thrust at 1° breaks at 180 kyr
+instead of 200.
+:::
 
 ## Step 3: What to look for
 
@@ -278,13 +288,13 @@ because the wedge is still too short for its base to carry much of the push.
 Then they part:
 
 - **At 80 kyr both break a new thrust far ahead.** At φb = 1° the new pair
-  roots in the decollement 17 km from the wall; at φb = 5° only 14 km. The
+  roots in the decollement 17 km from the wall; at φb = 5° only 15 km. The
   weak base transmits the push farther before the layer fails.
 - **At 200 kyr the 1° wedge has three thrust slices, the 5° wedge two.**
-  At 1° a third pair broke at 180 kyr, 23 km from the wall; at 5° the
-  second slice is still being overthrust and the front has not moved.
-- **The 5° wedge is narrower and higher.** It is 15.5 km wide and 2.8 km
-  high, against 24 km and 2.1 km at 1°. The same shortening has gone into
+  At 1° a third pair broke just before 200 kyr, 26 km from the wall; at 5°
+  the second slice is still being overthrust and the front has hardly moved.
+- **The 5° wedge is narrower and higher.** It is 15.6 km wide and 2.8 km
+  high, against 26 km and 2.2 km at 1°. The same shortening has gone into
   less width and more height, a steeper taper.
 - **The decollement is dragged along.** Under the wedge it is sheared and
   thickened against the wall (the bright band along the base); ahead of the
@@ -292,10 +302,10 @@ Then they part:
 
 | t (kyr) | Shortening (km) | Width at 1° (km) | Height at 1° (km) | Width at 5° (km) | Height at 5° (km) |
 |---|---|---|---|---|---|
-| 50 | 2.5 | 7.8 | 1.5 | 7.2 | 1.5 |
-| 100 | 5 | 17.3 | 1.6 | 15.2 | 1.9 |
-| 150 | 7.5 | 17.7 | 2.0 | 14.9 | 2.2 |
-| 200 | 10 | 24.1 | 2.1 | 15.5 | 2.8 |
+| 50 | 2.5 | 7.6 | 1.5 | 7.2 | 1.4 |
+| 100 | 5 | 17.0 | 1.6 | 14.4 | 1.9 |
+| 150 | 7.5 | 17.6 | 2.0 | 15.0 | 2.2 |
+| 200 | 10 | 26.0 | 2.2 | 15.6 | 2.8 |
 
 Width is measured from the wall to the thrust front, the farthest point of the
 upper 2.5 km of the brittle layer where plastic strain exceeds 0.5.
@@ -303,22 +313,24 @@ upper 2.5 km of the brittle layer where plastic strain exceeds 0.5.
 ![Strain rate of the same frames: the faults active at each moment](./img/wedge/wedge-strainrate.png)
 
 Strain rate shows which of those faults are moving at each moment, and it is
-fewer than plastic strain suggests. Where the two runs differ is in where the
-active faults are:
+fewer than plastic strain suggests. In both runs, from 80 kyr on, 75 to 94 %
+of the plastic strain rate of the brittle layer is within 8 km behind the
+thrust front, and the thrusts between the front and the wall are nearly
+locked. The runs differ in what carries the rest:
 
-- **At 1° the front does the work.** Once a new thrust has broken, 65 to 85 %
-  of the plastic strain rate of the brittle layer is in the frontal slice,
-  and the slices behind it are nearly locked. The decollement under the
-  wedge carries 50 to 80 % of all plastic strain rate.
-- **At 5° the rear comes back to life.** At 100 kyr more than half of the
-  brittle-layer plastic strain rate is within 8 km of the wall, on faults that
-  had been abandoned: the wedge thickens internally to steepen its taper
-  before it can advance again. The decollement carries 33 to 60 %.
+- **At 1° the decollement does.** It carries about half or more of all
+  plastic strain rate, 49 to 79 %, and the wedge slides on it as a whole. The
+  exception is the frame before the new thrust breaks (37 % at 180 kyr).
+- **At 5° the wedge itself does, more and more.** The decollement's share falls
+  steadily, from 63 % at 80 kyr to 39 % at 200 kyr, as the wedge grows and
+  its base gets harder to slide. The backthrust at the wall takes up 7 to 15 %
+  of the brittle-layer rate from 120 kyr on, against 2 to 6 % at 1° (14 % in
+  the frame before the new thrust).
 
 Lee, Tan & Chang (2024) found, over much longer runs, that the frontal thrusts
 are the only active structures for over 95 % of the time, and that new thrusts
-form and older ones reactivate in short episodes (here, the jumps at 80 and
-180 kyr). In this small model that pattern is clearest at 1°.
+form and older ones reactivate in short episodes. Here the episodes are the
+jumps at 80 and 200 kyr.
 
 ![Surface topography at 100 and 200 kyr, and wedge width and maximum elevation against shortening, for both runs](./img/wedge/wedge-growth.png)
 
@@ -341,15 +353,15 @@ python3 wedge_figures.py compare basal.png "wedge-phi1:φb = 1°" \
 
 | Run | Width at 200 kyr | Height at 200 kyr | New thrusts after the first |
 |-----|------------------|-------------------|-----------------------------|
-| φb = 1° | 24.1 km | 2.1 km | at 80 and 180 kyr |
-| φb = 3° | 22.2 km | 2.2 km | at 80 and 180 kyr |
-| φb = 5° | 15.5 km | 2.8 km | at 80 kyr |
+| φb = 1° | 26.0 km | 2.2 km | at 80 and 200 kyr |
+| φb = 3° | 22.2 km | 2.4 km | at 80 and 200 kyr |
+| φb = 5° | 15.6 km | 2.8 km | at 80 kyr |
 
 ![Plastic strain at 200 kyr for basal friction 1°, 3° and 5°, and wedge width and maximum elevation against shortening](./img/wedge/wedge-basal-friction.png)
 
-At 3° the wedge follows the 5° one at first: the second thrust breaks 14 km
-from the wall, as at 5°, and the height between jumps is in between. But at
-180 kyr it breaks a third thrust at the same time as the 1° wedge. Over only
+At 3° the wedge follows the 5° one at first: the second thrust breaks 13 to
+15 km from the wall, as at 5°, and the height between jumps is in between. But
+just before 200 kyr it breaks a third thrust, at the same time as the 1° wedge. Over only
 10 km of shortening the wedge has room for two or three slices, so a
 difference in basal friction shows up as whether one more thrust has formed or
 not. That is why the main comparison uses 5°: over this short a run, 3° and
@@ -364,36 +376,40 @@ Set `surface_diffusivity = 1e-5`, the paper's other value, in both configs
 
 | Run | Width at 200 kyr | Height at 200 kyr |
 |-----|------------------|-------------------|
-| φb = 1°, κ = 1e-6 | 24.1 km | 2.1 km |
-| φb = 1°, κ = 1e-5 | 26.1 km | 2.0 km |
-| φb = 5°, κ = 1e-6 | 15.5 km | 2.8 km |
-| φb = 5°, κ = 1e-5 | 12.8 km | 2.7 km |
+| φb = 1°, κ = 1e-6 | 26.0 km | 2.2 km |
+| φb = 1°, κ = 1e-5 | 15.2 km | 2.3 km |
+| φb = 5°, κ = 1e-6 | 15.6 km | 2.8 km |
+| φb = 5°, κ = 1e-5 | 14.2 km | 2.4 km |
 
 Erosion takes material off the top of the wedge and spreads it as an apron in
 front of the toe. The apron makes the topography look wider, which is why the
 width here is measured from the thrusts and not from where the surface starts
-to rise. Measured from the thrusts, the 5° wedge is *narrower* with erosion: by
-keeping the taper below critical, erosion delays the next thrust, and the
-front stays at the slice built at 80 kyr. At 1° the third thrust breaks at 190
-kyr instead of 180 kyr, and then lands farther out.
+to rise. Measured from the thrusts, both wedges are *narrower* with erosion.
+By keeping the taper below critical, erosion delays the next thrust: at 5° the
+second one breaks at 90 kyr instead of 80, and at 1° the third one has not
+broken by 200 kyr. The 5° wedge is also 0.4 km lower. With erosion this strong,
+the two basal frictions end up only 1 km apart in width and 0.1 km in height,
+against 10 km and 0.6 km without it: over 10 km of shortening, erosion hides
+most of the difference that basal friction makes.
 
 ## Exercise 3: is `inertial_scaling = 3e3` small enough?
 
 DES reaches a quasi-static solution by solving the dynamic equations with the
 density scaled up, and `inertial_scaling` controls how far. A smaller value is
 cheaper but lets inertia matter more. Rerun `wedge-phi1.cfg` with
-`inertial_scaling = 1e4` and `max_time_in_yr = 100000`. It takes 3.3 times as
-many steps, 1.55 million against 465 000 to 100 kyr.
+`inertial_scaling = 1e4` and `max_time_in_yr = 100000`. It takes 3.4 times as
+many steps, 1.45 million against 432 000 to 100 kyr.
 
 ![Plastic strain at 100 kyr with inertial_scaling 3e3 and 1e4, and wedge width and maximum elevation against shortening](./img/wedge/wedge-scaling.png)
 
-Up to 60 kyr the two runs are the same to within 0.3 km of width and 0.02 km
-of height. Then the second thrust breaks 10 kyr earlier at 1e4, and 2 km
-closer to the wall: 15.4 against 17.3 km at 100 kyr. The structure and the
-height are the same. When and where a new thrust nucleates is sensitive to
-small differences, including this one, while the wedge as a whole is not. Do
-not read a 2 km difference in thrust spacing between two runs as a result
-unless it survives a change of `inertial_scaling`.
+Up to 60 kyr the two runs are the same to within 0.3 km of width and 0.03 km
+of height. Then the second thrust breaks 10 kyr earlier at 1e4, at 70 kyr
+instead of 80, but in the same place: 17.2 against 17.3 km from the wall. At
+100 kyr the structure is the same and the heights differ by 0.1 km. When a new
+thrust nucleates is sensitive to small differences, including this one, while
+where it breaks and the shape of the wedge are not. Do not read a 10 kyr
+difference in when a thrust breaks between two runs as a result unless it
+survives a change of `inertial_scaling`.
 
 ## Troubleshooting
 
@@ -401,11 +417,11 @@ All rows were observed while building this tutorial.
 
 | Symptom | Cause and fix |
 |---------|---------------|
-| After the first remesh, `dt` jumps to about 5e5 yr and the run ends at once, with `prepare_interpolation` warnings | `remeshing_option = 12` with an MMG build (`usemmg=1`). It is not supported with MMG; build with `make ndims=2` |
-| The node count drops by half at the first remesh and plastic strain is spread over the whole wedge, with no discrete thrusts | A DynEarthSol without [PR #113](https://github.com/GeoFLAC/DynEarthSol/pull/113): each remesh deletes interior nodes. Update DynEarthSol |
+| After the first remesh, `dt` jumps to about 5e5 yr and the run ends at once, with `prepare_interpolation` warnings | An MMG build of DynEarthSol without [PR #113](https://github.com/GeoFLAC/DynEarthSol/pull/113), where `remeshing_option = 12` scatters the mesh. Update DynEarthSol |
+| The node count drops by half at the first remesh and plastic strain is spread over the whole wedge, with no discrete thrusts | A build without MMG and without [PR #113](https://github.com/GeoFLAC/DynEarthSol/pull/113): each remesh deletes interior nodes. Update DynEarthSol |
 | `Error: tangled mesh (post-remesh): boundary segments ... cross` on the pushing wall | The push was tapered with `vbc_x1 = 1` and the `vbc_val_x1_ratio*` table, which leaves the vertical velocity of the wall free; the wall folds over itself in the decollement. Push from the left wall with `vbc_x0 = 3`, which fixes it |
 | `dt` falls tenfold within 60 kyr, with `size of element ... too small` near the base of the pushing wall | `remeshing_option = 11` instead of 12: the sliver under the slanted wall foot is never cut off, and its elements keep shrinking |
-| Strain diffuse even with the fix | The mesh is too coarse: thrusts need several elements across the 3 km layer. Keep `resolution` at 250 or below; with Triangle, `resolution` 250 gives edges of about 360 m |
+| Strain diffuse even with the fix | The mesh is too coarse: thrusts need several elements across the 3 km layer. Keep `resolution` at 250 or below, which starts at edges of about 360 m and lets MMG refine the faults to about 180 m |
 | The run takes much longer than 5 minutes | `inertial_scaling` left at the default 1e5 (33 times the steps), or `smallest_size` lowered |
 
 ## Next steps
