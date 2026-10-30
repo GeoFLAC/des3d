@@ -3,12 +3,15 @@
 
 usage: python3 wedge_figures.py [rundir] [outdir]
        python3 wedge_figures.py compare out.png model:label[@frame] [model:label[@frame] ...]
+       python3 wedge_figures.py sections out.png f1,f2,... model:label [model:label ...]
 
 The first form reads wedge-phi1.* and wedge-phi5.* in rundir (default: .) and
 writes wedge-evolution.png, wedge-strainrate.png and wedge-growth.png to outdir;
 it prints the wedge width and height of every frame. The second form
 compares any runs, e.g. the exercise variants, in one figure: plastic strain
 of each at its last frame (or at @frame), then wedge width and height against shortening.
+The third form draws plastic strain of each run (rows) at each listed frame
+(columns), for models of any geometry.
 Output is read with DynEarthSol's Dynearthsol.py, found through DES_DIR or in
 ../DynEarthSol.
 """
@@ -126,6 +129,38 @@ def compare(out, specs):
     ax.set_xlabel('shortening (km)')
     fig.savefig(out, dpi=130, bbox_inches='tight')
 
+
+def sections(out, frames, specs):
+    nr, nc = len(specs), len(frames)
+    zmin = min(Dynearthsol(sp.split(':', 1)[0]).read_field(0, 'coordinate')[:, 1].min()
+               for sp in specs) / 1e3
+    zmax = max(Dynearthsol(sp.split(':', 1)[0]).read_field(fr, 'coordinate')[:, 1].max()
+               for sp in specs for fr in frames) / 1e3 + 0.4
+    fig, axes = plt.subplots(nr, nc, figsize=(6 * nc, 1.9 * nr + 0.8), squeeze=False,
+                             sharex=True, sharey=True)
+    for i, spec in enumerate(specs):
+        name, label = spec.split(':', 1) if ':' in spec else (spec, spec)
+        des = Dynearthsol(name)
+        for j, fr in enumerate(frames):
+            d = frame(des, fr)
+            ax = axes[i, j]
+            im = section(ax, d, d['pls'], cmap='magma', vmin=0, vmax=2)
+            interface(ax, d)
+            ax.set_ylim(zmin - 0.1, max(ZMAX, zmax))
+            ax.set_title('%s, t = %.0f kyr' % (label, d['t']), loc='left', fontsize=9)
+            if j == 0:
+                ax.set_ylabel('z (km)')
+    for ax in axes[-1]:
+        ax.set_xlabel('x (km)')
+    fig.colorbar(im, ax=axes, shrink=0.6, extend='max', pad=0.015).set_label('plastic strain')
+    fig.suptitle('Plastic strain, vertical exaggeration %g×; blue lines: decollement boundaries' % VE,
+                 fontweight='bold')
+    fig.savefig(out, dpi=130, bbox_inches='tight')
+
+
+if len(sys.argv) > 1 and sys.argv[1] == 'sections':
+    sections(sys.argv[2], [int(f) for f in sys.argv[3].split(',')], sys.argv[4:])
+    sys.exit(0)
 
 if len(sys.argv) > 1 and sys.argv[1] == 'compare':
     compare(sys.argv[2], sys.argv[3:])

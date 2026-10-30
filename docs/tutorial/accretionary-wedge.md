@@ -29,6 +29,9 @@ Lee, Tan & Chang (2024), cut down so that each run takes about 5 minutes on
   how to make a model cheap enough for a laptop
 - How to read thrust sequences from plastic strain and strain rate, and how
   basal friction sets the width and height of the wedge
+- How to build a more complex geometry, two offset decollements, from a
+  `.poly` file, and how their arrangement decides between ramp-flat thrusts
+  and duplexes
 
 ## Prerequisites
 
@@ -53,6 +56,15 @@ The two configs and the plotting script are here:
 <a href={useBaseUrl('/downloads/des-wedge/wedge-phi5.cfg')}>wedge-phi5.cfg</a> and
 <a href={useBaseUrl('/downloads/des-wedge/wedge_figures.py')}>wedge_figures.py</a>.
 The two configs differ only in `modelname` and the decollement friction angle.
+For the two-decollement models of the last section:
+<a href={useBaseUrl('/downloads/des-wedge/ramp-gap8.cfg')}>ramp-gap8.cfg</a>,
+<a href={useBaseUrl('/downloads/des-wedge/ramp-ov2.cfg')}>ramp-ov2.cfg</a>,
+<a href={useBaseUrl('/downloads/des-wedge/ramp-ov14.cfg')}>ramp-ov14.cfg</a>,
+their <a href={useBaseUrl('/downloads/des-wedge/ramp-gap8.poly')}>ramp-gap8.poly</a>,
+<a href={useBaseUrl('/downloads/des-wedge/ramp-ov2.poly')}>ramp-ov2.poly</a> and
+<a href={useBaseUrl('/downloads/des-wedge/ramp-ov14.poly')}>ramp-ov14.poly</a>,
+and <a href={useBaseUrl('/downloads/des-wedge/make_ramp_poly.py')}>make_ramp_poly.py</a>,
+which writes a `.poly` file for any other arrangement.
 :::
 
 ## Convergent wedges in nature
@@ -459,6 +471,143 @@ difference in basal friction shows up as whether one more thrust has formed or
 not. That is why the main comparison uses 5°: over this short a run, 3° and
 1° end up looking alike. In the paper's 100 km runs, 1° and 3° differ clearly.
 
+## More complex geometry: two decollements
+
+A real wedge seldom slides on one flat decollement. A sedimentary sequence
+often holds several weak layers at different depths, each of limited extent,
+and a thrust that runs out of one has to climb to the next. Feng, Bartholomew
+& Choi (2015) used DynEarthSol to show that the arrangement of two
+decollements, how far they overlap or how wide the gap between them is,
+decides the style of the thrust system. A long overlap gives a duplex, a short
+gap or overlap a ramp-flat thrust. DES handles such geometry with the same
+physics: draw the layers in a `.poly` file instead of layering them with
+`mattype_option = 1` (see
+[Making a complex mesh with `.poly` file](./usingpolyfile.md)). The models
+below follow the idea of that paper, not its setup, and keep this tutorial's
+materials and boundary conditions.
+
+### The geometry
+
+![Three model geometries with two decollements: a lower one along the base from the pushing wall to xa and an upper one at 1.5 to 2.5 km depth from xb to the right wall, with an 8 km gap, a 2 km overlap and a 14 km overlap](./img/wedge/wedge-ramp-setup.svg)
+
+The box is 5 km deep. The lower decollement is the bottom 1 km from the
+pushing wall to x = xa; the upper one lies between 1.5 and 2.5 km depth from
+x = xb to the right wall. Both have the 1° friction of `wedge-phi1.cfg`, and
+the rest is the same brittle layer as before. Beyond xa the bottom of the
+layer is welded to the fixed base, so the push has to find another way
+forward. The three runs differ only in xa and xb.
+
+### The configuration and the `.poly` file
+
+Starting from `wedge-phi1.cfg`, three things change: the mesh comes from a
+`.poly` file, the box is 5 km deep, and the materials come from the file's
+regions instead of from layers:
+
+```cfg
+[mesh]
+meshing_option = 90                 # mesh from a .poly file
+poly_filename = ramp-ov2.poly
+zlength = 5e3
+
+[ic]
+mattype_option = 0                  # materials from the .poly regions
+weakzone_option = 0
+```
+
+`num_mattype_layers`, `layer_mattypes` and `mattype_layer_depths` are dropped,
+and `[mat]` is unchanged: material 0 is the brittle layer, material 1 a
+decollement. `bottom_shear_zone_thickness = 1e3` still matches the lower
+decollement at the wall. The `.poly` file lists the corner nodes, the segments
+between them with their boundary flags (1 left, 2 right, 16 bottom, 32 top, 0
+inside), and one point in each region with its material and largest element
+area, here 1.5 × 250² m² to match the uniform mesh:
+
+```text title="ramp-ov2.poly (xa = 16 km, xb = 14 km)"
+#### node coordinates ####
+# npoints ndims 0 0
+  11 2 0 0
+   0        0.0        0.0
+   1        0.0    -4000.0
+   2        0.0    -5000.0
+   3    16000.0    -5000.0
+   4    40000.0    -5000.0
+   5    40000.0    -2500.0
+   6    40000.0    -1500.0
+   7    40000.0        0.0
+   8    16000.0    -4000.0
+   9    14000.0    -2500.0
+  10    14000.0    -1500.0
+#### segments ####
+# nsegments 1
+  13 1
+   0  0  1  1
+   1  1  2  1
+   2  2  3 16
+   3  3  4 16
+   4  4  5  2
+   5  5  6  2
+   6  6  7  2
+   7  7  0 32
+   8  1  8  0
+   9  8  3  0
+  10  9  5  0
+  11 10  6  0
+  12  9 10  0
+#### holes, must be 0 ####
+0
+#### regions ####
+# nregions
+  3
+# k  xk  zk  mattype  size
+  0     8000.0    -4500.0 1 93750
+  1    27000.0    -2000.0 1 93750
+  2     1000.0     -500.0 0 93750
+```
+
+`make_ramp_poly.py 16 14 ramp-ov2.poly` writes this file; any other xa and xb
+give another arrangement. The internal segments shape only the initial mesh:
+with MMG, DES keeps no internal segments (`is_discarding_internal_segments =
+yes`), and markers carry the materials, so the decollements can deform and
+fold.
+
+### Run and plot
+
+```bash
+for c in gap8 ov2 ov14; do
+    OMP_NUM_THREADS=4 /path/to/DynEarthSol/dynearthsol2d ramp-$c.cfg
+done
+python3 wedge_figures.py sections ramp.png 8,16 "ramp-gap8:gap of 8 km" \
+    "ramp-ov2:overlap of 2 km" "ramp-ov14:overlap of 14 km"
+```
+
+The runs start with about 3600 elements and take about 720 000 steps to
+160 kyr, 8 km of shortening. The three run together on 3 threads each took
+9 to 9.5 minutes on the 8-core desktop. They stop at 160 kyr because by
+180 kyr the front of the 2 km overlap run reaches the right wall.
+
+![Plastic strain at 80 and 160 kyr for the three arrangements of two decollements: thrusts rooted at the end of the lower decollement with an 8 km gap, a ramp-flat thrust with a 2 km overlap, and a duplex-like stack with a 14 km overlap](./img/wedge/wedge-ramp-results.png)
+
+The three arrangements give three styles:
+
+- **8 km gap: thrusts at the end of the lower decollement.** The thrusts
+  root where the lower decollement ends, at x = 12 km. Beyond it the base is
+  strong, so the wedge grows steep: 3.7 km high at 160 kyr, with its front
+  at x = 22.5 km, just reaching the upper decollement. Only later does
+  deformation step onto the upper decollement, and the front jumps to 27 and
+  then 34 km by 200 kyr.
+- **2 km overlap: a ramp-flat thrust.** The fault leaves the lower decollement
+  near its end, climbs 1.5 km of rock in a ramp to the upper decollement, and
+  follows that flat forward, with imbricate splays branching up from it. The
+  wedge stays low and wide: 1.7 km high, front at x = 35 km.
+- **14 km overlap: a duplex-like stack.** The ramp cuts up from the lower
+  decollement at about x = 16 km, some 10 km before its end. The slice of rock
+  between the two decollements is carried up the ramp, and the upper
+  decollement folds over it as a roof: 2.4 km high, front at x = 31 km.
+
+The 2 km and 14 km runs match the styles Feng et al. found for short and long
+overlaps. The same shortening on the same materials builds a wedge from
+1.7 to 3.7 km high, depending only on where the weak layers are.
+
 ## Troubleshooting
 
 All rows were observed while building this tutorial.
@@ -486,6 +635,10 @@ All rows were observed while building this tutorial.
 
 - Davis, D., Suppe, J. & Dahlen, F. A. (1983). Mechanics of fold-and-thrust
   belts and accretionary wedges. *J. Geophys. Res.*, 88, 1153–1172.
+- Feng, L., Bartholomew, M. J. & Choi, E. (2015). Spatial arrangement of
+  décollements as a control on the development of thrust faults. *J. Struct.
+  Geol.*, 75, 49–59.
+  [doi:10.1016/j.jsg.2015.03.002](https://doi.org/10.1016/j.jsg.2015.03.002)
 - Dahlen, F. A. (1990). Critical taper model of fold-and-thrust belts and
   accretionary wedges. *Annu. Rev. Earth Planet. Sci.*, 18, 55–99.
 - Davis, D. M. & Engelder, T. (1985). The role of salt in fold-and-thrust
