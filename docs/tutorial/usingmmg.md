@@ -44,7 +44,14 @@ defaults, `mmg_hmax_factor = 2.0`/`mmg_hmin_factor = 0.2`, convert to
 ### Parameters for MMG
 
 - `mmg_debug`: Turn on/off *debug* mode. In debug mode, MMG checks if all structures are allocated.
-- `mmg_verbose`: Level of verbosity, -1 to 10.
+- `mmg_verbose`: Level of verbosity, -1 to 10, for MMG's own library output.
+- `mesh.meshing_verbosity`: Screen output of DES's own remesh bookkeeping (not MMG's).
+  At the default `-1`, a remesh prints only its trigger line, "Remeshing starts",
+  "New mesh" and "Remeshing finished"; each MMG quality retry still prints one line
+  naming the bad elements and what was unfrozen. Set it to `0` to restore the full
+  stage-by-stage log (`[metric]`, `[collapse]`, `[freeze]`, `[unfreeze]`, `[require]`,
+  `[corner]`, `[mmg]`, `[restore]`, `[GPU mem]`, `[quality]`), useful when tuning the
+  `mmg_remesh_*` parameters below. `1`-`3` add Triangle/TetGen's own `-V` verbosity on top.
 - `mesh.smallest_size`/`mesh.largest_size`: set MMG's minimum/maximum element edge
   length (see above); not MMG-specific, they also bound `meshing_option = 2`'s coarse zone.
 - `mmg_hausd_factor`: Global Hausdorff distance (on all boundaries in the mesh), as a
