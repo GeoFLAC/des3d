@@ -155,7 +155,7 @@ vbc_val_x0_ratio3 = 0.5   # ratio at the bottom
 
 | Parameter | Effect |
 |---|---|
-| `bottom_shear_zone_thickness` | For `vbc_x0 = 3`, 2D only: ramps the x-velocity linearly to zero within this thickness (km) of the bottom, instead of a step. |
+| `bottom_shear_zone_thickness` | For `vbc_x0 = 3`, 2D only: ramps the x-velocity linearly to zero within this thickness (m) of the bottom, instead of a step. |
 | `vbc_val_z1_loading_period` | After this much model time, `vbc_z1` is forced to `0` (free) regardless of its configured type. Useful for a loading phase followed by free relaxation. |
 
 ## Traction (Neumann / stress) boundary conditions
