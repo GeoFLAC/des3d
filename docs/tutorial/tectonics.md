@@ -823,7 +823,7 @@ is the rule switched off.
 
 | Run | Thickness | Change | What you should see |
 |-----|-----------|--------|---------------------|
-| None | 0 km | `has_serpentinization = no` | The interface locks. The slab tip falls behind from 2 Myr on and reaches only 100 km at 5 Myr, the slab necks and tears below the overriding plate, and both plates thicken and buckle: relief reaches 17 km at 2.5 Myr and the trench 8 km |
+| None | 0 km | `has_serpentinization = no` | The interface locks. The slab tip falls behind from 2 Myr on and reaches only 100 km at 5 Myr, the slab necks and tears below the overriding plate, and both plates thicken and buckle: the trench reaches 9 km at 2.5 Myr, 3 km deeper than the reference |
 | Reference | 5 km | `serpentinization_thickness = 5e3` (one cell) | Steady subduction to 125 km at 5 Myr; trench deepens to 6.5 km by 3 Myr and recovers to 4 km; about 3200 serpentinite and 380 eclogite markers |
 | Thick | 10 km | `serpentinization_thickness = 10e3` (two cells) | Half again as much serpentinite (4600 markers) in a wedge body that reaches further down the slab; trench about 1.5 km shallower on average, with less swing; slab tip 120 km; a quarter fewer eclogite markers |
 
