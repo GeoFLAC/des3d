@@ -58,7 +58,7 @@ Each part has the same four steps, geometry, configuration, run, and what to
 look for, followed by exercises that change one parameter at a time.
 
 :::tip Workshop package
-For a 90-minute class, download the <a href={useBaseUrl('/downloads/des-tectonics/DES-Tectonics-Tutorial.zip')}>tutorial package</a>:
+For a hands-on class, download the <a href={useBaseUrl('/downloads/des-tectonics/DES-Tectonics-Tutorial.zip')}>tutorial package</a>:
 a Jupyter notebook that plots every figure of this page from DES output, the
 configs of both parts and all exercise variants behind a one-command launcher
 (`./run.sh <case>`), and trimmed reference results of every run so the plots
@@ -89,6 +89,15 @@ cover. Before starting, ensure you have:
 examples are 2D with steady wall velocities and no earthquake cycles. The
 next tutorial, [Coupling with GoSPL](./couplinggospl.md), adds surface processes
 to models like these.
+
+:::caution A default build is not enough
+A plain `make` builds the 3D executable without MMG, and that is what the
+build instructions and the first tutorial leave you with. This tutorial needs
+the 2D MMG build, `make ndims=2 usemmg=1`, which takes a few minutes on a
+laptop and leaves the 3D executable in place. Check it with
+`./dynearthsol2d --help | grep -c mmg`, which must print a number above zero.
+Part 2 also needs a source tree from after 30 October 2026; see its note.
+:::
 
 :::tip Which build?
 Both examples are 2D; a 3D build (`make`) runs the same physics at a much
