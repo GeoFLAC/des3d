@@ -335,10 +335,14 @@ Output goes to `result3.save.*` and `result3.info` in the working directory.
 
 Cost on a laptop: the stock 50 kyr run takes a few minutes. To 100 kyr the
 MMG build took 12 minutes on 6 threads while another run shared the machine,
-7.0 million steps, 24 remeshes, 720 to about 1400 elements. The Triangle build
-needs about the same number of steps but ends with about 2000 elements after
-some 140 remeshes. Remeshing is under 0.1 % of the wall time either way; the
-time step, not the mesh, is the cost.
+6.2 million steps, 23 remeshes, 720 to about 1300 elements. The Triangle build
+needs about the same number of steps and ends with about 1800 elements. It
+remeshes some 20 times for the usual reasons, but twice in the run a surface
+element at the fault scarp, x = 53 km, sits just below `min_quality` after
+each rebuild, so every quality
+check remeshes again, over 1100 times in all. Remeshing is still about 1 % of
+the wall time with Triangle and 0.03 % with MMG; the time step, not the mesh,
+is the cost.
 
 :::tip With and without MMG
 The runs shown below use the MMG build from the prerequisites. The same file
@@ -350,8 +354,9 @@ smallest `resolution × (smallest_size × mmg_remesh_defensive_tiny_ratio)^(1/2)
 3.2 km and 0.12 km here, and it is conservative, freezing elements that are
 not yielding, distorted or tiny so that each remesh touches mainly the fault
 band. Triangle rebuilds the whole mesh at the initial sizes. To 100 kyr the
-MMG run ends with about 1400 elements after 24 remeshes, the Triangle run
-with about 2000 after some 140.
+MMG run ends with about 1300 elements after 23 remeshes, the Triangle run
+with about 1800 after over 1100, nearly all of them repeats on a surface
+element at the fault scarp that a rebuild does not improve.
 
 The build is described in [Adaptive mesh refinement with MMG](./usingmmg.md).
 The full parameter list, with a one-line tuning rule for each, is in the
@@ -378,35 +383,35 @@ Open `result3.*.vtu` in ParaView. Fields to look at:
 
 The left column is where slip has accumulated and how the mesh follows it;
 the right column is where slip is happening now. They differ: at 50 kyr the
-strain rate shows a second, antithetic band under the footwall at x = 60–70
+strain rate shows a second, antithetic band under the footwall at x = 55–65
 km that never gains enough plastic strain to show on the left. The bottom
-row quantifies the rolling hinge: the fault band steepens to 50° while it
+row quantifies the rolling hinge: the fault band steepens to 49° while it
 breaks through, then rotates steadily to 35° by 100 kyr as relief grows to
-3.9 km.
+3.8 km.
 
 Things to look for as the run proceeds (the figure is the reference run):
 
-- **Breakthrough.** The seed fault cuts up to the surface within the first
-  10 kyr and the footwall starts to rise; the velocity arrows show the
+- **Breakthrough.** The seed fault cuts up to the surface at about 13 kyr
+  and the footwall starts to rise; the velocity arrows show the
   footwall moving up and to the right while the hanging wall slides left.
-- **Relief.** By 50 kyr the surface has a footwall crest of 1.3 km near
-  x = 54 km and a basin of 1.4 km near x = 50 km, 2.7 km of relief; by
-  100 kyr the crest is 2.2 km at x = 56 km and the relief 3.9 km.
+- **Relief.** By 50 kyr the surface has a footwall crest of 1.4 km near
+  x = 54 km and a basin of 1.2 km near x = 50 km, 2.6 km of relief; by
+  100 kyr the crest is 2.2 km at x = 56 km and the relief 3.8 km.
 - **The rolling hinge.** The fault rotates to a shallower dip as it is
-  exhumed, from about 46° at 25 kyr to 35° at 100 kyr; the band of high
+  exhumed, from about 47° at 25 kyr to 35° at 100 kyr; the band of high
   plastic strain curves from steep at depth to gentle near the surface, and
   its exhumed upper part drapes the footwall dome.
 - **The mesh.** After a remesh the elements along the fault are smaller than
   in the far field with MMG, and uniform with Triangle; the MMG run grows
-  from 720 to about 1400 elements over 100 kyr.
+  from 720 to about 1300 elements over 100 kyr.
 
 ### Exercise 1: change the surface diffusivity
 
 | Run | `surface_diffusivity` | What you should see at 100 kyr |
 |-----|-----------------------|-------------------------------|
-| Reference | `1e-7` | Sharp footwall crest 2.2 km high, basin 1.7 km deep, 3.9 km of relief |
-| Moderate | `1e-6` | The same structure a little smoothed: crest 1.8 km, basin 1.4 km, 3.2 km of relief |
-| Strong erosion | `1e-5` | Relief capped at 1.6 km from 40 kyr on; the crest is planed to 1 km and the basin filled to 0.6 km while the fault keeps slipping |
+| Reference | `1e-7` | Sharp footwall crest 2.2 km high, basin 1.7 km deep, 3.8 km of relief |
+| Moderate | `1e-6` | The same structure a little smoothed: crest 1.8 km, basin 1.6 km, 3.4 km of relief |
+| Strong erosion | `1e-5` | Relief capped at 1.5 km from about 50 kyr on; the crest is planed to 1 km and the basin filled to 0.5 km while the fault keeps slipping |
 
 ![Surface diffusivity 1e-7, 1e-6 and 1e-5 at 100 kyr: passive horizons of initial depth in 1 km bands with the fault band shaded, then the surface profiles, relief against time, and the initial depth of the rock now at the surface](./img/tectonics/core-complex-diffusivity.png)
 
@@ -415,21 +420,21 @@ position through remeshing in the `coord0` field, so contouring the initial
 depth on the present mesh shows where each layer of the original crust has
 gone. Read them together with the surface panels:
 
-- **The fault is the same in all three runs.** The band dips 42° at 50 kyr
-  and 35° at 100 kyr and reaches a plastic strain of 3.9 whatever the
-  diffusivity. Diffusion acts on the surface only.
-- **So is the exhumation.** Rock from 8 km depth has risen to 3.9 km below the
-  surface at x = 48 km in all three, the horizons under the dome are bent
-  the same way, and the rock exposed at the surface came from 1.4 to 2.1 km in
+- **The fault is the same in all three runs.** The band dips 41° to 42° at
+  50 kyr and 34° to 36° at 100 kyr and reaches a plastic strain of 3.7
+  whatever the diffusivity. Diffusion acts on the surface only.
+- **So is the exhumation.** Rock from 8 km depth has risen to about 4 km
+  depth at x = 48 km in all three, the horizons under the dome are bent
+  the same way, and the rock exposed at the surface came from 1.4 to 2.3 km in
   every run. The fault sets how far the footwall rises; erosion does not add
   to it here.
 - **What changes is the topography.** At 1e-5 m²/s the relief stops growing
-  at 40 kyr because the crest is planed as fast as the fault lifts it and
+  at about 50 kyr because the crest is planed as fast as the fault lifts it and
   the debris fills the basin. The same exhumation then shows as a low dome
   rather than a sharp crest.
 
 That is why relief alone is a poor measure of what a fault has done, and why
-the horizons are worth drawing. Each run took 5 to 12 minutes on 6 threads.
+the horizons are worth drawing. Each run took 4 to 12 minutes on 6 threads.
 
 ### Exercise 2: change how small the elements may get
 
@@ -449,10 +454,10 @@ and the floor allows.
 
 | Run | `smallest_size` | Smallest MMG element | What you should see |
 |-----|-----------------|----------------------|---------------------|
-| No refinement | `1` | 1.2 km | A diffuse band 3 km wide that never sharpens; the run takes a tenth of the time |
-| Stock | `0.01` | 0.12 km | A sharp fault, about 1400 elements; 12 min |
-| Very fine | `0.001` | 0.04 km | The same mesh as stock, since the target rather than the floor limits refinement; 60 % more steps for nothing |
-| Very fine, stronger target | `0.001` with `mmg_metric_refine_coeff = 10` | 0.04 km | Now the band refines: 1630 elements, half again as many in the band |
+| No refinement | `1` | 1.2 km | A diffuse band 3 km wide that never sharpens; the run takes an eighth of the time |
+| Stock | `0.01` | 0.12 km | A sharp fault, about 1300 elements; 12 min |
+| Very fine | `0.001` | 0.04 km | The same mesh as stock, since the target rather than the floor limits refinement; 5 % more steps for nothing |
+| Very fine, stronger target | `0.001` with `mmg_metric_refine_coeff = 10` | 0.04 km | Now the band refines: 1770 elements, 70 % more in the band, and a second fault splays into the hanging wall |
 
 ![smallest_size 1, the stock 0.01, 0.001, and 0.001 with a doubled refinement coefficient at 100 kyr: plastic strain on the mesh for each](./img/tectonics/core-complex-smallest-size.png)
 
@@ -460,26 +465,31 @@ All four rows were run. Going up to `smallest_size = 1` costs resolution:
 the fault still forms in the same place and the surface still domes, but
 the band cannot be narrower than the elements it runs through, so the strain
 is spread over a 3 km wide zone and the fault never sharpens. The time step
-is seven times longer, since it follows the smallest element, and the whole
-run takes a tenth of the time.
+is on average seven times longer, since it follows the smallest element, and
+the whole run takes an eighth of the time.
 
 Going down to `0.001` alone buys nothing. The smallest element in the stock
-run is 0.15 km, above the 0.12 km floor, so the floor was not what stopped
+run is 0.17 km, above the 0.12 km floor, so the floor was not what stopped
 the refinement; the target was. Lowering the floor further cannot refine the
 band, and what it does change is the tiny-element trigger: squeezed elements
 may now shrink to a third of the size before a remesh repairs them, so the
-time step falls and the run needs 60 % more steps for the same result.
+time step can fall further. Here that costs only 5 % more steps, but it is a
+cost with nothing in return.
 
 Raising the target as well, `mmg_metric_refine_coeff = 10`, is what makes
-the lower floor useful. The band now holds 580 elements instead of 350, at a
-median edge of 0.29 km instead of 0.38, and the smallest element reaches
-0.10 km, still above the 0.04 km floor. The fault is drawn more sharply and
-the maximum plastic strain is a little higher, 4.1 against 3.9.
+the lower floor useful. The band now holds 560 elements instead of the stock
+run's 330, at a median edge of 0.29 km instead of 0.43, and the smallest element reaches
+0.12 km, still above the 0.04 km floor. The fault is drawn more sharply and
+the maximum plastic strain is a little higher, 4.1 against 3.7. The finer
+band also lets a second fault split off the main one into the hanging wall
+from about 50 kyr; by 100 kyr it reaches the surface at x = 45 km and opens
+a second, smaller basin there.
 
 ![The same four runs: final surface topography, then element count and maximum plastic strain against time, and the elements of each run at 100 kyr split by plastic strain](./img/tectonics/core-complex-smallest-size-series.png)
 
-The surface itself hardly notices: the three refined runs end with the same crest and
-basin to within 0.2 km, and only the unrefined run is lower and broader. The
+Away from that splay the surface hardly notices: the three refined runs end
+with the same crest and basin to within 0.2 km, and only the unrefined run is
+lower and broader. The
 lesson is that the two parameters work as a pair: the target asks for refinement
 where plastic strain accumulates, the floor caps how far it may go, and
 moving one without the other changes the cost of the run more than its
