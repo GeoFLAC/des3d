@@ -487,16 +487,19 @@ step.
 
 ## Part 2: Subduction
 
-:::caution Part 2 runs on code under review
+:::note Part 2 needs a recent master
 The example below, `examples/subduction.cfg`, and the phase-change engine it
-uses (`phase_change_option = 3` on a virtual-topology marker grid) are
-DynEarthSol [pull request #110](https://github.com/GeoFLAC/DynEarthSol/pull/110),
-open against `master` from the branch `feature/virtual-topology`. Until it
-merges, build from that branch. Parameter names could still change in review.
+uses (`phase_change_option = 3` on a virtual-topology marker grid) reached
+DynEarthSol `master` on 30 October 2026 with
+[pull request #110](https://github.com/GeoFLAC/DynEarthSol/pull/110). A clone
+or build from before that date does not have them: `git pull` and rebuild
+with `make ndims=2 usemmg=1` first. A quick check is
+`./dynearthsol2d --help | grep -c serpentinization`, which must print a
+number above zero.
 :::
 
 The example
-[`examples/subduction.cfg`](https://github.com/GeoFLAC/DynEarthSol/blob/feature/virtual-topology/examples/subduction.cfg)
+[`examples/subduction.cfg`](https://github.com/GeoFLAC/DynEarthSol/blob/master/examples/subduction.cfg)
 with its mesh file `poly-subduction.poly` pushes an oceanic plate under a
 fixed overriding plate. A short slab is already in the mantle at the start,
 so the plate interface exists from the first step. Two metamorphic reactions
@@ -627,13 +630,12 @@ rheology_type = elasto-visco-plastic
 num_materials = 10
 phase_change_option = 3
 mattype_oceanic_crust = 0
-mattype_continental_crust = 1
 mattype_mantle = 2
 mattype_sediment = 3
 mattype_serpentinite = 4
 mattype_eclogite = 5
 serpentinization_thickness = 5e3
-#                 [ ocean0   cont1    mant2   sed3    serp4   eclg5  ... ]
+#                 [ ocean0   (1)      mant2   sed3    serp4   eclg5  ... ]
 rho0            = [ 2880,    2800,    3300,   2400,   3200,   3480,  ... ]
 friction_angle0 = [ 30,      30,      30,     3,      3,      30,    ... ]
 friction_angle1 = [ 15,      15,      15,     3,      3,      15,    ... ]
@@ -667,11 +669,11 @@ Section by section, with what is new relative to Part 1:
 - **`[ic]`** seeds the interface with a single 30° plastic weak zone along
   the slab top, extending a few km into the mantle wedge. Values are
   fractions of the domain.
-- **`[mat]`** has ten material slots. Six are populated by the initial mesh
-  or the active rules: oceanic crust, continental crust (unused here),
-  mantle, sediment, serpentinite and eclogite. Four more, hydrous mantle,
-  sedimentary rock, metasediment and schist, are the targets of rules that
-  are switched off, so they stay empty. Each `mattype_*` tells the rule
+- **`[mat]`** has ten material slots. Five are populated by the initial mesh
+  or the active rules: oceanic crust, mantle, sediment, serpentinite and
+  eclogite. Slot 1 is kept free for continental crust, and four more, hydrous
+  mantle, sedimentary rock, metasediment and schist, are the targets of rules
+  that are switched off, so they stay empty. Each `mattype_*` tells the rule
   engine which slot plays which role.
 
 #### The phase-change rules
@@ -682,7 +684,7 @@ materials; the run stops at input otherwise.
 
 | Transition | Rule | Switch |
 |---|---|---|
-| Mantle → serpentinite | In the antigorite pressure–temperature field (Ulmer & Trommsdorff 1995), shallower than 150 km, and with a grid cell within `serpentinization_thickness` below the marker that is more than half oceanic crust or sediment | `has_serpentinization` (on) |
+| Mantle → serpentinite | In the antigorite pressure–temperature field (Ulmer & Trommsdorff 1995), shallower than `serpentinization_max_depth` (150 km), and with a grid cell within `serpentinization_thickness` below the marker whose oceanic crust and sediment share exceeds `wet_crust_fraction_threshold` (one half) | `has_serpentinization` (on) |
 | Serpentinite → mantle | Above 550 °C and outside the antigorite field | `has_serpentinization` (on) |
 | Oceanic crust → eclogite | Past the basalt–eclogite boundary (Hacker 2003); one way | `has_eclogitization` (on) |
 | Hydrous mantle → mantle | Chlorite-out boundary (Grove et al. 2009) | `has_hydrous_mantle_dehydration` (off) |
@@ -893,7 +895,7 @@ others are the usual causes.
 | Stops at input with a `mattype_*` message | 2 | Each active rule needs its source and target set to distinct, valid materials; check the `mattype_*` lines against `num_materials` |
 | Stops at input: `serpentinization_thickness` too small | 2 | It must be at least one grid cell, `resolution × vt_size` |
 | `remeshing_option 13` refused | 2 | Restored side walls need an MMG build: `make ndims=2 usemmg=1` |
-| Serpentinite appears far from the slab | 2 | The rule has no temperature gate below 150 km; a slab bend can make a whole grid column crust-dominant. Set `serpentinization_crust_margin >= 0` to confine it |
+| Serpentinite appears far from the slab | 2 | The rule has no temperature gate below 150 km; a slab bend can make a whole grid column crust-dominant. Set `serpentinization_wet_crust_margin >= 0` to confine it |
 | Slab stalls, plates thicken, then `[DES exit 41] mesh generation` | 2 | The interface is too strong: this is the `has_serpentinization = no` case of Exercise 3. Check `mattype_serpentinite` is set and the sediment and serpentinite friction angles are low. To carry such a run on anyway, restart from the last checkpoint with `max_boundary_distortion` halved to 0.5 |
 
 ## Next Steps
