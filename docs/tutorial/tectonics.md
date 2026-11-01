@@ -752,16 +752,16 @@ Open `model-subduction.*.vtu` in ParaView. Fields to look at:
 - **viscosity**, the cold slab against the weak wedge
 - **temperature**, the slab's thermal anomaly and the heated wedge corner
 
-![Material with velocity arrows (left) and viscosity with isotherms (right) at 0.5, 1, 2.5 and 5 Myr, cropped to the slab: the tip sinks from 49 to 126 km depth, serpentinite (purple) lines the slab top and fills the wedge corner, eclogite (red) grows from the slab tip](./img/tectonics/subduction-evolution.png)
+![Material with velocity arrows (left) and viscosity with isotherms (right) at 0.5, 1, 2.5 and 5 Myr, cropped to the slab: the tip sinks from 48 to 124 km depth, serpentinite (purple) lines the slab top and fills the wedge corner, eclogite (red) grows from the slab tip](./img/tectonics/subduction-evolution.png)
 
 Things to look for as the run proceeds (the figure is the reference run):
 
 - **Serpentinite from the first frame.** The slab is already in place, so
-  mantle just above its top converts at once: about 450 markers by 0.5 Myr,
-  3100 by 5 Myr. On the viscosity panels this layer sits at the 10¹⁹ Pa s
+  mantle just above its top converts at once: about 370 markers by 0.5 Myr,
+  3200 by 5 Myr. On the viscosity panels this layer sits at the 10¹⁹ Pa s
   floor and is the weakest material in the model.
 - **Eclogite starts at the slab tip.** A few dozen markers have converted by
-  0.5 Myr, where the tip sits near 50 km; the count grows to about 400 by
+  0.5 Myr, where the tip sits near 50 km; the count grows to about 380 by
   5 Myr, when the deepest 30 km of the slab is eclogite.
 - **The slab tip** reaches 50 km at 0.5 Myr, 90 km at 2.5 Myr and about 125
   km at 5 Myr, keeping a dip of 30–35° on its way down. The cold core stays
@@ -775,32 +775,33 @@ Things to look for as the run proceeds (the figure is the reference run):
   down into it, while the incoming plate at the left wall keeps its three
   layers thanks to the restored wall.
 
-{/* Numbers are from the PR #110 head run pr110-ref (analysis/examples/376). */}
+{/* Numbers are from the DynEarthSol master (cce59ab5b) run subd-master-ref (analysis/examples/376, 379, 384). */}
 
 #### How the mesh keeps up
 
-![Mesh size and remeshing of the reference run: elements grow from 2603 to 4625 over 206 remeshes, split by plastic strain with each remesh marked by its trigger, and the cumulative remesh count by trigger](./img/tectonics/subduction-remeshing.png)
+![Mesh size and remeshing of the reference run: elements grow from 2603 to 4466 over 200 remeshes, split by plastic strain with each remesh marked by its trigger, and the cumulative remesh count by trigger](./img/tectonics/subduction-remeshing.png)
 
-The mesh nearly doubles over the run, and the left panel shows where the
-new elements go. Elements with no plastic strain fall from 2600 to about
-1900 as the deforming band widens into them, and they stay coarse at a
-median of 4.7 km. Fully softened elements, those past `pls1 = 0.1`, grow from
-none to about 2100, 44 % of the mesh, at a median size of 2.0 km against the
+The mesh grows by two thirds over the run, and the left panel shows where
+the new elements go. Elements with no plastic strain fall from 2600 to about
+2000 as the deforming band widens into them, and they stay coarse at a
+median of 4.5 km. Fully softened elements, those past `pls1 = 0.1`, grow from
+none to about 1900, 42 % of the mesh, at a median size of 2.1 km against the
 6 km resolution and the 1.5 km MMG floor. That is the MMG metric at work:
 `mmg_metric_refine_coeff` shrinks the target size where plastic strain has
 accumulated, along the plate interface and in the wedge, and nowhere else.
 
-The 206 remeshes have three triggers, each checked every
+The 200 remeshes have three triggers, each checked every
 `quality_check_step_interval` steps. A **tiny element** is one whose area has
 dropped below `smallest_size` times the resolution squared. **Low quality** is
 an element quality below `min_quality`, 0.2 here. **Bottom drift** is a bottom
 node more than `max_boundary_distortion` times `resolution`, 6 km here, from
 the 160 km base. The first two are the ordinary triggers and fire throughout.
-Bottom drift dominates the first 2 Myr while the slab tip sinks through the
-lower mantle and the Winkler bottom adjusts, then fades. Each remesh moves
+Bottom drift belongs to the first million years, 26 of its 28 remeshes, while
+the slab tip sinks through the lower mantle and the Winkler bottom adjusts;
+after that it stops. Each remesh moves
 the element count by only a few tens, because the conservative MMG mode
 freezes elements that are not yielding, distorted or tiny. Remeshing takes
-under 1 % of the wall time; the phase changes take 4 %.
+under 1 % of the wall time; the phase changes take 5 %.
 
 ### Exercise 3: change the thickness of the serpentinite layer
 
@@ -811,7 +812,7 @@ is the rule switched off.
 | Run | Thickness | Change | What you should see |
 |-----|-----------|--------|---------------------|
 | None | 0 km | `has_serpentinization = no` | The interface locks. The slab tip stalls near 80 km from 2 Myr on and the slab necks off; both plates thicken and buckle, relief reaches ±7 km, and the run ends at 3.45 Myr in a remeshing failure at the inflow wall (see the troubleshooting case below) |
-| Reference | 5 km | `serpentinization_thickness = 5e3` (one cell) | Steady subduction to 125 km at 5 Myr; trench 6 km deep at 2 Myr, recovering to 4 km; about 3100 serpentinite and 400 eclogite markers |
+| Reference | 5 km | `serpentinization_thickness = 5e3` (one cell) | Steady subduction to 125 km at 5 Myr; trench deepens to 6.5 km by 3 Myr and recovers to 4 km; about 3200 serpentinite and 380 eclogite markers |
 | Thick | 10 km | `serpentinization_thickness = 10e3` (two cells) | Half again as much serpentinite (4600 markers) in a wedge body that reaches further down the slab; trench 1.5 km shallower throughout; slab tip 120 km; 40 % fewer eclogite markers |
 
 ![Serpentinite layer none, 5 km and 10 km across the whole 400 km domain, the 5 km and 10 km runs at 5 Myr and the run without serpentinite at 3.4 Myr where it stopped: material, phase-change markers and velocity arrows per run, then slab-tip depth, trench depth and marker counts against time to 5 Myr](./img/tectonics/subduction-serp-thickness.png)
