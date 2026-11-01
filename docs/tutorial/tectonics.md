@@ -31,8 +31,8 @@ case takes minutes on a laptop; the second about half an hour.
   refines along the faults and the plate interface
 - How to read the output: plastic strain, topography, viscosity, temperature,
   material and velocity
-- How to diagnose a run that stops in a remeshing failure and carry it on
-  from a checkpoint with a changed parameter
+- How to restart a run from a checkpoint with a changed boundary condition,
+  and read what the model does when its forcing stops
 
 The two parts are meant to be read in order. Part 1 is the smallest model
 that shows a DES fault: one material, no temperature, a box mesh, a planar
@@ -49,6 +49,10 @@ a time:
 | Phase changes | None | Serpentinization and eclogitization on a marker grid |
 | Remeshing | Bottom restored | Bottom and side walls restored, which needs MMG |
 | Run time, 6 threads | 12 minutes to 100 kyr | 23 minutes to 5 Myr |
+
+Every run time quoted on this page is the wall-clock time on 6 threads of an
+Apple M3 Max laptop; a 4-core machine of a few years ago takes two to three
+times longer.
 
 Each part has the same four steps, geometry, configuration, run, and what to
 look for, followed by exercises that change one parameter at a time.
@@ -726,8 +730,7 @@ cd DynEarthSol/examples
 OMP_NUM_THREADS=6 ../dynearthsol2d subduction.cfg
 ```
 
-The full run takes about 23 minutes on 6 threads of a recent laptop, two to
-three times that on an older 4-core machine, with the mesh growing from
+The full run takes about 23 minutes on 6 threads, with the mesh growing from
 about 2600 to 4500 elements. Output goes to `model-subduction.save.*`; the
 step counter in the log advances about a million steps per 0.9 Myr.
 
@@ -811,74 +814,98 @@ is the rule switched off.
 
 | Run | Thickness | Change | What you should see |
 |-----|-----------|--------|---------------------|
-| None | 0 km | `has_serpentinization = no` | The interface locks. The slab tip stalls near 80 km from 2 Myr on and the slab necks off; both plates thicken and buckle, relief reaches ±7 km, and the run ends at 3.45 Myr in a remeshing failure at the inflow wall (see the troubleshooting case below) |
+| None | 0 km | `has_serpentinization = no` | The interface locks. The slab tip falls behind from 2 Myr on and reaches only 100 km at 5 Myr, the slab necks and tears below the overriding plate, and both plates thicken and buckle: relief reaches 17 km at 2.5 Myr and the trench 8 km |
 | Reference | 5 km | `serpentinization_thickness = 5e3` (one cell) | Steady subduction to 125 km at 5 Myr; trench deepens to 6.5 km by 3 Myr and recovers to 4 km; about 3200 serpentinite and 380 eclogite markers |
-| Thick | 10 km | `serpentinization_thickness = 10e3` (two cells) | Half again as much serpentinite (4600 markers) in a wedge body that reaches further down the slab; trench 1.5 km shallower throughout; slab tip 120 km; 40 % fewer eclogite markers |
+| Thick | 10 km | `serpentinization_thickness = 10e3` (two cells) | Half again as much serpentinite (4600 markers) in a wedge body that reaches further down the slab; trench about 1.5 km shallower on average, with less swing; slab tip 120 km; a quarter fewer eclogite markers |
 
-![Serpentinite layer none, 5 km and 10 km across the whole 400 km domain, the 5 km and 10 km runs at 5 Myr and the run without serpentinite at 3.4 Myr where it stopped: material, phase-change markers and velocity arrows per run, then slab-tip depth, trench depth and marker counts against time to 5 Myr](./img/tectonics/subduction-serp-thickness.png)
+![Serpentinite layer none, 5 km and 10 km across the whole 400 km domain at 5 Myr: material, phase-change markers and velocity arrows per run, then slab-tip depth, trench depth and marker counts against time](./img/tectonics/subduction-serp-thickness.png)
 
 What the comparison shows:
 
 - **The weak layer is what makes this model subduct.** Without it the
   sediment seed alone cannot keep the interface slipping; convergence goes
-  into thickening and buckling the plates, the slab stops descending and tears
-  below the overriding plate, and the mesh at the thickened inflow wall
-  eventually defeats the remesher. The failure message, `[DES exit 41] mesh
-  generation` after an MMG normal-vector error, is the symptom, not the cause.
+  into thickening and buckling the plates, the slab falls behind and tears
+  below the overriding plate, and the velocity arrows show the whole
+  overriding plate being pushed instead of the slab sliding under it. Such a
+  run also works the mesh hard: the thickened plates load the Winkler bottom
+  unevenly and most of its remeshes are bottom-drift triggers, and an earlier
+  build of this case died in a remeshing failure at 3.45 Myr.
 - **A thicker layer lubricates more.** With two cells the trench is shallower
-  by about 1.5 km for the whole run, the forearc high is lower, and the
-  wedge-corner body is larger. The slab tip ends 6 km shallower.
-- **Eclogite responds indirectly.** The 10 km run has 245 eclogite markers at
-  5 Myr against 414 in the reference. The rule did not change; the thicker
-  weak layer keeps the slab crust shallower and warmer where it would
+  by about 1.5 km on average and swings less, the forearc high is lower, and
+  the wedge-corner body is larger. The slab tip ends 4 km shallower.
+- **Eclogite responds indirectly.** The 10 km run has about 300 eclogite
+  markers at 5 Myr against 380 in the reference. The rule did not change; the
+  thicker weak layer keeps the slab crust shallower and warmer where it would
   otherwise cross the reaction boundary.
-- **Time step and cost barely change**: 5.7 to 5.8 million steps for all
-  three, about 23 minutes alone on 6 threads.
+- **Time step and cost barely change**: 5.7 to 5.9 million steps for the two
+  subducting runs, about 22 minutes alone on 6 threads; the locked run takes
+  4.3 million steps and 17 minutes because its plates move more slowly.
 
-No run was repeated with a tiny perturbation, so the size of the chaotic
-scatter is unknown. The locking of the 0 km case is robust, since it starts
-by 1 Myr and grows; the 1.5 km trench difference between 5 and 10 km should
-be read as suggestive until a perturbed twin bounds it.
+The reference and the 10 km run were each made twice, on the pull request's
+branch and on `master` after the merge, with the same configuration. The
+pairs agree on everything above, but differ in detail: the 10 km trench ended
+1 km shallower than the reference in one pair and 0.5 km deeper in the other,
+and the eclogite deficit was 40 % in one and 22 % in the other. That is the
+chaotic scatter of a remeshing model. Read differences of that size as
+suggestive, and the locking of the 0 km case, which starts by 1 Myr and grows,
+as robust.
 
-### Troubleshooting case: carrying on the run that locked up
+### Restart case: stop the convergence and see what carries on
 
-The 0 km run above stops at 3.45 Myr with
-
-```
-[DES exit 41] mesh generation
-```
-
-after MMG reports that it cannot compute a boundary normal at a tiny element
-on the inflow wall, 96 km deep. The log before the failure shows what led to
-it: of the last 40 remeshes, 34 were triggered by bottom nodes drifting more
-than `max_boundary_distortion × resolution` = 6 km from the 160 km base,
-because the stacked plates load the Winkler bottom unevenly. Each of those
-remeshes flattens the base back by up to 6 km in one go, and the mesh near the
-wall degrades a little further each time until MMG gives up.
-
-The run can be carried on from its last good checkpoint, frame 60 at 3.0 Myr,
-with the base corrected in smaller steps:
+A run can be continued from any checkpoint with changed settings. DES writes a
+checkpoint every `checkpoint_frame_interval` frames, 10 by default, so the
+reference run leaves its last one at frame 100, 5 Myr. The example is already
+set up to restart from it; switch the restart on, give the run another two
+million years and stop the push:
 
 ```cfg
 is_restarting = yes
 restarting_from_modelname = model-subduction
-restarting_from_frame = 60
-max_boundary_distortion = 0.5     # 3 km instead of 6
+restarting_from_frame = 100
+max_time_in_yr = 7e6
+vbc_val_x0 = 0                    # the left plate is held still
 ```
 
-With that one change the restart runs through to 5 Myr, remeshing 58 times in
-the remaining 2 Myr, 51 of them still bottom-drift triggers, but each
-correcting half as much. The physics does not change: the slab stays stalled
-near 80 km, the trench stays near 7 km deep and the plates keep buckling.
-Only the mesh survives.
+The restart runs in the same directory as the parent, reads its frame 100 and
+checkpoint, and writes frames 100 to 140 of its own; the extra two million
+years take about two minutes. The question it answers is which parts of the model were
+driven by the push and which carry on by themselves once convergence stops, as
+after a collision or a plate reorganisation.
 
-![The restarted run at 5 Myr, and trench depth and remesh count of the run as shipped against its restart with the halved boundary-distortion limit](./img/tectonics/subduction-restart-fix.png)
+![The reference run at 5 Myr and its restart at 7 Myr with the left wall held still: material with velocity arrows and viscosity with isotherms, then trench depth and forearc high, slab-tip depth, deep-slab temperature and marker counts from 3 to 7 Myr with the restart marked](./img/tectonics/subduction-stop-convergence.png)
+
+- **The slab stops.** Its tip sank 13 km per million years while pushed and
+  less than 1 km in the two million years after. There is no slab pull to
+  speak of here: the plate it hangs from is held at the wall, and sinking
+  further would mean stretching a plate at the 10²⁴ Pa s viscosity cap. This
+  model subducts because it is pushed. The peak speed in the domain falls from
+  19 to 1 cm/yr.
+- **The surface rebounds first, then smooths.** Within the first million
+  years the trench shallows from 3.8 to 1.8 km and the forearc high rises from
+  2.6 to 5.3 km; the whole overriding plate between x = 100 and 300 km comes
+  up by 1.5 to 2.5 km. That is isostatic rebound: the shear on the plate
+  interface that was holding the overriding plate down is gone. After that
+  the levels hardly move, the high eases back to 4.6 km, and surface diffusion
+  takes over: at `surface_diffusivity = 5e-7` it reaches √(κt) ≈ 6 km in two
+  million years, enough to cut the root-mean-square slope between x = 60 and
+  340 km by a third while the overall relief stays near 6 km. Diffusion rounds
+  the slopes; it does not remove the relief. The incoming plate next to the
+  held wall sags by up to 6 km, a wall effect to be aware of.
+- **The slab warms and reacts until it runs out of crust.** Below 60 km the
+  slab's mean temperature rises by 50 °C over the two million years, because
+  nothing cold arrives any more. Eclogite is the one thing that speeds up: 381
+  markers at 5 Myr become 588 by 5.75 Myr as the stationary crust heats across
+  the basalt–eclogite boundary and the eclogite front climbs from 87 to 71 km
+  depth. Then it stops, at 610 markers by 7 Myr: the crust above 71 km is too
+  shallow to cross the boundary however warm it gets, so a stationary slab
+  saturates. Serpentinite grows by 190 markers in the first half million
+  years, then stops too: its rule is geometric and needs new mantle to be
+  brought over crust.
 
 Two cautions. Pick a restart frame that is not a remesh step, since a
-checkpoint written on one is not bit-recoverable. And a single restart that
-survives does not prove the parameter was the cure, because a restart is a new
-realization of a chaotic run; a control restart with the original setting
-would be needed for that.
+checkpoint written on one is not bit-recoverable. And a restart is a new
+realization of a chaotic run, so compare it with the parent's trend, as the
+bottom row does, rather than with a single frame.
 
 Change one parameter at a time, and keep a log of what you changed.
 
@@ -897,7 +924,7 @@ others are the usual causes.
 | Stops at input: `serpentinization_thickness` too small | 2 | It must be at least one grid cell, `resolution × vt_size` |
 | `remeshing_option 13` refused | 2 | Restored side walls need an MMG build: `make ndims=2 usemmg=1` |
 | Serpentinite appears far from the slab | 2 | The rule has no temperature gate below 150 km; a slab bend can make a whole grid column crust-dominant. Set `serpentinization_wet_crust_margin >= 0` to confine it |
-| Slab stalls, plates thicken, then `[DES exit 41] mesh generation` | 2 | The interface is too strong: this is the `has_serpentinization = no` case of Exercise 3. Check `mattype_serpentinite` is set and the sediment and serpentinite friction angles are low. To carry such a run on anyway, restart from the last checkpoint with `max_boundary_distortion` halved to 0.5 |
+| Slab stalls, plates thicken and buckle | 2 | The interface is too strong: this is the `has_serpentinization = no` case of Exercise 3. Check `mattype_serpentinite` is set and the sediment and serpentinite friction angles are low. Such a run also piles up bottom-drift remeshes and can end in `[DES exit 41]`; to carry it on, restart from the last checkpoint with `max_boundary_distortion` halved to 0.5 |
 
 ## Next Steps
 
