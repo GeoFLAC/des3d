@@ -48,7 +48,7 @@ a time:
 | Walls | Both pulled apart | One pushed in, one fixed; material flows in through the wall |
 | Phase changes | None | Serpentinization and eclogitization on a marker grid |
 | Remeshing | Bottom restored | Bottom and side walls restored, which needs MMG |
-| Run time, 6 threads | 12 minutes to 100 kyr | 23 minutes to 5 Myr |
+| Run time, 6 threads | 12 minutes to 100 kyr | 22 minutes to 5 Myr |
 
 Every run time quoted on this page is the wall-clock time on 6 threads of an
 Apple M3 Max laptop; a 4-core machine of a few years ago takes two to three
@@ -739,7 +739,7 @@ cd DynEarthSol/examples
 OMP_NUM_THREADS=6 ../dynearthsol2d subduction.cfg
 ```
 
-The full run takes about 23 minutes on 6 threads, with the mesh growing from
+The full run takes about 22 minutes on 6 threads, with the mesh growing from
 about 2600 to 4500 elements. Output goes to `model-subduction.save.*`; the
 step counter in the log advances about a million steps per 0.9 Myr.
 
@@ -775,7 +775,7 @@ Things to look for as the run proceeds (the figure is the reference run):
 - **Eclogite starts at the slab tip.** A few dozen markers have converted by
   0.5 Myr, where the tip sits near 50 km; the count grows to about 380 by
   5 Myr, when the deepest 30 km of the slab is eclogite.
-- **The slab tip** reaches 50 km at 0.5 Myr, 90 km at 2.5 Myr and about 125
+- **The slab tip** reaches 50 km at 0.5 Myr, 85 km at 2.5 Myr and about 125
   km at 5 Myr, keeping a dip of 30–35° on its way down. The cold core stays
   at the 10²⁴ Pa s viscosity cap and drags the isotherms down with it.
 - **The wedge corner serpentinizes wholesale.** The mantle between the
@@ -794,7 +794,7 @@ Things to look for as the run proceeds (the figure is the reference run):
 ![Mesh size and remeshing of the reference run: elements grow from 2603 to 4466 over 200 remeshes, split by plastic strain with each remesh marked by its trigger, and the cumulative remesh count by trigger](./img/tectonics/subduction-remeshing.png)
 
 The mesh grows by two thirds over the run, and the left panel shows where
-the new elements go. Elements with no plastic strain fall from 2600 to about
+the new elements go. Elements with no plastic strain fall from 2500 to about
 2000 as the deforming band widens into them, and they stay coarse at a
 median of 4.5 km. Fully softened elements, those past `pls1 = 0.1`, grow from
 none to about 1900, 42 % of the mesh, at a median size of 2.1 km against the
@@ -825,7 +825,7 @@ is the rule switched off.
 |-----|-----------|--------|---------------------|
 | None | 0 km | `has_serpentinization = no` | The interface locks. The slab tip falls behind from 2 Myr on and reaches only 100 km at 5 Myr, the slab necks and tears below the overriding plate, and both plates thicken and buckle: the trench reaches 9 km at 2.5 Myr, 3 km deeper than the reference |
 | Reference | 5 km | `serpentinization_thickness = 5e3` (one cell) | Steady subduction to 125 km at 5 Myr; trench deepens to 6.5 km by 3 Myr and recovers to 4 km; about 3200 serpentinite and 380 eclogite markers |
-| Thick | 10 km | `serpentinization_thickness = 10e3` (two cells) | Half again as much serpentinite (4600 markers) in a wedge body that reaches further down the slab; trench about 1.5 km shallower on average, with less swing; slab tip 120 km; a quarter fewer eclogite markers |
+| Thick | 10 km | `serpentinization_thickness = 10e3` (two cells) | Half again as much serpentinite (4600 markers) in a wedge body that reaches further down the slab; trench about 1 km shallower on average, with less swing; slab tip 120 km; a quarter fewer eclogite markers |
 
 ![Serpentinite layer none, 5 km and 10 km across the whole 400 km domain at 5 Myr: material, phase-change markers and velocity arrows per run, then slab-tip depth, trench depth and marker counts against time](./img/tectonics/subduction-serp-thickness.png)
 
@@ -840,7 +840,7 @@ What the comparison shows:
   unevenly and most of its remeshes are bottom-drift triggers, and an earlier
   build of this case died in a remeshing failure at 3.45 Myr.
 - **A thicker layer lubricates more.** With two cells the trench is shallower
-  by about 1.5 km on average and swings less, the forearc high is lower, and
+  by about 1 km on average and swings less, the forearc high is lower, and
   the wedge-corner body is larger. The slab tip ends 4 km shallower.
 - **Eclogite responds indirectly.** The 10 km run has about 300 eclogite
   markers at 5 Myr against 380 in the reference. The rule did not change; the
