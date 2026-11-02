@@ -31,8 +31,8 @@ case takes minutes on a laptop; the second about half an hour.
   refines along the faults and the plate interface
 - How to read the output: plastic strain, topography, viscosity, temperature,
   material and velocity
-- How to diagnose a run that stops in a remeshing failure and carry it on
-  from a checkpoint with a changed parameter
+- How to restart a run from a checkpoint with a changed boundary condition,
+  and read what the model does when its forcing stops
 
 The two parts are meant to be read in order. Part 1 is the smallest model
 that shows a DES fault: one material, no temperature, a box mesh, a planar
@@ -48,19 +48,21 @@ a time:
 | Walls | Both pulled apart | One pushed in, one fixed; material flows in through the wall |
 | Phase changes | None | Serpentinization and eclogitization on a marker grid |
 | Remeshing | Bottom restored | Bottom and side walls restored, which needs MMG |
-| Run time, 6 threads | 12 minutes to 100 kyr | 23 minutes to 5 Myr |
+| Run time, 6 threads | 12 minutes to 100 kyr | 22 minutes to 5 Myr |
+
+Every run time quoted on this page is the wall-clock time on 6 threads of an
+Apple M3 Max laptop; a 4-core machine of a few years ago takes two to three
+times longer.
 
 Each part has the same four steps, geometry, configuration, run, and what to
 look for, followed by exercises that change one parameter at a time.
 
 :::tip Workshop package
-For a 90-minute class, download the <a href={useBaseUrl('/downloads/des-tectonics/DES-Tectonics-Tutorial.zip')}>tutorial package</a>:
-a Jupyter notebook that plots every figure of this page from DES output, the
-configs of both parts and all exercise variants behind a one-command launcher
-(`./run.sh <case>`), and trimmed reference results of every run so the plots
-work before, or without, your own runs. Its
-`resources/SETUP.md` has a shorter build recipe than the pages linked below,
-and its README has the class schedule.
+For a hands-on class, download the <a href={useBaseUrl('/downloads/des-tectonics/DES-Tectonics-Tutorial.zip')}>tutorial package</a> (12 MB).
+It holds a Jupyter notebook that draws every figure of this page, the configs
+of both parts and all exercises with the shell commands to run them, and
+reference results so the plots work before your own runs finish. Start with its
+README; `resources/SETUP.md` has a short build recipe.
 :::
 
 ## Prerequisites
@@ -85,6 +87,15 @@ cover. Before starting, ensure you have:
 examples are 2D with steady wall velocities and no earthquake cycles. The
 next tutorial, [Coupling with GoSPL](./couplinggospl.md), adds surface processes
 to models like these.
+
+:::caution A default build is not enough
+A plain `make` builds the 3D executable without MMG, and that is what the
+build instructions and the first tutorial leave you with. This tutorial needs
+the 2D MMG build, `make ndims=2 usemmg=1`, which takes a few minutes on a
+laptop and leaves the 3D executable in place. Check it with
+`./dynearthsol2d --help | grep -c mmg`, which must print a number above zero.
+Part 2 also needs a source tree from after 30 October 2026; see its note.
+:::
 
 :::tip Which build?
 Both examples are 2D; a 3D build (`make`) runs the same physics at a much
@@ -322,10 +333,14 @@ Output goes to `result3.save.*` and `result3.info` in the working directory.
 
 Cost on a laptop: the stock 50 kyr run takes a few minutes. To 100 kyr the
 MMG build took 12 minutes on 6 threads while another run shared the machine,
-7.0 million steps, 24 remeshes, 720 to about 1400 elements. The Triangle build
-needs about the same number of steps but ends with about 2000 elements after
-some 140 remeshes. Remeshing is under 0.1 % of the wall time either way; the
-time step, not the mesh, is the cost.
+6.2 million steps, 23 remeshes, 720 to about 1300 elements. The Triangle build
+needs about the same number of steps and ends with about 1800 elements. It
+remeshes some 20 times for the usual reasons, but twice in the run a surface
+element at the fault scarp, x = 53 km, sits just below `min_quality` after
+each rebuild, so every quality
+check remeshes again, over 1100 times in all. Remeshing is still about 1 % of
+the wall time with Triangle and 0.03 % with MMG; the time step, not the mesh,
+is the cost.
 
 :::tip With and without MMG
 The runs shown below use the MMG build from the prerequisites. The same file
@@ -337,8 +352,9 @@ smallest `resolution × (smallest_size × mmg_remesh_defensive_tiny_ratio)^(1/2)
 3.2 km and 0.12 km here, and it is conservative, freezing elements that are
 not yielding, distorted or tiny so that each remesh touches mainly the fault
 band. Triangle rebuilds the whole mesh at the initial sizes. To 100 kyr the
-MMG run ends with about 1400 elements after 24 remeshes, the Triangle run
-with about 2000 after some 140.
+MMG run ends with about 1300 elements after 23 remeshes, the Triangle run
+with about 1800 after over 1100, nearly all of them repeats on a surface
+element at the fault scarp that a rebuild does not improve.
 
 The build is described in [Adaptive mesh refinement with MMG](./usingmmg.md).
 The full parameter list, with a one-line tuning rule for each, is in the
@@ -365,35 +381,35 @@ Open `result3.*.vtu` in ParaView. Fields to look at:
 
 The left column is where slip has accumulated and how the mesh follows it;
 the right column is where slip is happening now. They differ: at 50 kyr the
-strain rate shows a second, antithetic band under the footwall at x = 60–70
+strain rate shows a second, antithetic band under the footwall at x = 55–65
 km that never gains enough plastic strain to show on the left. The bottom
-row quantifies the rolling hinge: the fault band steepens to 50° while it
+row quantifies the rolling hinge: the fault band steepens to 49° while it
 breaks through, then rotates steadily to 35° by 100 kyr as relief grows to
-3.9 km.
+3.8 km.
 
 Things to look for as the run proceeds (the figure is the reference run):
 
-- **Breakthrough.** The seed fault cuts up to the surface within the first
-  10 kyr and the footwall starts to rise; the velocity arrows show the
+- **Breakthrough.** The seed fault cuts up to the surface at about 13 kyr
+  and the footwall starts to rise; the velocity arrows show the
   footwall moving up and to the right while the hanging wall slides left.
-- **Relief.** By 50 kyr the surface has a footwall crest of 1.3 km near
-  x = 54 km and a basin of 1.4 km near x = 50 km, 2.7 km of relief; by
-  100 kyr the crest is 2.2 km at x = 56 km and the relief 3.9 km.
+- **Relief.** By 50 kyr the surface has a footwall crest of 1.4 km near
+  x = 54 km and a basin of 1.2 km near x = 50 km, 2.6 km of relief; by
+  100 kyr the crest is 2.2 km at x = 56 km and the relief 3.8 km.
 - **The rolling hinge.** The fault rotates to a shallower dip as it is
-  exhumed, from about 46° at 25 kyr to 35° at 100 kyr; the band of high
+  exhumed, from about 47° at 25 kyr to 35° at 100 kyr; the band of high
   plastic strain curves from steep at depth to gentle near the surface, and
   its exhumed upper part drapes the footwall dome.
 - **The mesh.** After a remesh the elements along the fault are smaller than
   in the far field with MMG, and uniform with Triangle; the MMG run grows
-  from 720 to about 1400 elements over 100 kyr.
+  from 720 to about 1300 elements over 100 kyr.
 
 ### Exercise 1: change the surface diffusivity
 
 | Run | `surface_diffusivity` | What you should see at 100 kyr |
 |-----|-----------------------|-------------------------------|
-| Reference | `1e-7` | Sharp footwall crest 2.2 km high, basin 1.7 km deep, 3.9 km of relief |
-| Moderate | `1e-6` | The same structure a little smoothed: crest 1.8 km, basin 1.4 km, 3.2 km of relief |
-| Strong erosion | `1e-5` | Relief capped at 1.6 km from 40 kyr on; the crest is planed to 1 km and the basin filled to 0.6 km while the fault keeps slipping |
+| Reference | `1e-7` | Sharp footwall crest 2.2 km high, basin 1.7 km deep, 3.8 km of relief |
+| Moderate | `1e-6` | The same structure a little smoothed: crest 1.8 km, basin 1.6 km, 3.4 km of relief |
+| Strong erosion | `1e-5` | Relief capped at 1.5 km from about 50 kyr on; the crest is planed to 1 km and the basin filled to 0.5 km while the fault keeps slipping |
 
 ![Surface diffusivity 1e-7, 1e-6 and 1e-5 at 100 kyr: passive horizons of initial depth in 1 km bands with the fault band shaded, then the surface profiles, relief against time, and the initial depth of the rock now at the surface](./img/tectonics/core-complex-diffusivity.png)
 
@@ -402,21 +418,21 @@ position through remeshing in the `coord0` field, so contouring the initial
 depth on the present mesh shows where each layer of the original crust has
 gone. Read them together with the surface panels:
 
-- **The fault is the same in all three runs.** The band dips 42° at 50 kyr
-  and 35° at 100 kyr and reaches a plastic strain of 3.9 whatever the
-  diffusivity. Diffusion acts on the surface only.
-- **So is the exhumation.** Rock from 8 km depth has risen to 3.9 km below the
-  surface at x = 48 km in all three, the horizons under the dome are bent
-  the same way, and the rock exposed at the surface came from 1.4 to 2.1 km in
+- **The fault is the same in all three runs.** The band dips 41° to 42° at
+  50 kyr and 34° to 36° at 100 kyr and reaches a plastic strain of 3.7
+  whatever the diffusivity. Diffusion acts on the surface only.
+- **So is the exhumation.** Rock from 8 km depth has risen to about 4 km
+  depth at x = 48 km in all three, the horizons under the dome are bent
+  the same way, and the rock exposed at the surface came from 1.4 to 2.3 km in
   every run. The fault sets how far the footwall rises; erosion does not add
   to it here.
 - **What changes is the topography.** At 1e-5 m²/s the relief stops growing
-  at 40 kyr because the crest is planed as fast as the fault lifts it and
+  at about 50 kyr because the crest is planed as fast as the fault lifts it and
   the debris fills the basin. The same exhumation then shows as a low dome
   rather than a sharp crest.
 
 That is why relief alone is a poor measure of what a fault has done, and why
-the horizons are worth drawing. Each run took 5 to 12 minutes on 6 threads.
+the horizons are worth drawing. Each run took 4 to 12 minutes on 6 threads.
 
 ### Exercise 2: change how small the elements may get
 
@@ -436,10 +452,10 @@ and the floor allows.
 
 | Run | `smallest_size` | Smallest MMG element | What you should see |
 |-----|-----------------|----------------------|---------------------|
-| No refinement | `1` | 1.2 km | A diffuse band 3 km wide that never sharpens; the run takes a tenth of the time |
-| Stock | `0.01` | 0.12 km | A sharp fault, about 1400 elements; 12 min |
-| Very fine | `0.001` | 0.04 km | The same mesh as stock, since the target rather than the floor limits refinement; 60 % more steps for nothing |
-| Very fine, stronger target | `0.001` with `mmg_metric_refine_coeff = 10` | 0.04 km | Now the band refines: 1630 elements, half again as many in the band |
+| No refinement | `1` | 1.2 km | A diffuse band 3 km wide that never sharpens; the run takes an eighth of the time |
+| Stock | `0.01` | 0.12 km | A sharp fault, about 1300 elements; 12 min |
+| Very fine | `0.001` | 0.04 km | The same mesh as stock, since the target rather than the floor limits refinement; 5 % more steps for nothing |
+| Very fine, stronger target | `0.001` with `mmg_metric_refine_coeff = 10` | 0.04 km | Now the band refines: 1770 elements, 70 % more in the band, and a second fault splays into the hanging wall |
 
 ![smallest_size 1, the stock 0.01, 0.001, and 0.001 with a doubled refinement coefficient at 100 kyr: plastic strain on the mesh for each](./img/tectonics/core-complex-smallest-size.png)
 
@@ -447,26 +463,31 @@ All four rows were run. Going up to `smallest_size = 1` costs resolution:
 the fault still forms in the same place and the surface still domes, but
 the band cannot be narrower than the elements it runs through, so the strain
 is spread over a 3 km wide zone and the fault never sharpens. The time step
-is seven times longer, since it follows the smallest element, and the whole
-run takes a tenth of the time.
+is on average seven times longer, since it follows the smallest element, and
+the whole run takes an eighth of the time.
 
 Going down to `0.001` alone buys nothing. The smallest element in the stock
-run is 0.15 km, above the 0.12 km floor, so the floor was not what stopped
+run is 0.17 km, above the 0.12 km floor, so the floor was not what stopped
 the refinement; the target was. Lowering the floor further cannot refine the
 band, and what it does change is the tiny-element trigger: squeezed elements
 may now shrink to a third of the size before a remesh repairs them, so the
-time step falls and the run needs 60 % more steps for the same result.
+time step can fall further. Here that costs only 5 % more steps, but it is a
+cost with nothing in return.
 
 Raising the target as well, `mmg_metric_refine_coeff = 10`, is what makes
-the lower floor useful. The band now holds 580 elements instead of 350, at a
-median edge of 0.29 km instead of 0.38, and the smallest element reaches
-0.10 km, still above the 0.04 km floor. The fault is drawn more sharply and
-the maximum plastic strain is a little higher, 4.1 against 3.9.
+the lower floor useful. The band now holds 560 elements instead of the stock
+run's 330, at a median edge of 0.29 km instead of 0.43, and the smallest element reaches
+0.12 km, still above the 0.04 km floor. The fault is drawn more sharply and
+the maximum plastic strain is a little higher, 4.1 against 3.7. The finer
+band also lets a second fault split off the main one into the hanging wall
+from about 50 kyr; by 100 kyr it reaches the surface at x = 45 km and opens
+a second, smaller basin there.
 
 ![The same four runs: final surface topography, then element count and maximum plastic strain against time, and the elements of each run at 100 kyr split by plastic strain](./img/tectonics/core-complex-smallest-size-series.png)
 
-The surface itself hardly notices: the three refined runs end with the same crest and
-basin to within 0.2 km, and only the unrefined run is lower and broader. The
+Away from that splay the surface hardly notices: the three refined runs end
+with the same crest and basin to within 0.2 km, and only the unrefined run is
+lower and broader. The
 lesson is that the two parameters work as a pair: the target asks for refinement
 where plastic strain accumulates, the floor caps how far it may go, and
 moving one without the other changes the cost of the run more than its
@@ -487,16 +508,19 @@ step.
 
 ## Part 2: Subduction
 
-:::caution Part 2 runs on code under review
+:::note Part 2 needs a recent master
 The example below, `examples/subduction.cfg`, and the phase-change engine it
-uses (`phase_change_option = 3` on a virtual-topology marker grid) are
-DynEarthSol [pull request #110](https://github.com/GeoFLAC/DynEarthSol/pull/110),
-open against `master` from the branch `feature/virtual-topology`. Until it
-merges, build from that branch. Parameter names could still change in review.
+uses (`phase_change_option = 3` on a virtual-topology marker grid) reached
+DynEarthSol `master` on 30 October 2026 with
+[pull request #110](https://github.com/GeoFLAC/DynEarthSol/pull/110). A clone
+or build from before that date does not have them: `git pull` and rebuild
+with `make ndims=2 usemmg=1` first. A quick check is
+`./dynearthsol2d --help | grep -c serpentinization`, which must print a
+number above zero.
 :::
 
 The example
-[`examples/subduction.cfg`](https://github.com/GeoFLAC/DynEarthSol/blob/feature/virtual-topology/examples/subduction.cfg)
+[`examples/subduction.cfg`](https://github.com/GeoFLAC/DynEarthSol/blob/master/examples/subduction.cfg)
 with its mesh file `poly-subduction.poly` pushes an oceanic plate under a
 fixed overriding plate. A short slab is already in the mantle at the start,
 so the plate interface exists from the first step. Two metamorphic reactions
@@ -627,13 +651,12 @@ rheology_type = elasto-visco-plastic
 num_materials = 10
 phase_change_option = 3
 mattype_oceanic_crust = 0
-mattype_continental_crust = 1
 mattype_mantle = 2
 mattype_sediment = 3
 mattype_serpentinite = 4
 mattype_eclogite = 5
 serpentinization_thickness = 5e3
-#                 [ ocean0   cont1    mant2   sed3    serp4   eclg5  ... ]
+#                 [ ocean0   (1)      mant2   sed3    serp4   eclg5  ... ]
 rho0            = [ 2880,    2800,    3300,   2400,   3200,   3480,  ... ]
 friction_angle0 = [ 30,      30,      30,     3,      3,      30,    ... ]
 friction_angle1 = [ 15,      15,      15,     3,      3,      15,    ... ]
@@ -667,11 +690,11 @@ Section by section, with what is new relative to Part 1:
 - **`[ic]`** seeds the interface with a single 30° plastic weak zone along
   the slab top, extending a few km into the mantle wedge. Values are
   fractions of the domain.
-- **`[mat]`** has ten material slots. Six are populated by the initial mesh
-  or the active rules: oceanic crust, continental crust (unused here),
-  mantle, sediment, serpentinite and eclogite. Four more, hydrous mantle,
-  sedimentary rock, metasediment and schist, are the targets of rules that
-  are switched off, so they stay empty. Each `mattype_*` tells the rule
+- **`[mat]`** has ten material slots. Five are populated by the initial mesh
+  or the active rules: oceanic crust, mantle, sediment, serpentinite and
+  eclogite. Slot 1 is kept free for continental crust, and four more, hydrous
+  mantle, sedimentary rock, metasediment and schist, are the targets of rules
+  that are switched off, so they stay empty. Each `mattype_*` tells the rule
   engine which slot plays which role.
 
 #### The phase-change rules
@@ -682,7 +705,7 @@ materials; the run stops at input otherwise.
 
 | Transition | Rule | Switch |
 |---|---|---|
-| Mantle → serpentinite | In the antigorite pressure–temperature field (Ulmer & Trommsdorff 1995), shallower than 150 km, and with a grid cell within `serpentinization_thickness` below the marker that is more than half oceanic crust or sediment | `has_serpentinization` (on) |
+| Mantle → serpentinite | In the antigorite pressure–temperature field (Ulmer & Trommsdorff 1995), shallower than `serpentinization_max_depth` (150 km), and with a grid cell within `serpentinization_thickness` below the marker whose oceanic crust and sediment share exceeds `wet_crust_fraction_threshold` (one half) | `has_serpentinization` (on) |
 | Serpentinite → mantle | Above 550 °C and outside the antigorite field | `has_serpentinization` (on) |
 | Oceanic crust → eclogite | Past the basalt–eclogite boundary (Hacker 2003); one way | `has_eclogitization` (on) |
 | Hydrous mantle → mantle | Chlorite-out boundary (Grove et al. 2009) | `has_hydrous_mantle_dehydration` (off) |
@@ -724,8 +747,7 @@ cd DynEarthSol/examples
 OMP_NUM_THREADS=6 ../dynearthsol2d subduction.cfg
 ```
 
-The full run takes about 23 minutes on 6 threads of a recent laptop, two to
-three times that on an older 4-core machine, with the mesh growing from
+The full run takes about 22 minutes on 6 threads, with the mesh growing from
 about 2600 to 4500 elements. Output goes to `model-subduction.save.*`; the
 step counter in the log advances about a million steps per 0.9 Myr.
 
@@ -750,18 +772,18 @@ Open `model-subduction.*.vtu` in ParaView. Fields to look at:
 - **viscosity**, the cold slab against the weak wedge
 - **temperature**, the slab's thermal anomaly and the heated wedge corner
 
-![Material with velocity arrows (left) and viscosity with isotherms (right) at 0.5, 1, 2.5 and 5 Myr, cropped to the slab: the tip sinks from 49 to 126 km depth, serpentinite (purple) lines the slab top and fills the wedge corner, eclogite (red) grows from the slab tip](./img/tectonics/subduction-evolution.png)
+![Material with velocity arrows (left) and viscosity with isotherms (right) at 0.5, 1, 2.5 and 5 Myr, cropped to the slab: the tip sinks from 48 to 124 km depth, serpentinite (purple) lines the slab top and fills the wedge corner, eclogite (red) grows from the slab tip](./img/tectonics/subduction-evolution.png)
 
 Things to look for as the run proceeds (the figure is the reference run):
 
 - **Serpentinite from the first frame.** The slab is already in place, so
-  mantle just above its top converts at once: about 450 markers by 0.5 Myr,
-  3100 by 5 Myr. On the viscosity panels this layer sits at the 10¹⁹ Pa s
+  mantle just above its top converts at once: about 370 markers by 0.5 Myr,
+  3200 by 5 Myr. On the viscosity panels this layer sits at the 10¹⁹ Pa s
   floor and is the weakest material in the model.
 - **Eclogite starts at the slab tip.** A few dozen markers have converted by
-  0.5 Myr, where the tip sits near 50 km; the count grows to about 400 by
+  0.5 Myr, where the tip sits near 50 km; the count grows to about 380 by
   5 Myr, when the deepest 30 km of the slab is eclogite.
-- **The slab tip** reaches 50 km at 0.5 Myr, 90 km at 2.5 Myr and about 125
+- **The slab tip** reaches 50 km at 0.5 Myr, 85 km at 2.5 Myr and about 125
   km at 5 Myr, keeping a dip of 30–35° on its way down. The cold core stays
   at the 10²⁴ Pa s viscosity cap and drags the isotherms down with it.
 - **The wedge corner serpentinizes wholesale.** The mantle between the
@@ -773,32 +795,33 @@ Things to look for as the run proceeds (the figure is the reference run):
   down into it, while the incoming plate at the left wall keeps its three
   layers thanks to the restored wall.
 
-{/* Numbers are from the PR #110 head run pr110-ref (analysis/examples/376). */}
+{/* Numbers are from the DynEarthSol master (cce59ab5b) run subd-master-ref (analysis/examples/376, 379, 384). */}
 
 #### How the mesh keeps up
 
-![Mesh size and remeshing of the reference run: elements grow from 2603 to 4625 over 206 remeshes, split by plastic strain with each remesh marked by its trigger, and the cumulative remesh count by trigger](./img/tectonics/subduction-remeshing.png)
+![Mesh size and remeshing of the reference run: elements grow from 2603 to 4466 over 200 remeshes, split by plastic strain with each remesh marked by its trigger, and the cumulative remesh count by trigger](./img/tectonics/subduction-remeshing.png)
 
-The mesh nearly doubles over the run, and the left panel shows where the
-new elements go. Elements with no plastic strain fall from 2600 to about
-1900 as the deforming band widens into them, and they stay coarse at a
-median of 4.7 km. Fully softened elements, those past `pls1 = 0.1`, grow from
-none to about 2100, 44 % of the mesh, at a median size of 2.0 km against the
+The mesh grows by two thirds over the run, and the left panel shows where
+the new elements go. Elements with no plastic strain fall from 2500 to about
+2000 as the deforming band widens into them, and they stay coarse at a
+median of 4.5 km. Fully softened elements, those past `pls1 = 0.1`, grow from
+none to about 1900, 42 % of the mesh, at a median size of 2.1 km against the
 6 km resolution and the 1.5 km MMG floor. That is the MMG metric at work:
 `mmg_metric_refine_coeff` shrinks the target size where plastic strain has
 accumulated, along the plate interface and in the wedge, and nowhere else.
 
-The 206 remeshes have three triggers, each checked every
+The 200 remeshes have three triggers, each checked every
 `quality_check_step_interval` steps. A **tiny element** is one whose area has
 dropped below `smallest_size` times the resolution squared. **Low quality** is
 an element quality below `min_quality`, 0.2 here. **Bottom drift** is a bottom
 node more than `max_boundary_distortion` times `resolution`, 6 km here, from
 the 160 km base. The first two are the ordinary triggers and fire throughout.
-Bottom drift dominates the first 2 Myr while the slab tip sinks through the
-lower mantle and the Winkler bottom adjusts, then fades. Each remesh moves
+Bottom drift belongs to the first million years, 26 of its 28 remeshes, while
+the slab tip sinks through the lower mantle and the Winkler bottom adjusts;
+after that it stops. Each remesh moves
 the element count by only a few tens, because the conservative MMG mode
 freezes elements that are not yielding, distorted or tiny. Remeshing takes
-under 1 % of the wall time; the phase changes take 4 %.
+under 1 % of the wall time; the phase changes take 5 %.
 
 ### Exercise 3: change the thickness of the serpentinite layer
 
@@ -808,74 +831,98 @@ is the rule switched off.
 
 | Run | Thickness | Change | What you should see |
 |-----|-----------|--------|---------------------|
-| None | 0 km | `has_serpentinization = no` | The interface locks. The slab tip stalls near 80 km from 2 Myr on and the slab necks off; both plates thicken and buckle, relief reaches ±7 km, and the run ends at 3.45 Myr in a remeshing failure at the inflow wall (see the troubleshooting case below) |
-| Reference | 5 km | `serpentinization_thickness = 5e3` (one cell) | Steady subduction to 125 km at 5 Myr; trench 6 km deep at 2 Myr, recovering to 4 km; about 3100 serpentinite and 400 eclogite markers |
-| Thick | 10 km | `serpentinization_thickness = 10e3` (two cells) | Half again as much serpentinite (4600 markers) in a wedge body that reaches further down the slab; trench 1.5 km shallower throughout; slab tip 120 km; 40 % fewer eclogite markers |
+| None | 0 km | `has_serpentinization = no` | The interface locks. The slab tip falls behind from 2 Myr on and reaches only 100 km at 5 Myr, the slab necks and tears below the overriding plate, and both plates thicken and buckle: the trench reaches 9 km at 2.5 Myr, 3 km deeper than the reference |
+| Reference | 5 km | `serpentinization_thickness = 5e3` (one cell) | Steady subduction to 125 km at 5 Myr; trench deepens to 6.5 km by 3 Myr and recovers to 4 km; about 3200 serpentinite and 380 eclogite markers |
+| Thick | 10 km | `serpentinization_thickness = 10e3` (two cells) | Half again as much serpentinite (4600 markers) in a wedge body that reaches further down the slab; trench about 1 km shallower on average, with less swing; slab tip 120 km; a quarter fewer eclogite markers |
 
-![Serpentinite layer none, 5 km and 10 km across the whole 400 km domain, the 5 km and 10 km runs at 5 Myr and the run without serpentinite at 3.4 Myr where it stopped: material, phase-change markers and velocity arrows per run, then slab-tip depth, trench depth and marker counts against time to 5 Myr](./img/tectonics/subduction-serp-thickness.png)
+![Serpentinite layer none, 5 km and 10 km across the whole 400 km domain at 5 Myr: material, phase-change markers and velocity arrows per run, then slab-tip depth, trench depth and marker counts against time](./img/tectonics/subduction-serp-thickness.png)
 
 What the comparison shows:
 
 - **The weak layer is what makes this model subduct.** Without it the
   sediment seed alone cannot keep the interface slipping; convergence goes
-  into thickening and buckling the plates, the slab stops descending and tears
-  below the overriding plate, and the mesh at the thickened inflow wall
-  eventually defeats the remesher. The failure message, `[DES exit 41] mesh
-  generation` after an MMG normal-vector error, is the symptom, not the cause.
+  into thickening and buckling the plates, the slab falls behind and tears
+  below the overriding plate, and the velocity arrows show the whole
+  overriding plate being pushed instead of the slab sliding under it. Such a
+  run also works the mesh hard: the thickened plates load the Winkler bottom
+  unevenly and most of its remeshes are bottom-drift triggers, and an earlier
+  build of this case died in a remeshing failure at 3.45 Myr.
 - **A thicker layer lubricates more.** With two cells the trench is shallower
-  by about 1.5 km for the whole run, the forearc high is lower, and the
-  wedge-corner body is larger. The slab tip ends 6 km shallower.
-- **Eclogite responds indirectly.** The 10 km run has 245 eclogite markers at
-  5 Myr against 414 in the reference. The rule did not change; the thicker
-  weak layer keeps the slab crust shallower and warmer where it would
+  by about 1 km on average and swings less, the forearc high is lower, and
+  the wedge-corner body is larger. The slab tip ends 4 km shallower.
+- **Eclogite responds indirectly.** The 10 km run has about 300 eclogite
+  markers at 5 Myr against 380 in the reference. The rule did not change; the
+  thicker weak layer keeps the slab crust shallower and warmer where it would
   otherwise cross the reaction boundary.
-- **Time step and cost barely change**: 5.7 to 5.8 million steps for all
-  three, about 23 minutes alone on 6 threads.
+- **Time step and cost barely change**: 5.7 to 5.9 million steps for the two
+  subducting runs, about 22 minutes alone on 6 threads; the locked run takes
+  4.3 million steps and 17 minutes because its plates move more slowly.
 
-No run was repeated with a tiny perturbation, so the size of the chaotic
-scatter is unknown. The locking of the 0 km case is robust, since it starts
-by 1 Myr and grows; the 1.5 km trench difference between 5 and 10 km should
-be read as suggestive until a perturbed twin bounds it.
+The reference and the 10 km run were each made twice, on the pull request's
+branch and on `master` after the merge, with the same configuration. The
+pairs agree on everything above, but differ in detail: the 10 km trench ended
+1 km shallower than the reference in one pair and 0.5 km deeper in the other,
+and the eclogite deficit was 40 % in one and 22 % in the other. That is the
+chaotic scatter of a remeshing model. Read differences of that size as
+suggestive, and the locking of the 0 km case, which starts by 1 Myr and grows,
+as robust.
 
-### Troubleshooting case: carrying on the run that locked up
+### Restart case: stop the convergence and see what carries on
 
-The 0 km run above stops at 3.45 Myr with
-
-```
-[DES exit 41] mesh generation
-```
-
-after MMG reports that it cannot compute a boundary normal at a tiny element
-on the inflow wall, 96 km deep. The log before the failure shows what led to
-it: of the last 40 remeshes, 34 were triggered by bottom nodes drifting more
-than `max_boundary_distortion × resolution` = 6 km from the 160 km base,
-because the stacked plates load the Winkler bottom unevenly. Each of those
-remeshes flattens the base back by up to 6 km in one go, and the mesh near the
-wall degrades a little further each time until MMG gives up.
-
-The run can be carried on from its last good checkpoint, frame 60 at 3.0 Myr,
-with the base corrected in smaller steps:
+A run can be continued from any checkpoint with changed settings. DES writes a
+checkpoint every `checkpoint_frame_interval` frames, 10 by default, so the
+reference run leaves its last one at frame 100, 5 Myr. The example is already
+set up to restart from it; switch the restart on, give the run another two
+million years and stop the push:
 
 ```cfg
 is_restarting = yes
 restarting_from_modelname = model-subduction
-restarting_from_frame = 60
-max_boundary_distortion = 0.5     # 3 km instead of 6
+restarting_from_frame = 100
+max_time_in_yr = 7e6
+vbc_val_x0 = 0                    # the left plate is held still
 ```
 
-With that one change the restart runs through to 5 Myr, remeshing 58 times in
-the remaining 2 Myr, 51 of them still bottom-drift triggers, but each
-correcting half as much. The physics does not change: the slab stays stalled
-near 80 km, the trench stays near 7 km deep and the plates keep buckling.
-Only the mesh survives.
+The restart runs in the same directory as the parent, reads its frame 100 and
+checkpoint, and writes frames 100 to 140 of its own; the extra two million
+years take about two minutes. The question it answers is which parts of the model were
+driven by the push and which carry on by themselves once convergence stops, as
+after a collision or a plate reorganisation.
 
-![The restarted run at 5 Myr, and trench depth and remesh count of the run as shipped against its restart with the halved boundary-distortion limit](./img/tectonics/subduction-restart-fix.png)
+![The reference run at 5 Myr and its restart at 7 Myr with the left wall held still: material with velocity arrows and viscosity with isotherms, then trench depth and forearc high, slab-tip depth, deep-slab temperature and marker counts from 3 to 7 Myr with the restart marked](./img/tectonics/subduction-stop-convergence.png)
+
+- **The slab stops.** Its tip sank 13 km per million years while pushed and
+  less than 1 km in the two million years after. There is no slab pull to
+  speak of here: the plate it hangs from is held at the wall, and sinking
+  further would mean stretching a plate at the 10²⁴ Pa s viscosity cap. This
+  model subducts because it is pushed. The peak speed in the domain falls from
+  19 to 1 cm/yr.
+- **The surface rebounds first, then smooths.** Within the first million
+  years the trench shallows from 3.8 to 1.8 km and the forearc high rises from
+  2.6 to 5.3 km; the whole overriding plate between x = 100 and 300 km comes
+  up by 1.5 to 2.5 km. That is isostatic rebound: the shear on the plate
+  interface that was holding the overriding plate down is gone. After that
+  the levels hardly move, the high eases back to 4.6 km, and surface diffusion
+  takes over: at `surface_diffusivity = 5e-7` it reaches √(κt) ≈ 6 km in two
+  million years, enough to cut the root-mean-square slope between x = 60 and
+  340 km by a third while the overall relief stays near 6 km. Diffusion rounds
+  the slopes; it does not remove the relief. The incoming plate next to the
+  held wall sags by up to 6 km, a wall effect to be aware of.
+- **The slab warms and reacts until it runs out of crust.** Below 60 km the
+  slab's mean temperature rises by 50 °C over the two million years, because
+  nothing cold arrives any more. Eclogite is the one thing that speeds up: 381
+  markers at 5 Myr become 588 by 5.75 Myr as the stationary crust heats across
+  the basalt–eclogite boundary and the eclogite front climbs from 87 to 71 km
+  depth. Then it stops, at 610 markers by 7 Myr: the crust above 71 km is too
+  shallow to cross the boundary however warm it gets, so a stationary slab
+  saturates. Serpentinite grows by 190 markers in the first half million
+  years, then stops too: its rule is geometric and needs new mantle to be
+  brought over crust.
 
 Two cautions. Pick a restart frame that is not a remesh step, since a
-checkpoint written on one is not bit-recoverable. And a single restart that
-survives does not prove the parameter was the cure, because a restart is a new
-realization of a chaotic run; a control restart with the original setting
-would be needed for that.
+checkpoint written on one is not bit-recoverable. And a restart is a new
+realization of a chaotic run, so compare it with the parent's trend, as the
+bottom row does, rather than with a single frame.
 
 Change one parameter at a time, and keep a log of what you changed.
 
@@ -886,15 +933,14 @@ others are the usual causes.
 
 | Symptom | Part | Cause and fix |
 |---------|------|---------------|
-| `[DES exit 41] mesh generation` after an MMG error | both | MMG could not rebuild the mesh, usually at a boundary that a storm of remeshes has degraded. Read the triggers of the last remeshes in the log; if one boundary dominates, lower `max_boundary_distortion` so it is corrected in smaller steps (observed, see the troubleshooting case) |
 | Strain stays diffuse, no single fault | 1 | The band cannot be narrower than its elements: `smallest_size` too large (observed at 1, Exercise 2) or `resolution` too coarse. Or softening is too slow: `pls1` large, or `weakzone_plstrain` below `pls1` so the seed is not pre-softened |
 | Fault dies and a new one forms | 1 | Slow softening or a thick layer favours several short-lived faults over one long-lived one; lower `pls1` or thin the layer (Lavier, Buck & Poliakov 2000) |
 | Time step shrinks and the run slows | both | `dt` follows the smallest element; the mesh has refined more than you want. Raise `smallest_size` or lower `mmg_metric_refine_coeff` (observed: 0.017 yr at the stock 0.01 against 0.11 yr at 1) |
 | Stops at input with a `mattype_*` message | 2 | Each active rule needs its source and target set to distinct, valid materials; check the `mattype_*` lines against `num_materials` |
 | Stops at input: `serpentinization_thickness` too small | 2 | It must be at least one grid cell, `resolution × vt_size` |
 | `remeshing_option 13` refused | 2 | Restored side walls need an MMG build: `make ndims=2 usemmg=1` |
-| Serpentinite appears far from the slab | 2 | The rule has no temperature gate below 150 km; a slab bend can make a whole grid column crust-dominant. Set `serpentinization_crust_margin >= 0` to confine it |
-| Slab stalls, plates thicken, then `[DES exit 41] mesh generation` | 2 | The interface is too strong: this is the `has_serpentinization = no` case of Exercise 3. Check `mattype_serpentinite` is set and the sediment and serpentinite friction angles are low. To carry such a run on anyway, restart from the last checkpoint with `max_boundary_distortion` halved to 0.5 |
+| Serpentinite appears far from the slab | 2 | The rule has no temperature gate below 150 km; a slab bend can make a whole grid column crust-dominant. Set `serpentinization_wet_crust_margin >= 0` to confine it |
+| Slab stalls, plates thicken and buckle | 2 | The interface is too strong: this is the `has_serpentinization = no` case of Exercise 3. Check `mattype_serpentinite` is set and the sediment and serpentinite friction angles are low. Such a run also piles up bottom-drift remeshes and can end in `[DES exit 41]`; to carry it on, restart from the last checkpoint with `max_boundary_distortion` halved to 0.5 |
 
 ## Next Steps
 
