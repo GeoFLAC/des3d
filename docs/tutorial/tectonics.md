@@ -933,7 +933,6 @@ others are the usual causes.
 
 | Symptom | Part | Cause and fix |
 |---------|------|---------------|
-| `[DES exit 41] mesh generation` after an MMG error | both | MMG could not rebuild the mesh, usually at a boundary that a storm of remeshes has degraded. Read the triggers of the last remeshes in the log; if one boundary dominates, lower `max_boundary_distortion` so it is corrected in smaller steps (observed, see the troubleshooting case) |
 | Strain stays diffuse, no single fault | 1 | The band cannot be narrower than its elements: `smallest_size` too large (observed at 1, Exercise 2) or `resolution` too coarse. Or softening is too slow: `pls1` large, or `weakzone_plstrain` below `pls1` so the seed is not pre-softened |
 | Fault dies and a new one forms | 1 | Slow softening or a thick layer favours several short-lived faults over one long-lived one; lower `pls1` or thin the layer (Lavier, Buck & Poliakov 2000) |
 | Time step shrinks and the run slows | both | `dt` follows the smallest element; the mesh has refined more than you want. Raise `smallest_size` or lower `mmg_metric_refine_coeff` (observed: 0.017 yr at the stock 0.01 against 0.11 yr at 1) |
