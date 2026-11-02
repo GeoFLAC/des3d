@@ -58,13 +58,11 @@ Each part has the same four steps, geometry, configuration, run, and what to
 look for, followed by exercises that change one parameter at a time.
 
 :::tip Workshop package
-For a hands-on class, download the <a href={useBaseUrl('/downloads/des-tectonics/DES-Tectonics-Tutorial.zip')}>tutorial package</a>:
-a Jupyter notebook that plots every figure of this page from DES output, the
-configs of both parts and all exercise variants behind a one-command launcher
-(`./run.sh <case>`), and trimmed reference results of every run so the plots
-work before, or without, your own runs. Its
-`resources/SETUP.md` has a shorter build recipe than the pages linked below,
-and its README has the class schedule.
+For a hands-on class, download the <a href={useBaseUrl('/downloads/des-tectonics/DES-Tectonics-Tutorial.zip')}>tutorial package</a> (12 MB).
+It holds a Jupyter notebook that draws every figure of this page, the configs
+of both parts and all exercises, a one-line launcher (`./run.sh <case>`), and
+reference results so the plots work before your own runs finish. Start with its
+README; `resources/SETUP.md` has a short build recipe.
 :::
 
 ## Prerequisites
