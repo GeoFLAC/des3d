@@ -60,7 +60,7 @@ look for, followed by exercises that change one parameter at a time.
 :::tip Workshop package
 For a hands-on class, download the <a href={useBaseUrl('/downloads/des-tectonics/DES-Tectonics-Tutorial.zip')}>tutorial package</a> (12 MB).
 It holds a Jupyter notebook that draws every figure of this page, the configs
-of both parts and all exercises, a one-line launcher (`./run.sh <case>`), and
+of both parts and all exercises with the shell commands to run them, and
 reference results so the plots work before your own runs finish. Start with its
 README; `resources/SETUP.md` has a short build recipe.
 :::
