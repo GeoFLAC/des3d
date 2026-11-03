@@ -92,30 +92,36 @@ Installing locally for DynEarthSol integration...
 
 ### Build DynEarthSol with GoSPL support
 
-1. Set `usegospl = 1` in Makefile.
-2. Set `GOSPL_EXT_DIR` if `gospl_extensions` isn't at the default
-   `$(HOME)/opt/gospl_extensions`: e.g., `GOSPL_EXT_DIR = $(HOME)/opt/gospl_extensions`.
-   Edit it in the Makefile, pass it on the `make` command line, or `export` it
-   in your shell — all three work.
-3. Check `CONDA_ENV_PATH`, the gospl environment. It defaults to
-   `$(HOME)/miniforge3/envs/gospl`, where the Miniforge install above puts it;
-   set it the same way (Makefile, command line, or `export`) only if your
-   environment is elsewhere.
-4. Set `ndims = 3`, which is **required** for the GoSPL coupling.
-5. Set `usemmg = 1`, which is **recommended**: MMG mesh optimization during
-   remeshing (see [Adaptive mesh refinement with MMG](./usingmmg)).
-6. Build with any conda environment active or none; it doesn't matter unless
+The build itself just needs `usegospl=1` (plus `ndims=3` and `usemmg=1`,
+below) — set the two paths first, if yours aren't at their defaults, so the
+build command stays copy-pasteable either way:
+
+1. `GOSPL_EXT_DIR` defaults to `$(HOME)/opt/gospl_extensions`. If
+   `gospl_extensions` isn't there, `export` the real path once, in the same
+   shell you'll build and run in:
+   ```bash
+   export GOSPL_EXT_DIR=/path/to/gospl_extensions
+   ```
+2. `CONDA_ENV_PATH` defaults to `$(HOME)/miniforge3/envs/gospl`, where the
+   Miniforge install above puts it. If your `gospl` environment is
+   elsewhere, `export` it the same way:
+   ```bash
+   export CONDA_ENV_PATH=/path/to/envs/gospl
+   ```
+   Either variable can also be edited directly in the Makefile instead —
+   but exporting means the build command below never needs editing, whether
+   your paths are the defaults or not: `make` reads an exported variable the
+   same way it reads one passed on its own command line.
+3. Build with any conda environment active or none; it doesn't matter unless
    that environment has its own Boost or compilers ahead of the system ones.
-   `make config` prints what was actually picked up. All five options above,
-   as command-line arguments instead of editing the Makefile:
+   `make config` prints what was actually picked up:
    ```bash
    make clean
-   make -j4 usegospl=1 ndims=3 usemmg=1 \
-     GOSPL_EXT_DIR=$HOME/opt/gospl_extensions \
-     CONDA_ENV_PATH=$HOME/miniforge3/envs/gospl
+   make -j4 usegospl=1 ndims=3 usemmg=1
    ```
-   Drop `GOSPL_EXT_DIR` and/or `CONDA_ENV_PATH` from the command line if
-   your installs already sit at those defaults.
+   `ndims=3` is **required** for the GoSPL coupling; `usemmg=1` is
+   **recommended** — MMG mesh optimization during remeshing (see
+   [Adaptive mesh refinement with MMG](./usingmmg)).
 
 :::tip This builds whatever commit is checked out, not a specific release
 A plain clone's `master` branch is typically ahead of the latest tagged release (e.g.
