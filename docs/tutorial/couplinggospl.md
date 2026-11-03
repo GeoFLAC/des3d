@@ -13,10 +13,10 @@ This tutorial explains how to run DynEarthSol coupled with **GoSPL** (Global Sca
 ## What is GoSPL?
 
 [GoSPL](https://github.com/Geodels/gospl) is a Python-based landscape evolution model that simulates:
-- River incision and sediment transport
-- Hillslope diffusion
-- Marine deposition
-- Flexural isostasy
+- Hillslope diffusion — DES already does this natively (`surface_process_option = 1`, `surface_diffusivity`); see e.g. [Tectonic rifting and subduction](./tectonics)
+- River incision and sediment transport — new to DES, added through the coupling
+- Marine deposition — also added through the coupling
+- Flexural isostasy — GoSPL's own simplified stand-in for tectonics; coupled with DES, much more sophisticated tectonic motions are available instead, through DES's own mechanical solver
 
 When coupled with DynEarthSol, you can study how tectonic processes (uplift, extension, compression) interact with surface erosion over geological timescales.
 
