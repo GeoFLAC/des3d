@@ -4,6 +4,8 @@ title: Coupling with GoSPL
 description: Learn how to couple DynEarthSol with GoSPL for landscape evolution modeling
 ---
 
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # Coupling DynEarthSol with GoSPL
 
 This tutorial explains how to run DynEarthSol coupled with **GoSPL** (Global Scalable Paleo Landscape Evolution) to simulate the interaction between tectonic deformation and surface processes like erosion and sediment transport.
@@ -452,6 +454,43 @@ names exactly what it was built from, e.g.
 past `v2.0.2`; see [Provenance](../usage/run#provenance).
 :::
 
+## Visualizing results
+
+A coupled run leaves two independent sets of output, in two different
+formats, in two different places.
+
+### DES3D's own output
+
+Written to the working directory as usual. Convert it with `2vtk.py` and open
+the result in ParaView or VisIt — see
+[Visualizing outputs](../usage/visualize) for the full workflow.
+
+### GoSPL's own output
+
+GoSPL writes its own time series directly in a ParaView-readable format — no
+conversion step needed. Inside the directory named by the YAML's `output:
+dir` (`coupling_test` in the template above), you'll find `gospl.xdmf` plus
+two subdirectories, `h5/` and `xmf/`, that hold the data the `.xdmf` file
+indexes. In ParaView: **File → Open**, pick `gospl.xdmf`, **Apply**.
+
+To see both side by side, as in the [comparison figure
+above](#exercise-1-run-the-reference-case), open DES3D's converted output and
+GoSPL's `gospl.xdmf` in the same ParaView session.
+
+### A starter ParaView state
+
+Rather than building a scene from a blank canvas, download a bundled
+ParaView state file with a GoSPL visualization — elevation and
+erosion/deposition color maps, representations and camera already set up:
+
+<a href={useBaseUrl('/downloads/des-gospl/gospl-visualization.pvsm')}>gospl-visualization.pvsm</a>
+
+In ParaView: **File → Load State**, pick the downloaded file. The state
+remembers the machine it was saved on, so ParaView will ask you to locate its
+missing data source the first time you load it — point it at your own run's
+`gospl.xdmf`, and the rest of the visualization (colors, opacity, camera)
+applies automatically.
+
 ## Worked example: a Gaussian weak zone rift
 
 The [`gospl_driver/examples`](https://github.com/GeoFLAC/DynEarthSol/tree/master/gospl_driver/examples)
@@ -500,12 +539,15 @@ Things to look for as the run proceeds:
 - channels organizing down those flanks as the relief grows;
 - sediment accumulating in the axial low.
 
-### Exercise 1.1: adjust the problem size
+### Exercise 2: adjust the problem size
 
 If the progress of the example model is found to be too slow on your computing environment, consider reducing the problem size.
-To advance significantly in model time over a reasonable amount of wall clock time, it is recommended to reduce the `y` dimension, originally 80 km, down to 10 km or so, keeping everything else the same. The Gaussian geometry of the weak zone will be lost but the action of the coupled physics will be still visible. 
+To advance significantly in model time over a reasonable amount of wall clock time, it is recommended to reduce the `y` dimension, originally 80 km, down to 10 km or so, keeping everything else the same. The Gaussian geometry of the weak zone will be lost but the action of the coupled physics will be still visible.
 
-### Exercise 2: vary the erodibility
+The compression case below builds on this reduced-size setup, so keep the
+`.cfg` with `ylength = 10e3` (or whatever size worked for you) around.
+
+### Exercise 3: vary the erodibility
 
 Change one line in the YAML, `spl: K`, and rerun. Nothing needs rebuilding.
 
@@ -520,6 +562,45 @@ As an optional second experiment, set `gospl_coupling_frequency = 50` in the
 was too coarse.
 
 Change one parameter at a time, and keep a log of what you changed.
+
+### Exercise 4: a compression case
+
+Everything so far has been extensional. Starting from the reduced-size `.cfg`
+of [Exercise 2](#exercise-2-adjust-the-problem-size) — so the run stays fast
+— copy it to a new file and flip the sign of the two boundary velocities:
+
+```bash
+cp gaussian-weakzone-3d-with-gospl.cfg compression-3d-with-gospl.cfg
+```
+
+```diff title="compression-3d-with-gospl.cfg"
+ [mesh]
+ xlength = 100e3
+-ylength = 80e3        # reduced to 10e3 in Exercise 2
++ylength = 10e3
+ zlength = 10e3
+ ...
+ [bc]
+-vbc_val_x0 = -4.756468797564688e-10  # 1.5 cm/yr, extension
+-vbc_val_x1 =  4.756468797564688e-10  # 1.5 cm/yr, extension
++vbc_val_x0 =  4.756468797564688e-10  # 1.5 cm/yr, convergence
++vbc_val_x1 = -4.756468797564688e-10  # 1.5 cm/yr, convergence
+```
+
+That's the whole change: both walls now move inward at 1.5 cm/yr (3 cm/yr of
+total convergence) instead of apart, everything else — including the dipping
+weak zone — stays as it was. Run it the same way as Exercise 1, pointing at
+the new file:
+
+```bash
+../../dynearthsol-gospl ./compression-3d-with-gospl.cfg
+```
+
+Where the reference case opens a rift valley, this one should raise a
+shortening welt along the weak zone instead, with GoSPL now eroding the
+rising relief and depositing in the lows beside it rather than filling an
+axial graben. See [Visualizing results](#visualizing-results) above to watch
+the two cases side by side.
 
 
 ## Troubleshooting
