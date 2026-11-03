@@ -67,9 +67,7 @@ weakzone_plstrain = 1
   since z = 0 is the surface. In 2D the world must have a `cross section`, and
   DES's x is the distance along it; in 3D, DES's x and y are the world's map
   coordinates and no cross section is needed.
-- **When.** Only while the model is initialized. The world is then released; a
-  restart reads the saved fields and never opens it, except to re-seed the weak
-  zone with `is_restarting_weakzone = yes`.
+- **When.** Only while the model is initialized; the world is then released.
 - **Remeshing.** Materials ride on the markers, and temperature and plastic
   strain are carried over as usual. With MMG, DES refines the weak zone at
   t = 0, so a GWB fault also gets a finer initial mesh.
@@ -216,8 +214,7 @@ DynEarthSol's `GWB build` workflow builds GWB at a pinned commit, builds DES
 in 2D and 3D with `usegwb=1`, and runs `tests/functional/gwb/check_gwb.py`. The
 script compares frame 0 of a 2D and a 3D world with GWB's own `gwb-dat`
 application point by point: every node temperature, every marker's material
-and every weak element. It also checks the error exits above and a restart
-from a mid-run frame.
+and every weak element. It also checks the error exits above.
 
 ## References
 
