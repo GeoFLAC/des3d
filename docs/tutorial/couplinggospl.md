@@ -183,24 +183,6 @@ One coupling event, between the previous event at $t_\mathrm{prev}$ and the
 current one at $t_\mathrm{now}$ (`gospl_coupling_frequency` DES steps apart in
 `steps` mode):
 
-```
- DES time    t_prev   ────────── DES steps ──────────    t_now
-               │                                           │
-               │◄────────── Δt = t_now − t_prev ──────────►│
-               │                                           │
-          coord_prev                                   coord_now
-               └───── Δcoord = coord_now − coord_prev ─────┘
-
- At t_now:
-
-   DES ───────── v̄ = Δcoord / Δt  (vx, vy, vz) ─────────►  GoSPL
-                                                             │  advances Δt:
-                                                             │  advection, uplift,
-                                                             │  incision, diffusion
-   DES ◄──── Δh (erosion + diffusion, uplift removed) ───────┘
-
-   DES then sets   z_surface ← z_surface + Δh
-```
 ![DES3D–goSPL coupling loop](./img/gospl/coupling-loop.svg)
 
 DES3D and GoSPL exchange data in a way inspired by the [**ASPECT-FastScape simple
