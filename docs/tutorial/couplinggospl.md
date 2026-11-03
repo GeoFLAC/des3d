@@ -31,29 +31,10 @@ Before starting, ensure you have:
   `gospl_driver` directory), which needs a C++ toolchain and `make`
 
 :::tip Skip the setup with Docker
-`GOSPL=1 ./build.sh` builds an image with the conda environment,
-`gospl_extensions` and a 3D executable already inside. If you use it, jump to
-[Run with Docker](#run-with-docker).
-
-On WSL, if the script fails with `docker: command not found`, install Docker
-Desktop on Windows, then enable it for WSL: Settings → Resources → WSL
-Integration → check "Enable integration with my default WSL distro".
-
-If instead you see
-
-```
-ERROR: permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock
-```
-
-add yourself to the `docker` group:
-
-```bash
-sudo usermod -aG docker $USER
-```
-
-then restart a new shell to take effect. When starting a plain new shell in the same
-session isn't enough, you need to restart wsl (`wsl --shutdown`
-from Windows, then reopen the terminal).
+Everything from here through [Build DynEarthSol with GoSPL
+support](#build-dynearthsol-with-gospl-support) can be skipped with one
+Docker image — see [Running with Docker](#running-with-docker) at the end of
+this page.
 :::
 
 ### Install GoSPL
@@ -439,35 +420,6 @@ lines are filtered out; its `+++ Output` lines, and any errors or
 instantaneous-velocity-fallback notices, are not and still print as they
 happen.
 
-### Run with Docker
-
-`GOSPL=1 ./build.sh` in the DynEarthSol repository root builds the image
-`dynearthsol/gcc-11-gospl`. It has the `gospl` conda environment (activated in
-every login shell), `gospl_extensions` and a 3D `dynearthsol3d` already inside,
-so none of the setup above is needed on the host. Mount a directory for your
-case and run from it:
-
-```bash
-docker run --rm -it -v /path/to/case:/home/human/case dynearthsol/gcc-11-gospl bash
-cd ~/case
-cp ~/DynEarthSol/gospl_driver/examples/* .
-~/DynEarthSol/dynearthsol-gospl ./gaussian-weakzone-3d-with-gospl.cfg
-```
-
-The `cp` above seeds the mounted directory with the bundled example — copy in
-your own `.cfg` and GoSPL YAML instead once you have one.
-
-:::tip This builds whatever commit is checked out, not a specific release
-The Dockerfile copies your local working tree as-is; it doesn't pin or fetch a
-specific DynEarthSol version. A plain clone's `master` branch is typically ahead
-of the latest tagged release (e.g. `v2.0.2`), not that release itself. For a
-specific, reproducible version, check out its tag on the host before running
-`./build.sh`: `git checkout v2.0.2`. The running binary's own startup output
-names exactly what it was built from, e.g.
-`[build][code] rev=v2.0.2-136-gc96c00e, branch=master, ...` means 136 commits
-past `v2.0.2`; see [Provenance](../usage/run#provenance).
-:::
-
 ## Visualizing results
 
 A coupled run leaves two independent sets of output, in two different
@@ -663,6 +615,60 @@ already includes the fix.
 ```cfg
 gospl_coupling_frequency = 200
 ```
+
+## Running with Docker
+
+An alternative to the manual setup above
+([Install GoSPL](#install-gospl) through
+[Build DynEarthSol with GoSPL support](#build-dynearthsol-with-gospl-support)):
+`GOSPL=1 ./build.sh` in the DynEarthSol repository root builds the image
+`dynearthsol/gcc-11-gospl`. It has the `gospl` conda environment (activated in
+every login shell), `gospl_extensions` and a 3D `dynearthsol3d` already
+inside, so none of the host setup is needed. Mount a directory for your case
+and run from it:
+
+```bash
+docker run --rm -it -v /path/to/case:/home/human/case dynearthsol/gcc-11-gospl bash
+cd ~/case
+cp ~/DynEarthSol/gospl_driver/examples/* .
+~/DynEarthSol/dynearthsol-gospl ./gaussian-weakzone-3d-with-gospl.cfg
+```
+
+The `cp` above seeds the mounted directory with the bundled example — copy in
+your own `.cfg` and GoSPL YAML instead once you have one.
+
+:::tip This builds whatever commit is checked out, not a specific release
+The Dockerfile copies your local working tree as-is; it doesn't pin or fetch a
+specific DynEarthSol version. A plain clone's `master` branch is typically ahead
+of the latest tagged release (e.g. `v2.0.2`), not that release itself. For a
+specific, reproducible version, check out its tag on the host before running
+`./build.sh`: `git checkout v2.0.2`. The running binary's own startup output
+names exactly what it was built from, e.g.
+`[build][code] rev=v2.0.2-136-gc96c00e, branch=master, ...` means 136 commits
+past `v2.0.2`; see [Provenance](../usage/run#provenance).
+:::
+
+### WSL troubleshooting
+
+If `./build.sh` fails with `docker: command not found`, install Docker
+Desktop on Windows, then enable it for WSL: Settings → Resources → WSL
+Integration → check "Enable integration with my default WSL distro".
+
+If instead you see
+
+```
+ERROR: permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock
+```
+
+add yourself to the `docker` group:
+
+```bash
+sudo usermod -aG docker $USER
+```
+
+then restart a new shell to take effect. When starting a plain new shell in
+the same session isn't enough, you need to restart wsl (`wsl --shutdown` from
+Windows, then reopen the terminal).
 
 ## Next Steps
 

@@ -19,7 +19,7 @@ docker run --rm -it dynearthsol/gcc-11
 `GOSPL=1 ./build.sh` builds `dynearthsol/gcc-11-gospl` instead: a 3D executable
 with GoSPL coupling, the `gospl` conda environment and `gospl_extensions`
 included, so no conda setup is needed on the host. See
-[Coupling with GoSPL](../tutorial/couplinggospl.md#run-with-docker) for how to run it.
+[Coupling with GoSPL](../tutorial/couplinggospl.md#running-with-docker) for how to run it.
 
 The rest of this page covers building from source.
 
