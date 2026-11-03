@@ -27,8 +27,10 @@ Before starting, ensure you have:
 - ✅ GoSPL 2026.6.30 or later installed through conda (earlier releases do not
   read the letter boundary codes used below)
 - ✅ `gospl_extensions`
-- ✅ DynEarthSol compiled with GoSPL support (the source tree must include the
-  `gospl_driver` directory), which needs a C++ toolchain and `make`
+- ✅ DynEarthSol compiled with GoSPL support **and MMG** (`ndims=3
+  usegospl=1 usemmg=1`; the source tree must include the `gospl_driver`
+  directory), which needs a C++ toolchain and `make` — MMG isn't optional
+  here, see [below](#build-dynearthsol-with-gospl-support)
 
 :::tip Skip the setup with Docker
 Everything from here through [Build DynEarthSol with GoSPL
@@ -131,9 +133,12 @@ build command stays copy-pasteable either way:
    make clean
    make -j4 usegospl=1 ndims=3 usemmg=1
    ```
-   `ndims=3` is **required** for the GoSPL coupling; `usemmg=1` is
-   **recommended** — MMG mesh optimization during remeshing (see
-   [Adaptive mesh refinement with MMG](./usingmmg)).
+   `ndims=3` and `usemmg=1` are both **required** for the GoSPL coupling —
+   not just recommended. Plain TetGen remeshing (`usemmg=0`) doesn't fail at
+   startup; it lets a coupled run start and then fails partway through, at
+   the first remesh, which wastes far more time than it saves. See
+   [Adaptive mesh refinement with MMG](./usingmmg) and
+   [Known limitations](#known-limitations) below.
 
 :::tip This builds whatever commit is checked out, not a specific release
 A plain clone's `master` branch is typically ahead of the latest tagged release (e.g.
@@ -254,6 +259,12 @@ readable.
 
 ### Known limitations
 
+- **MMG is effectively required (`usemmg=1`), not just recommended.**
+  Nothing stops you from building and starting a coupled run with plain
+  TetGen remeshing (`usemmg=0`); it simply fails partway through, at the
+  first remesh, rather than at startup or at input validation. A coupled
+  run that gets to run for a while before failing isn't a meaningful
+  result, so treat `usemmg=1` as a hard requirement alongside `ndims=3`.
 - **The coupling interval is a trigger, not a clamp.** In `time` mode,
   `gospl_coupling_interval_in_yr` only decides *when* coupling fires. The
   `dt` handed to GoSPL is the time accumulated since the last event, so if
