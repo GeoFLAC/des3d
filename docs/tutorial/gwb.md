@@ -68,6 +68,8 @@ weakzone_plstrain = 1
   DES's x is the distance along it; in 3D, DES's x and y are the world's map
   coordinates and no cross section is needed.
 - **When.** Only while the model is initialized; the world is then released.
+  A restart cannot re-seed its weak zone from the world:
+  `is_restarting_weakzone = yes` with `weakzone_option = 936` is an error.
 - **Remeshing.** Materials ride on the markers, and temperature and plastic
   strain are carried over as usual. With MMG, DES refines the weak zone at
   t = 0, so a GWB fault also gets a finer initial mesh.
@@ -204,6 +206,7 @@ mesh is remeshed often.
 | exit 31: `... 936 needs the Geodynamic World Builder: build with usegwb=1` | DES was built without GWB |
 | exit 11: `... 936 needs ic.gwb_filename` | no world named |
 | exit 20: `cannot open ic.gwb_filename` | the world file is missing |
+| exit 11: `ic.weakzone_option 936 cannot re-seed the weak zone of a restart` | a restart with `is_restarting_weakzone = yes` |
 | exit 11: `Error: Geodynamic World Builder, world '...': ...` | GWB rejected the world; its own message follows. In 2D, a world without a `cross section` is one cause |
 | exit 12: `... defines no material at x = (...)` | `mattype_option = 936` and a marker without a composition of at least 0.5 below `num_materials`; see [Every point needs a material](#every-point-needs-a-material) |
 | exit 12: `ic.weakzone_option 936 needs a fault feature` | the world has no `fault` |
