@@ -541,11 +541,14 @@ Things to look for as the run proceeds:
 
 ### Exercise 2: adjust the problem size
 
-If the progress of the example model is found to be too slow on your computing environment, consider reducing the problem size.
-To advance significantly in model time over a reasonable amount of wall clock time, it is recommended to reduce the `y` dimension, originally 80 km, down to 10 km or so, keeping everything else the same. The Gaussian geometry of the weak zone will be lost but the action of the coupled physics will be still visible.
+If the progress of the example model is found to be too slow on your computing environment, consider reducing the problem size. Two independent ways to do that:
 
-The compression case below builds on this reduced-size setup, so keep the
-`.cfg` with `ylength = 10e3` (or whatever size worked for you) around.
+- **Shrink the domain.** To advance significantly in model time over a reasonable amount of wall clock time, it is recommended to reduce the `y` dimension, originally 80 km, down to 10 km or so, keeping everything else the same. The Gaussian geometry of the weak zone will be lost but the action of the coupled physics will be still visible.
+- **Cap how finely the weak zone refines, instead.** Lower `mmg_metric_refine_coeff` (default 5, in `[mesh]`) — it sets how strongly plastic strain drives local refinement, with target element volume scaling as `1/(1 + coeff · plastic_strain)`, so a smaller value keeps the strained band coarser and the element count down without touching the domain size or losing the Gaussian weak zone's along-strike shape. See [Conservative remeshing](./usingmmg#conservative-remeshing-freeze--required-policy) for the full parameter set this belongs to.
+
+Finish this exercise before moving on: settle on a domain size and/or
+`mmg_metric_refine_coeff` that finishes in a reasonable time on your machine,
+and keep that `.cfg` around — the compression exercise below reuses it.
 
 ### Exercise 3: vary the erodibility
 
@@ -565,35 +568,25 @@ Change one parameter at a time, and keep a log of what you changed.
 
 ### Exercise 4: a compression case
 
-Everything so far has been extensional. Starting from the reduced-size `.cfg`
-of [Exercise 2](#exercise-2-adjust-the-problem-size) — so the run stays fast
-— copy it to a new file and flip the sign of the two boundary velocities:
+Everything so far has been extensional. This exercise reuses whichever
+reduced-size setup you settled on in
+[Exercise 2](#exercise-2-adjust-the-problem-size), so the run stays fast
+enough to watch. Before running anything:
+
+1. Make sure you have a scaled-down `.cfg` from Exercise 2 that finishes in a
+   reasonable time on your machine.
+2. Copy that file to a new name, e.g. `cp your-scaled-down.cfg compression.cfg`.
+3. In the new file's `[bc]` section, flip the sign of `vbc_val_x0` and
+   `vbc_val_x1`: whatever value was pulling the two end walls apart
+   (extension) now pushes them together (convergence) at the same rate.
+   Everything else — domain size, `mmg_metric_refine_coeff`, the dipping weak
+   zone — stays as it was.
+
+Only once the copy exists and both signs are flipped, run it the same way as
+Exercise 1, pointing at the new file:
 
 ```bash
-cp gaussian-weakzone-3d-with-gospl.cfg compression-3d-with-gospl.cfg
-```
-
-```diff title="compression-3d-with-gospl.cfg"
- [mesh]
- xlength = 100e3
--ylength = 80e3        # reduced to 10e3 in Exercise 2
-+ylength = 10e3
- zlength = 10e3
- ...
- [bc]
--vbc_val_x0 = -4.756468797564688e-10  # 1.5 cm/yr, extension
--vbc_val_x1 =  4.756468797564688e-10  # 1.5 cm/yr, extension
-+vbc_val_x0 =  4.756468797564688e-10  # 1.5 cm/yr, convergence
-+vbc_val_x1 = -4.756468797564688e-10  # 1.5 cm/yr, convergence
-```
-
-That's the whole change: both walls now move inward at 1.5 cm/yr (3 cm/yr of
-total convergence) instead of apart, everything else — including the dipping
-weak zone — stays as it was. Run it the same way as Exercise 1, pointing at
-the new file:
-
-```bash
-../../dynearthsol-gospl ./compression-3d-with-gospl.cfg
+../../dynearthsol-gospl ./compression.cfg
 ```
 
 Where the reference case opens a rift valley, this one should raise a
