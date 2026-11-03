@@ -111,8 +111,16 @@ To set the initial temperature, marker materials or weak zone from a
 [Geodynamic World Builder](https://geodynamicworldbuilder.github.io/) world
 (`ic.temperature_option`, `ic.mattype_option` or `ic.weakzone_option` 936):
 
-- build GWB as a shared library and install it, e.g.
-  `cmake .. -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$HOME/opt/WorldBuilder && make install`;
+- build GWB (CMake 3.5 or newer, a C++14 compiler) as a shared library and
+  install it:
+  ```bash
+  git clone https://github.com/GeodynamicWorldBuilder/WorldBuilder.git
+  cmake -S WorldBuilder -B WorldBuilder/build -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_SHARED_LIBS=ON -DWB_ENABLE_TESTS=OFF -DWB_ENABLE_PYTHON=OFF \
+    -DWB_MAKE_FORTRAN_WRAPPER=OFF -DCMAKE_INSTALL_PREFIX=$HOME/opt/WorldBuilder
+  cmake --build WorldBuilder/build -j 4
+  cmake --install WorldBuilder/build
+  ```
 - set `usegwb = 1`, and `GWB_DIR` if GWB is installed elsewhere. GWB puts its
   library in `bin/`, which `GWB_LIB_DIR` overrides.
 

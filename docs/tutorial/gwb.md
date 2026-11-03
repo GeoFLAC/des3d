@@ -26,14 +26,20 @@ such as ASPECT.
 
 ## Prerequisites
 
-- ✅ GWB built as a shared library and installed:
+- ✅ GWB (CMake 3.5 or newer, a C++14 compiler) built as a shared library and
+  installed, in under a minute on 4 cores:
   ```bash
   git clone https://github.com/GeodynamicWorldBuilder/WorldBuilder.git
-  cd WorldBuilder && mkdir build && cd build
-  cmake .. -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$HOME/opt/WorldBuilder
-  make install
+  cmake -S WorldBuilder -B WorldBuilder/build -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_SHARED_LIBS=ON -DWB_ENABLE_TESTS=OFF -DWB_ENABLE_PYTHON=OFF \
+    -DWB_MAKE_FORTRAN_WRAPPER=OFF -DCMAKE_INSTALL_PREFIX=$HOME/opt/WorldBuilder
+  cmake --build WorldBuilder/build -j 4
+  cmake --install WorldBuilder/build
   ```
-  GWB installs its library in `bin/`, not `lib/`.
+  The `OFF` options skip parts DES does not use; with Python on, the install
+  also runs GWB's `setup.py install` into the active Python. GWB installs its
+  library in `bin/`, not `lib/`. Its `gwb-dat`, which prints a world's fields
+  at given points, is not installed and stays in `WorldBuilder/build/bin/`.
 - ✅ DynEarthSol with [GeoFLAC/DynEarthSol#117](https://github.com/GeoFLAC/DynEarthSol/pull/117),
   which adds option 936, built with `usegwb=1` (and `GWB_DIR` if GWB is not in
   `~/opt/WorldBuilder`); see [Build](../usage/usage.md):
