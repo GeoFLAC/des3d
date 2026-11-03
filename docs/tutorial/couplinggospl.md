@@ -65,7 +65,8 @@ named `gospl`, activated with `conda activate gospl`, whichever track you
 took to get here:
 
 ```bash
-mamba create -y -n gospl -c geodels -c conda-forge gospl python=3.11   # or `conda create` if you don't have mamba
+# or `conda create` if you don't have mamba
+mamba create -y -n gospl -c geodels -c conda-forge gospl python=3.11
 ```
 
 **Need conda first?** The quickest way to get one is Miniforge:
