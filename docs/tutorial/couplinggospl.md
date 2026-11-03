@@ -4,6 +4,8 @@ title: Coupling with GoSPL
 description: Learn how to couple DynEarthSol with GoSPL for landscape evolution modeling
 ---
 
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
 # Coupling DynEarthSol with GoSPL
 
 This tutorial explains how to run DynEarthSol coupled with **GoSPL** (Global Scalable Paleo Landscape Evolution) to simulate the interaction between tectonic deformation and surface processes like erosion and sediment transport.
@@ -11,10 +13,10 @@ This tutorial explains how to run DynEarthSol coupled with **GoSPL** (Global Sca
 ## What is GoSPL?
 
 [GoSPL](https://github.com/Geodels/gospl) is a Python-based landscape evolution model that simulates:
-- River incision and sediment transport
-- Hillslope diffusion
-- Marine deposition
-- Flexural isostasy
+- **Hillslope diffusion** — DES already does this natively (`surface_process_option = 1`, `surface_diffusivity`); see e.g. [Tectonic rifting and subduction](./tectonics)
+- **River incision and sediment transport** — new to DES, added through the coupling
+- **Marine deposition** — also added through the coupling
+- **Flexural isostasy** — GoSPL's own simplified stand-in for tectonics; coupled with DES, much more sophisticated tectonic motions are available instead, through DES's own mechanical solver
 
 When coupled with DynEarthSol, you can study how tectonic processes (uplift, extension, compression) interact with surface erosion over geological timescales.
 
@@ -25,39 +27,32 @@ Before starting, ensure you have:
 - ✅ GoSPL 2026.6.30 or later installed through conda (earlier releases do not
   read the letter boundary codes used below)
 - ✅ `gospl_extensions`
-- ✅ DynEarthSol compiled with GoSPL support (the source tree must include the
-  `gospl_driver` directory), which needs a C++ toolchain and `make`
+- ✅ DynEarthSol compiled with GoSPL support **and MMG** (`ndims=3
+  usegospl=1 usemmg=1`; the source tree must include the `gospl_driver`
+  directory), which needs a C++ toolchain and `make` — MMG isn't optional
+  here, see [below](#build-dynearthsol-with-gospl-support)
 
 :::tip Skip the setup with Docker
-`GOSPL=1 ./build.sh` builds an image with the conda environment,
-`gospl_extensions` and a 3D executable already inside. If you use it, jump to
-[Run with Docker](#run-with-docker).
-
-On WSL, if the script fails with `docker: command not found`, install Docker
-Desktop on Windows, then enable it for WSL: Settings → Resources → WSL
-Integration → check "Enable integration with my default WSL distro".
-
-If instead you see
-
-```
-ERROR: permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock
-```
-
-add yourself to the `docker` group:
-
-```bash
-sudo usermod -aG docker $USER
-```
-
-then restart a new shell to take effect. When starting a plain new shell in the same
-session isn't enough, you need to restart wsl (`wsl --shutdown`
-from Windows, then reopen the terminal).
+Everything from here through [Build DynEarthSol with GoSPL
+support](#build-dynearthsol-with-gospl-support) can be skipped with one
+Docker image — see [Running with Docker](#running-with-docker) at the end of
+this page.
 :::
 
 ### Install GoSPL
 Refer to https://gospl.readthedocs.io/en/latest/getting_started/installConda.html.
 
-To recap the quickest way,
+**Already have conda, from whatever distribution?** Create the `gospl`
+environment directly — the rest of this tutorial assumes an environment
+named `gospl`, activated with `conda activate gospl`, whichever track you
+took to get here:
+
+```bash
+# or `conda create` if you don't have mamba
+mamba create -y -n gospl -c geodels -c conda-forge gospl python=3.11
+```
+
+**Need conda first?** The quickest way to get one is Miniforge:
 
 ```bash
 curl -fsSL "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-$(uname -m).sh" -o /tmp/miniforge.sh
@@ -66,6 +61,10 @@ rm /tmp/miniforge.sh
 $HOME/miniforge3/bin/mamba create -y -n gospl -c geodels -c conda-forge gospl python=3.11
 $HOME/miniforge3/bin/conda clean -afy
 ```
+
+If your conda lives somewhere other than `$HOME/miniforge3`, remember to
+update `CONDA_ENV_PATH` when [building DynEarthSol with GoSPL
+support](#build-dynearthsol-with-gospl-support) below.
 
 ### Install gospl_extensions
 
@@ -95,25 +94,51 @@ Installing locally for DynEarthSol integration...
 
 ### Build DynEarthSol with GoSPL support
 
-1. Set `usegospl = 1` in Makefile.
-2. Set `GOSPL_EXT_DIR` if `gospl_extensions` isn't at the default
-   `$(HOME)/opt/gospl_extensions`: e.g., `GOSPL_EXT_DIR = $(HOME)/opt/gospl_extensions`.
-   Edit it in the Makefile, pass it on the `make` command line, or `export` it
-   in your shell — all three work.
-3. Check `CONDA_ENV_PATH`, the gospl environment. It defaults to
-   `$(HOME)/miniforge3/envs/gospl`, where the Miniforge install above puts it;
-   set it the same way (Makefile, command line, or `export`) only if your
-   environment is elsewhere.
-4. Set `ndims = 3`, which is **required** for the GoSPL coupling.
-5. Set `usemmg = 1`, which is **recommended**: MMG mesh optimization during
-   remeshing (see [Adaptive mesh refinement with MMG](./usingmmg)).
-6. Build with any conda environment active or none; it doesn't matter unless
+The build itself just needs `usegospl=1` (plus `ndims=3` and `usemmg=1`,
+below) — set the two paths first, if yours aren't at their defaults, so the
+build command stays copy-pasteable either way:
+
+1. `GOSPL_EXT_DIR` defaults to `$(HOME)/opt/gospl_extensions`. If
+   `gospl_extensions` isn't there, `export` the real path once, in the same
+   shell you'll build and run in:
+   ```bash
+   export GOSPL_EXT_DIR=/path/to/gospl_extensions
+   ```
+2. `CONDA_ENV_PATH` defaults to `$(HOME)/miniforge3/envs/gospl`, where the
+   Miniforge install above puts it. If your `gospl` environment is
+   elsewhere, `export` it the same way:
+   ```bash
+   export CONDA_ENV_PATH=/path/to/envs/gospl
+   ```
+   Either variable can also be edited directly in the Makefile instead —
+   but exporting means the build command below never needs editing, whether
+   your paths are the defaults or not: `make` reads an exported variable the
+   same way it reads one passed on its own command line.
+3. Check both paths before building, whether you exported them or are
+   relying on the defaults (the `:-` fallback below matches the Makefile's
+   own default, so this works either way):
+   ```bash
+   ls "${GOSPL_EXT_DIR:-$HOME/opt/gospl_extensions}"
+   ls "${CONDA_ENV_PATH:-$HOME/miniforge3/envs/gospl}"
+   ```
+   The first should list `include` and `lib` (from `make install-local` in
+   [Install gospl_extensions](#install-gospl_extensions)); the second should
+   look like a Python environment (`bin/python3`, `lib/python3.11`, …). An
+   empty or missing directory here means a wrong path now, not a build
+   error later.
+4. Build with any conda environment active or none; it doesn't matter unless
    that environment has its own Boost or compilers ahead of the system ones.
    `make config` prints what was actually picked up:
    ```bash
    make clean
-   make -j4
+   make -j4 usegospl=1 ndims=3 usemmg=1
    ```
+   `ndims=3` and `usemmg=1` are both **required** for the GoSPL coupling —
+   not just recommended. Plain TetGen remeshing (`usemmg=0`) doesn't fail at
+   startup; it lets a coupled run start and then fails partway through, at
+   the first remesh, which wastes far more time than it saves. See
+   [Adaptive mesh refinement with MMG](./usingmmg) and
+   [Known limitations](#known-limitations) below.
 
 :::tip This builds whatever commit is checked out, not a specific release
 A plain clone's `master` branch is typically ahead of the latest tagged release (e.g.
@@ -158,24 +183,6 @@ One coupling event, between the previous event at $t_\mathrm{prev}$ and the
 current one at $t_\mathrm{now}$ (`gospl_coupling_frequency` DES steps apart in
 `steps` mode):
 
-```
- DES time    t_prev   ────────── DES steps ──────────    t_now
-               │                                           │
-               │◄────────── Δt = t_now − t_prev ──────────►│
-               │                                           │
-          coord_prev                                   coord_now
-               └───── Δcoord = coord_now − coord_prev ─────┘
-
- At t_now:
-
-   DES ───────── v̄ = Δcoord / Δt  (vx, vy, vz) ─────────►  GoSPL
-                                                             │  advances Δt:
-                                                             │  advection, uplift,
-                                                             │  incision, diffusion
-   DES ◄──── Δh (erosion + diffusion, uplift removed) ───────┘
-
-   DES then sets   z_surface ← z_surface + Δh
-```
 ![DES3D–goSPL coupling loop](./img/gospl/coupling-loop.svg)
 
 DES3D and GoSPL exchange data in a way inspired by the [**ASPECT-FastScape simple
@@ -234,6 +241,12 @@ readable.
 
 ### Known limitations
 
+- **MMG is effectively required (`usemmg=1`), not just recommended.**
+  Nothing stops you from building and starting a coupled run with plain
+  TetGen remeshing (`usemmg=0`); it simply fails partway through, at the
+  first remesh, rather than at startup or at input validation. A coupled
+  run that gets to run for a while before failing isn't a meaningful
+  result, so treat `usemmg=1` as a hard requirement alongside `ndims=3`.
 - **The coupling interval is a trigger, not a clamp.** In `time` mode,
   `gospl_coupling_interval_in_yr` only decides *when* coupling fires. The
   `dt` handed to GoSPL is the time accumulated since the last event, so if
@@ -423,34 +436,42 @@ lines are filtered out; its `+++ Output` lines, and any errors or
 instantaneous-velocity-fallback notices, are not and still print as they
 happen.
 
-### Run with Docker
+## Visualizing results
 
-`GOSPL=1 ./build.sh` in the DynEarthSol repository root builds the image
-`dynearthsol/gcc-11-gospl`. It has the `gospl` conda environment (activated in
-every login shell), `gospl_extensions` and a 3D `dynearthsol3d` already inside,
-so none of the setup above is needed on the host. Mount a directory for your
-case and run from it:
+A coupled run leaves two independent sets of output, in two different
+formats, in two different places.
 
-```bash
-docker run --rm -it -v /path/to/case:/home/human/case dynearthsol/gcc-11-gospl bash
-cd ~/case
-cp ~/DynEarthSol/gospl_driver/examples/* .
-~/DynEarthSol/dynearthsol-gospl ./gaussian-weakzone-3d-with-gospl.cfg
-```
+### DES3D's own output
 
-The `cp` above seeds the mounted directory with the bundled example — copy in
-your own `.cfg` and GoSPL YAML instead once you have one.
+Written to the working directory as usual. Convert it with `2vtk.py` and open
+the result in ParaView or VisIt — see
+[Visualizing outputs](../usage/visualize) for the full workflow.
 
-:::tip This builds whatever commit is checked out, not a specific release
-The Dockerfile copies your local working tree as-is; it doesn't pin or fetch a
-specific DynEarthSol version. A plain clone's `master` branch is typically ahead
-of the latest tagged release (e.g. `v2.0.2`), not that release itself. For a
-specific, reproducible version, check out its tag on the host before running
-`./build.sh`: `git checkout v2.0.2`. The running binary's own startup output
-names exactly what it was built from, e.g.
-`[build][code] rev=v2.0.2-136-gc96c00e, branch=master, ...` means 136 commits
-past `v2.0.2`; see [Provenance](../usage/run#provenance).
-:::
+### GoSPL's own output
+
+GoSPL writes its own time series directly in a ParaView-readable format — no
+conversion step needed. Inside the directory named by the YAML's `output:
+dir` (`coupling_test` in the template above), you'll find `gospl.xdmf` plus
+two subdirectories, `h5/` and `xmf/`, that hold the data the `.xdmf` file
+indexes. In ParaView: **File → Open**, pick `gospl.xdmf`, **Apply**.
+
+To see both side by side, as in the [comparison figure
+above](#exercise-1-run-the-reference-case), open DES3D's converted output and
+GoSPL's `gospl.xdmf` in the same ParaView session.
+
+### A starter ParaView state
+
+Rather than building a scene from a blank canvas, download a bundled
+ParaView state file with a GoSPL visualization — elevation and
+erosion/deposition color maps, representations and camera already set up:
+
+<a href={useBaseUrl('/downloads/des-gospl/gospl-visualization.pvsm')}>gospl-visualization.pvsm</a>
+
+In ParaView: **File → Load State**, pick the downloaded file. The state
+remembers the machine it was saved on, so ParaView will ask you to locate its
+missing data source the first time you load it — point it at your own run's
+`gospl.xdmf`, and the rest of the visualization (colors, opacity, camera)
+applies automatically.
 
 ## Worked example: a Gaussian weak zone rift
 
@@ -500,12 +521,18 @@ Things to look for as the run proceeds:
 - channels organizing down those flanks as the relief grows;
 - sediment accumulating in the axial low.
 
-### Exercise 1.1: adjust the problem size
+### Exercise 2: adjust the problem size
 
-If the progress of the example model is found to be too slow on your computing environment, consider reducing the problem size.
-To advance significantly in model time over a reasonable amount of wall clock time, it is recommended to reduce the `y` dimension, originally 80 km, down to 10 km or so, keeping everything else the same. The Gaussian geometry of the weak zone will be lost but the action of the coupled physics will be still visible. 
+If the progress of the example model is found to be too slow on your computing environment, consider reducing the problem size. Two independent ways to do that:
 
-### Exercise 2: vary the erodibility
+- **Shrink the domain.** To advance significantly in model time over a reasonable amount of wall clock time, it is recommended to reduce the `y` dimension, originally 80 km, down to 10 km or so, keeping everything else the same. The Gaussian geometry of the weak zone will be lost but the action of the coupled physics will be still visible.
+- **Cap how finely the weak zone refines, instead.** Lower `mmg_metric_refine_coeff` (default 5, in `[mesh]`) — it sets how strongly plastic strain drives local refinement, with target element volume scaling as `1/(1 + coeff · plastic_strain)`, so a smaller value keeps the strained band coarser and the element count down without touching the domain size or losing the Gaussian weak zone's along-strike shape. See [Conservative remeshing](./usingmmg#conservative-remeshing-freeze--required-policy) for the full parameter set this belongs to.
+
+Finish this exercise before moving on: settle on a domain size and/or
+`mmg_metric_refine_coeff` that finishes in a reasonable time on your machine,
+and keep that `.cfg` around — the compression exercise below reuses it.
+
+### Exercise 3: vary the erodibility
 
 Change one line in the YAML, `spl: K`, and rerun. Nothing needs rebuilding.
 
@@ -520,6 +547,35 @@ As an optional second experiment, set `gospl_coupling_frequency = 50` in the
 was too coarse.
 
 Change one parameter at a time, and keep a log of what you changed.
+
+### Exercise 4: a compression case
+
+Everything so far has been extensional. This exercise reuses whichever
+reduced-size setup you settled on in
+[Exercise 2](#exercise-2-adjust-the-problem-size), so the run stays fast
+enough to watch. Before running anything:
+
+1. Make sure you have a scaled-down `.cfg` from Exercise 2 that finishes in a
+   reasonable time on your machine.
+2. Copy that file to a new name, e.g. `cp your-scaled-down.cfg compression.cfg`.
+3. In the new file's `[bc]` section, flip the sign of `vbc_val_x0` and
+   `vbc_val_x1`: whatever value was pulling the two end walls apart
+   (extension) now pushes them together (convergence) at the same rate.
+   Everything else — domain size, `mmg_metric_refine_coeff`, the dipping weak
+   zone — stays as it was.
+
+Only once the copy exists and both signs are flipped, run it the same way as
+Exercise 1, pointing at the new file:
+
+```bash
+../../dynearthsol-gospl ./compression.cfg
+```
+
+Where the reference case opens a rift valley, this one should raise a
+shortening welt along the weak zone instead, with GoSPL now eroding the
+rising relief and depositing in the lows beside it rather than filling an
+axial graben. See [Visualizing results](#visualizing-results) above to watch
+the two cases side by side.
 
 
 ## Troubleshooting
@@ -575,6 +631,60 @@ already includes the fix.
 ```cfg
 gospl_coupling_frequency = 200
 ```
+
+## Running with Docker
+
+An alternative to the manual setup above
+([Install GoSPL](#install-gospl) through
+[Build DynEarthSol with GoSPL support](#build-dynearthsol-with-gospl-support)):
+`GOSPL=1 ./build.sh` in the DynEarthSol repository root builds the image
+`dynearthsol/gcc-11-gospl`. It has the `gospl` conda environment (activated in
+every login shell), `gospl_extensions` and a 3D `dynearthsol3d` already
+inside, so none of the host setup is needed. Mount a directory for your case
+and run from it:
+
+```bash
+docker run --rm -it -v /path/to/case:/home/human/case dynearthsol/gcc-11-gospl bash
+cd ~/case
+cp ~/DynEarthSol/gospl_driver/examples/* .
+~/DynEarthSol/dynearthsol-gospl ./gaussian-weakzone-3d-with-gospl.cfg
+```
+
+The `cp` above seeds the mounted directory with the bundled example — copy in
+your own `.cfg` and GoSPL YAML instead once you have one.
+
+:::tip This builds whatever commit is checked out, not a specific release
+The Dockerfile copies your local working tree as-is; it doesn't pin or fetch a
+specific DynEarthSol version. A plain clone's `master` branch is typically ahead
+of the latest tagged release (e.g. `v2.0.2`), not that release itself. For a
+specific, reproducible version, check out its tag on the host before running
+`./build.sh`: `git checkout v2.0.2`. The running binary's own startup output
+names exactly what it was built from, e.g.
+`[build][code] rev=v2.0.2-136-gc96c00e, branch=master, ...` means 136 commits
+past `v2.0.2`; see [Provenance](../usage/run#provenance).
+:::
+
+### WSL troubleshooting
+
+If `./build.sh` fails with `docker: command not found`, install Docker
+Desktop on Windows, then enable it for WSL: Settings → Resources → WSL
+Integration → check "Enable integration with my default WSL distro".
+
+If instead you see
+
+```
+ERROR: permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock
+```
+
+add yourself to the `docker` group:
+
+```bash
+sudo usermod -aG docker $USER
+```
+
+then restart a new shell to take effect. When starting a plain new shell in
+the same session isn't enough, you need to restart wsl (`wsl --shutdown` from
+Windows, then reopen the terminal).
 
 ## Next Steps
 
