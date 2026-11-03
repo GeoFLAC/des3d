@@ -106,11 +106,16 @@ Installing locally for DynEarthSol integration...
    remeshing (see [Adaptive mesh refinement with MMG](./usingmmg)).
 6. Build with any conda environment active or none; it doesn't matter unless
    that environment has its own Boost or compilers ahead of the system ones.
-   `make config` prints what was actually picked up:
+   `make config` prints what was actually picked up. All five options above,
+   as command-line arguments instead of editing the Makefile:
    ```bash
    make clean
-   make -j4
+   make -j4 usegospl=1 ndims=3 usemmg=1 \
+     GOSPL_EXT_DIR=$HOME/opt/gospl_extensions \
+     CONDA_ENV_PATH=$HOME/miniforge3/envs/gospl
    ```
+   Drop `GOSPL_EXT_DIR` and/or `CONDA_ENV_PATH` from the command line if
+   your installs already sit at those defaults.
 
 :::tip This builds whatever commit is checked out, not a specific release
 A plain clone's `master` branch is typically ahead of the latest tagged release (e.g.
