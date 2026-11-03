@@ -112,7 +112,19 @@ build command stays copy-pasteable either way:
    but exporting means the build command below never needs editing, whether
    your paths are the defaults or not: `make` reads an exported variable the
    same way it reads one passed on its own command line.
-3. Build with any conda environment active or none; it doesn't matter unless
+3. Check both paths before building, whether you exported them or are
+   relying on the defaults (the `:-` fallback below matches the Makefile's
+   own default, so this works either way):
+   ```bash
+   ls "${GOSPL_EXT_DIR:-$HOME/opt/gospl_extensions}"
+   ls "${CONDA_ENV_PATH:-$HOME/miniforge3/envs/gospl}"
+   ```
+   The first should list `include` and `lib` (from `make install-local` in
+   [Install gospl_extensions](#install-gospl_extensions)); the second should
+   look like a Python environment (`bin/python3`, `lib/python3.11`, …). An
+   empty or missing directory here means a wrong path now, not a build
+   error later.
+4. Build with any conda environment active or none; it doesn't matter unless
    that environment has its own Boost or compilers ahead of the system ones.
    `make config` prints what was actually picked up:
    ```bash
