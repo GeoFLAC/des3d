@@ -13,10 +13,10 @@ This tutorial explains how to run DynEarthSol coupled with **GoSPL** (Global Sca
 ## What is GoSPL?
 
 [GoSPL](https://github.com/Geodels/gospl) is a Python-based landscape evolution model that simulates:
-- Hillslope diffusion — DES already does this natively (`surface_process_option = 1`, `surface_diffusivity`); see e.g. [Tectonic rifting and subduction](./tectonics)
-- River incision and sediment transport — new to DES, added through the coupling
-- Marine deposition — also added through the coupling
-- Flexural isostasy — GoSPL's own simplified stand-in for tectonics; coupled with DES, much more sophisticated tectonic motions are available instead, through DES's own mechanical solver
+- **Hillslope diffusion** — DES already does this natively (`surface_process_option = 1`, `surface_diffusivity`); see e.g. [Tectonic rifting and subduction](./tectonics)
+- **River incision and sediment transport** — new to DES, added through the coupling
+- **Marine deposition** — also added through the coupling
+- **Flexural isostasy** — GoSPL's own simplified stand-in for tectonics; coupled with DES, much more sophisticated tectonic motions are available instead, through DES's own mechanical solver
 
 When coupled with DynEarthSol, you can study how tectonic processes (uplift, extension, compression) interact with surface erosion over geological timescales.
 
@@ -59,7 +59,16 @@ from Windows, then reopen the terminal).
 ### Install GoSPL
 Refer to https://gospl.readthedocs.io/en/latest/getting_started/installConda.html.
 
-To recap the quickest way,
+**Already have conda, from whatever distribution?** Create the `gospl`
+environment directly — the rest of this tutorial assumes an environment
+named `gospl`, activated with `conda activate gospl`, whichever track you
+took to get here:
+
+```bash
+mamba create -y -n gospl -c geodels -c conda-forge gospl python=3.11   # or `conda create` if you don't have mamba
+```
+
+**Need conda first?** The quickest way to get one is Miniforge:
 
 ```bash
 curl -fsSL "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-$(uname -m).sh" -o /tmp/miniforge.sh
@@ -68,6 +77,10 @@ rm /tmp/miniforge.sh
 $HOME/miniforge3/bin/mamba create -y -n gospl -c geodels -c conda-forge gospl python=3.11
 $HOME/miniforge3/bin/conda clean -afy
 ```
+
+If your conda lives somewhere other than `$HOME/miniforge3`, remember to
+update `CONDA_ENV_PATH` when [building DynEarthSol with GoSPL
+support](#build-dynearthsol-with-gospl-support) below.
 
 ### Install gospl_extensions
 
