@@ -92,6 +92,21 @@ Installing locally for DynEarthSol integration...
 ```
 :::
 
+:::caution macOS: point `install-local` at the conda env explicitly
+This Makefile detects its Python flags with `python3-config --ldflags
+--embed`, which on macOS doesn't reliably resolve to the active conda
+environment's own Python library. If the build fails here, or succeeds but
+the resulting library can't find `libpythonX.Y.dylib` at link time, override
+`PYTHON_LIBS` on the command line instead, pointing explicitly at
+`$CONDA_PREFIX` (set by `conda activate gospl`):
+```bash
+make install-local \
+  PYTHON_LIBS="-L${CONDA_PREFIX}/lib $(python3-config --ldflags --embed) -Wl,-rpath,${CONDA_PREFIX}/lib"
+```
+Note the comma in `-Wl,-rpath,...` — Apple's linker only accepts `-rpath` in
+that form, not the `-Wl,-rpath=...` (equals-sign) form that works on Linux.
+:::
+
 ### Build DynEarthSol with GoSPL support
 
 The build itself just needs `usegospl=1` (plus `ndims=3` and `usemmg=1`,
@@ -140,6 +155,28 @@ build command stays copy-pasteable either way:
    [Adaptive mesh refinement with MMG](./usingmmg) and
    [Known limitations](#known-limitations) below.
 
+   :::caution macOS: pre-configure MMG without VTK
+   The MMG submodule is only auto-configured on its *first* build (`make`
+   skips the `cmake` step once `mmg/build/Makefile` already exists), and its
+   default CMake configuration can pick up a Homebrew VTK install that fails
+   to link on macOS. Avoid this by configuring `mmg/build` yourself, with
+   VTK explicitly off, before the `make -j4 ...` command above:
+   ```bash
+   cmake -S mmg -B mmg/build -DUSE_VTK=OFF
+   ```
+   :::
+
+5. **macOS only:** the Darwin build fixes up the Boost, MMG and Exodus
+   libraries' runtime paths automatically after linking, but not GoSPL's or
+   Python's — export `DYLD_LIBRARY_PATH` in the same shell before running
+   anything built with `usegospl=1` (building, verifying, or any of the
+   exercises below):
+   ```bash
+   export DYLD_LIBRARY_PATH="${GOSPL_EXT_DIR:-$HOME/opt/gospl_extensions}/lib:${CONDA_ENV_PATH:-$HOME/miniforge3/envs/gospl}/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}"
+   ```
+   Without this, the binary links successfully but fails at startup with a
+   dyld "Library not loaded" error.
+
 :::tip This builds whatever commit is checked out, not a specific release
 A plain clone's `master` branch is typically ahead of the latest tagged release (e.g.
 `v2.0.2`), not that release itself. For a specific, reproducible version, check out
@@ -173,7 +210,7 @@ Run these four checks before moving on:
 ```bash
 ./dynearthsol3d --help | grep gospl                # options registered?
 conda activate gospl && python -c "import gospl"   # GoSPL importable?
-ldd dynearthsol3d | grep python                    # linked to Python?
+ldd dynearthsol3d | grep python                    # linked to Python? (macOS: otool -L dynearthsol3d | grep -i python)
 cat dynearthsol-gospl                              # wrapper script written?
 ```
 
