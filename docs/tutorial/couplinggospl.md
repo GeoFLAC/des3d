@@ -523,14 +523,15 @@ Things to look for as the run proceeds:
 
 ### Exercise 2: adjust the problem size
 
-If the progress of the example model is found to be too slow on your computing environment, consider reducing the problem size. Two independent ways to do that:
+If the progress of the example model is found to be too slow on your computing environment, consider reducing the problem size. Three independent ways to do that:
 
 - **Shrink the domain.** To advance significantly in model time over a reasonable amount of wall clock time, it is recommended to reduce the `y` dimension, originally 80 km, down to 10 km or so, keeping everything else the same. The Gaussian geometry of the weak zone will be lost but the action of the coupled physics will be still visible.
+- **Start with larger elements.** Raise `resolution` (default `1e3`, in `[mesh]`) — it sets the base target element size for both the initial mesh and every remeshing target afterward, so a larger value means fewer, coarser elements from the very first step, across the whole domain, not just where strain localizes. This is the most direct lever on element count and wall-clock time; it leaves the domain size and the Gaussian weak zone's shape untouched.
 - **Cap how finely the weak zone refines, instead.** Lower `mmg_metric_refine_coeff` (default 5, in `[mesh]`) — it sets how strongly plastic strain drives local refinement, with target element volume scaling as `1/(1 + coeff · plastic_strain)`, so a smaller value keeps the strained band coarser and the element count down without touching the domain size or losing the Gaussian weak zone's along-strike shape. See [Conservative remeshing](./usingmmg#conservative-remeshing-freeze--required-policy) for the full parameter set this belongs to.
 
-Finish this exercise before moving on: settle on a domain size and/or
-`mmg_metric_refine_coeff` that finishes in a reasonable time on your machine,
-and keep that `.cfg` around — the compression exercise below reuses it.
+Finish this exercise before moving on: settle on a domain size, `resolution`,
+and/or `mmg_metric_refine_coeff` that finishes in a reasonable time on your
+machine, and keep that `.cfg` around — the compression exercise below reuses it.
 
 ### Exercise 3: vary the erodibility
 
