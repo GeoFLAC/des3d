@@ -7,8 +7,8 @@ sidebar_position: 1
 The dynamic equation and explicit time integration below describe the
 default `control.has_PT = no` path. Both paths share the spatial force
 discretization. With `control.has_PT = yes`,
-[pseudo-transient mechanics](./pt.md) instead seeks equilibrium within each
-physical timestep. See [solver selection](../usage/pt.md) for configuration.
+[pseudo-transient mechanics](../pt/theory.md) instead seeks equilibrium within each
+physical timestep. See [solver selection](../pt/index.md) for configuration.
 
 ## Equation of motion
 

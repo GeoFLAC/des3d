@@ -30,7 +30,7 @@ Choose saved fields with the `[sim]` output settings in
 
 ### PT force output
 
-Accepted [PT solves](./pt.md) can save an optional nodal vector,
+Accepted [PT solves](../pt/index.md) can save an optional nodal vector,
 `PT residual force`. The Python reader and `2vtk.py` support this field.
 
 | Field | Meaning |
@@ -53,7 +53,7 @@ restart; older saves remain readable and acquire it after the next accepted
 solve. It adds no checkpoint requirement. During binary-to-VTU conversion,
 `2vtk.py` reports once if selected frames lack it and preserves the field
 where available. An initial-frame notice can be expected in the
-[elastic tutorial](../tutorial/pt-elastic.md).
+[elastic tutorial](../pt/tutorials/elastic.md).
 
 ### Restarted models
 
