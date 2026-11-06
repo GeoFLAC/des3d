@@ -1,16 +1,17 @@
 ---
-sidebar_position: 2.5
-title: Pseudo-transient mechanics
+sidebar_position: 1
+slug: /theory/pt
+title: Theory
 ---
 
-# Pseudo-transient mechanics
+# Theory
 
 With `control.has_PT = yes`, DES3D solves for quasi-static mechanical
 equilibrium within a physical timestep. The finite-element force assembly
-uses the [spatial discretization](./theory.md#discretization) shared with the
+uses the [spatial discretization](../theory/theory.md#discretization) shared with the
 explicit momentum path. PT adds an inner relaxation loop whose candidates
 all refer to the same physical increment. Configuration and diagnostic
-details are in [Choosing a mechanical solver](../usage/pt.md).
+details are in [Choosing a mechanical solver](./index.md).
 
 ## One physical increment, many trials
 
@@ -68,7 +69,7 @@ arbitrary contradictory prescriptions are not simultaneously enforced.
 The default acceptance threshold uses an absolute tolerance plus a relative
 tolerance times the first warm candidate's residual. The alternative
 running-scale criterion and its limitations are given in the
-[convergence reference](../usage/pt.md#understand-convergence).
+[convergence reference](./index.md#understand-convergence).
 
 ## Starting candidates
 
@@ -83,7 +84,7 @@ could apply the same compression again. Zero free motion can represent its
 equilibrium. For a Maxwell material, however, zero velocity still permits
 constitutive relaxation over $\Delta t$ and need not satisfy the imposed
 traction. A new equilibrium velocity must then produce continued creep.
-The [elastic](../tutorial/pt-elastic.md) and [Maxwell](../tutorial/pt-maxwell.md)
+The [elastic](./tutorials/elastic.md) and [Maxwell](./tutorials/maxwell.md)
 tutorials demonstrate the distinction.
 
 ## Relaxation schemes

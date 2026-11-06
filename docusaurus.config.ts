@@ -4,6 +4,9 @@ import type * as Preset from '@docusaurus/preset-classic';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
+// Maintainer sync record: general baseline DynEarthSol #114 (2026-10-31);
+// PT mechanics #106 and build requirements #122/#125 are also documented.
+
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -103,14 +106,6 @@ const config: Config = {
   themeConfig: {
     // Replace with your project's social card
     image: 'img/docusaurus-social-card.jpg',
-    announcementBar: {
-      id: 'dynearthsol-sync-status-8',
-      content:
-        'Latest docs include <a href="/des3d/docs/usage/pt">PT mechanics</a> from <a href="https://github.com/GeoFLAC/DynEarthSol/pull/106" target="_blank" rel="noopener noreferrer">PR&nbsp;#106</a> (2026-11-06). General sync baseline: <a href="https://github.com/GeoFLAC/DynEarthSol/pull/114" target="_blank" rel="noopener noreferrer">PR&nbsp;#114</a> (2026-10-31).',
-      backgroundColor: 'var(--ifm-color-primary)',
-      textColor: '#fff',
-      isCloseable: true,
-    },
     navbar: {
       title: 'Main',
       logo: {

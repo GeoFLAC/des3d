@@ -1,10 +1,11 @@
 ---
-sidebar_position: 0.5
-title: PT elastic loading and equilibrium
+sidebar_position: 1
+slug: /tutorial/pt-elastic
+title: Elastic loading and equilibrium
 description: Run a confined elastic cell with both PT schemes, check its analytical response, and interpret convergence and restart.
 ---
 
-# PT elastic loading and equilibrium
+# Elastic loading and equilibrium
 
 This exercise compresses a 1 m elastic cell with a constant top traction.
 You will run both pseudo-transient schemes, compare the result with an
@@ -12,23 +13,17 @@ analytical elastic response, and see why a held load does not produce
 repeated compression. Finish by restarting from a held state and applying
 a larger load.
 
-The examples use the PT implementation merged in
-[PR #106](https://github.com/GeoFLAC/DynEarthSol/pull/106). The commands and
-reference figures were checked with GCC 13.3, one OpenMP thread and binary
-output at revision `707e481fea957971d5cb6ca67d8d24bd689a3467`.
-
 ## Build the checked solver
 
 Use a new terminal and a separate checkout. You need Git, Make, a C++17
 compiler, and Python 3. On Debian/Ubuntu, install `git g++ make python3
 python3-venv`; on macOS, install the Xcode Command Line Tools and Homebrew's
-`libomp` and `python`. See [installation](../usage/usage.md) for other platforms.
-The parser is vendored CLI11; this revision does not require Boost.
+`libomp` and `python`. See [installation](../../usage/usage.md) for other platforms.
+The config parser is bundled with the source.
 
 ```bash
 git clone https://github.com/GeoFLAC/DynEarthSol.git DynEarthSol-pt-tutorial
 cd DynEarthSol-pt-tutorial
-git checkout 707e481fea957971d5cb6ca67d8d24bd689a3467
 make -j2 ndims=2 hdf5=0
 ./dynearthsol2d --help
 ```
@@ -112,7 +107,7 @@ surface_process_option = 0
 `elastic-1`. The running scale keeps force precision tied to the applied
 load during subsequent held steps. It is an explicit tutorial setting;
 the solver default is `no`. Read its
-[scope and limitations](../usage/pt.md#optional-running-scale) before using
+[scope and limitations](../index.md#optional-running-scale) before using
 it in another problem.
 
 ## Run and plot
@@ -190,7 +185,7 @@ precedes hydraulic transport, mesh motion and stress rotation.
 The saved `PT residual force` has this same diagnostic time level. Saved
 stress includes the later physical stress rotation, so independently
 assembling force from it need not reproduce exactly the printed residual.
-See [the force-output reference](../usage/visualize.md#pt-force-output).
+See [the force-output reference](../../usage/visualize.md#pt-force-output).
 
 ## Restart and double the load
 
@@ -231,7 +226,7 @@ PY
 The changed load must produce a new deformation even though the saved
 velocity was zero. This is a changed-load exercise, not an exact
 continuation comparison. Keep output names distinct for fresh, restarted
-and repeated runs. The [restart reference](../usage/run.md#checkpointing-and-restart)
+and repeated runs. The [restart reference](../../usage/run.md#checkpointing-and-restart)
 describes unchanged-control continuation.
 
 ## Repeat in 3D or continue to creep
@@ -243,5 +238,14 @@ The analysis script detects the dimension. In 3D the cell also has roller
 y sides; the expected confined response is the same. The reload checking
 snippet above is specifically 2D (`zz` is component 1); in 3D it is component 2.
 
-Continue with [PT Maxwell creep](./pt-maxwell.md) to see a material that keeps
+Continue with [PT Maxwell creep](./maxwell.md) to see a material that keeps
 deforming under the same held traction.
+
+<details>
+<summary>Reproducing the reference figures</summary>
+
+The bundle's README records the source version used for the reference
+figures. They were checked with GCC 13.3, one OpenMP thread and binary
+output. For an exact source match, check out that version before building.
+
+</details>

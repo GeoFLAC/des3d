@@ -1,12 +1,13 @@
 ---
-sidebar_position: 0.6
-title: PT Maxwell creep under a held load
+sidebar_position: 2
+slug: /tutorial/pt-maxwell
+title: Maxwell creep under a held load
 description: Compare continued physical creep with an independent discrete Maxwell reference using both PT schemes.
 ---
 
-# PT Maxwell creep under a held load
+# Maxwell creep under a held load
 
-The [elastic tutorial](./pt-elastic.md) reaches equilibrium after the load is
+The [elastic tutorial](./elastic.md) reaches equilibrium after the load is
 applied and then holds its strain. A Maxwell material continues to creep:
 its deviatoric stress relaxes over physical time, and additional deformation
 is needed to maintain the prescribed traction. This exercise checks that
@@ -120,11 +121,11 @@ constitutive relaxation over the physical dt; a zero-velocity shortcut
 cannot suppress creep. Both PT schemes must recover the discrete history.
 
 For the matching 3D exercise, use the 3D build and a fresh output directory
-as described in the [elastic tutorial](./pt-elastic.md#repeat-in-3d-or-continue-to-creep).
+as described in the [elastic tutorial](./elastic.md#repeat-in-3d-or-continue-to-creep).
 The same inputs and analysis script apply.
 
 These homogeneous, dry, fixed-grid checks do not qualify moving meshes,
 localized softening, arbitrary irreversible loading or hydraulic coupling.
 For solver controls and known convergence limits, return to
-[Choosing a mechanical solver](../usage/pt.md) and the
+[Choosing a mechanical solver](../index.md) and the
 [validation record](https://github.com/GeoFLAC/DynEarthSol/blob/master/doc/pt-validation-20261006.md).

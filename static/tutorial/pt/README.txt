@@ -5,8 +5,8 @@ Manual pages:
 https://geoflac.github.io/des3d/docs/tutorial/pt-elastic
 https://geoflac.github.io/des3d/docs/tutorial/pt-maxwell
 
-Checked source: GeoFLAC/DynEarthSol PR #106, merged November 6, 2026
-Revision: 707e481fea957971d5cb6ca67d8d24bd689a3467
+Reference source: GeoFLAC/DynEarthSol
+Version for reproducing the figures: 707e481fea957971d5cb6ca67d8d24bd689a3467
 Reference figures: GCC 13.3, Linux, OpenMP with one thread, binary output.
 Both dimensions and both PT options were checked. Published figures use 2D.
 

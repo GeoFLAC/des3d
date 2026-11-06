@@ -6,7 +6,7 @@ Docusaurus site for [GeoFLAC/DynEarthSol](https://github.com/GeoFLAC/DynEarthSol
 
 When asked to catch up the docs with recent DynEarthSol changes ("what's new", "sync the docs", "catch up with recent PRs"), run this procedure without being walked through it step by step:
 
-1. **Find the last sync point.** Check `themeConfig.announcementBar` in `docusaurus.config.ts` for the PR number/date it references, and/or `git log --oneline -- docs/` for the last "docs: update ..." commit date. If you're here because an automated triage issue (see below) already named a specific PR, skip straight to step 4 with that PR number instead of re-scanning.
+1. **Find the last sync point.** Check the maintainer sync comment in `docusaurus.config.ts` for the baseline and separately covered PRs, and/or `git log --oneline -- docs/`. If you're here because an automated triage issue (see below) already named a specific PR, skip straight to step 4 with that PR number instead of re-scanning.
 2. **List what's merged since then:**
    ```
    gh pr list --repo GeoFLAC/DynEarthSol --state merged --limit 100 \
@@ -20,12 +20,13 @@ When asked to catch up the docs with recent DynEarthSol changes ("what's new", "
    - output / visualization format → `docs/usage/visualize.md`
    - meshing/remeshing behavior and parameters → `docs/theory/remeshing.md` (other `docs/theory/` pages as applicable)
    - workflow-level features (coupling, weak zones, MMG, etc.) → `docs/tutorial/`
+   - PT solver controls, theory and worked examples → `docs/pt/` and its `tutorials/` subsection. Keep related material in this chapter instead of adding separate entries across the general categories. Preserve published URLs when reorganizing pages.
 6. **Use the DynEarthSol README as source of truth** for build/dependency wording — it's usually updated in the same PR:
    ```
    gh api repos/GeoFLAC/DynEarthSol/contents/README.md --jq '.content' | base64 -d
    ```
    Condense its language into the docs rather than re-deriving it from source.
-7. **Update the announcement bar** (`docusaurus.config.ts` → `themeConfig.announcementBar`): bump the PR number/date in `content`, and bump the `id` (e.g. increment a numeric suffix) so visitors who already dismissed the old banner see the new one.
+7. **Update the maintainer sync comment** in `docusaurus.config.ts`. Keep PR numbers, merge dates and sync history out of the published manual. Record source versions needed to reproduce tutorial figures in the downloadable bundle's README.
 8. **Verify before committing:** `yarn build`, then grep the generated HTML under `build/` for the new content to confirm it rendered (not just that the build didn't crash). Clean up `build/` and `.docusaurus/` afterward — they're not committed.
 9. **Commit** with a message naming which upstream PR numbers were covered. Ask before pushing.
 

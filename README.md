@@ -32,12 +32,12 @@ yarn clear       # clean .docusaurus/ and build/ when something looks stale
 
 | Path | Contents |
 |---|---|
-| `docs/` | The current ("Latest") documentation content, organized into `usage/`, `tutorial/`, and `theory/` categories. |
+| `docs/` | The current ("Latest") manual: general Usage, Tutorial and Theory sections, plus the PT chapter in `pt/` with its own theory and tutorials. |
 | `sidebars.ts` | Sidebar structure for `docs/`. |
 | `versioned_docs/version-X.Y.Z/`, `versioned_sidebars/`, `versions.json` | Frozen snapshots of the docs matching already-tagged DynEarthSol releases (currently v2.0.0 and v2.0.2). Independent copies, not derived from `docs/`, see [CLAUDE.md](./CLAUDE.md) before editing one. |
 | `static/` | Images and other files served as-is. |
 | `src/css/custom.css` | Site-wide style overrides. |
-| `docusaurus.config.ts` | Site config: navbar, footer, the announcement bar (tracks which DynEarthSol PR the docs are synced through), KaTeX/search plugins. |
+| `docusaurus.config.ts` | Site config: navbar, footer and KaTeX/search plugins. A maintainer comment records the documentation sync baseline. |
 
 ## Keeping the docs in sync with DynEarthSol
 
@@ -51,7 +51,7 @@ scratch, it's catching up with upstream DynEarthSol changes:
 - **[`CLAUDE.md`](./CLAUDE.md) is the source of truth for that procedure**:
   which page a given kind of change belongs on, how to verify a change
   actually rendered, when something needs backporting into an older
-  version's snapshot, and the announcement-bar/version-dropdown mechanics.
+  version's snapshot, and the sync-record/version-dropdown mechanics.
   Read it before making a non-trivial change, whether you're a human
   contributor or an AI assistant.
 
