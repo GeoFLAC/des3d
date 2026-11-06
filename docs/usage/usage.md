@@ -25,28 +25,22 @@ The rest of this page covers building from source.
 
 ## Requirements
 
-1.  A C++ compiler that supports C++11 standard. GNU g++ 5.0 or
-    newer will suffice
-2.  **Boost::Program_options** library. Version 1.42 or newer. Boost is a large set of libraries. 
-    To install only `program_options` library, follow these stpes:
-    1. First download the source code from [https://www.boost.org]. 
-    2. In the untarred source directory, run:
+1. A C++17 compiler: GNU g++ 8 or newer, NVIDIA nvc++ 25.7 or newer,
+   or Clang 5 or newer. Apple Clang is also supported.
+2. Make and Git. The CLI11 config parser is vendored in the source tree;
+   Boost is no longer required by current builds.
+3. Python 3 with NumPy and SciPy for the Python tools. Add `h5py` to read
+   VTKHDF output and Matplotlib for the PT tutorial figures.
+4. On macOS, an OpenMP runtime such as Homebrew's `libomp`.
+5. Optional libraries: [MMG](https://github.com/MmgTools/mmg) for adaptive
+   remeshing (bundled as a submodule), ExodusII from
+   [SEACAS](https://github.com/sandialabs/seacas) for 3D mesh import, and
+   HDF5 for VTKHDF output.
 
-        ``` console
-        ./bootstrap.sh
-        ```
-
-        In the same directory, build the library by running:
-
-        ``` console
-        ./b2 --with-program_options -q
-        ```
-3.  Python 3.2+
-4.  Numpy for post-processing
-5.  Optional: 
-    1. [MMG](https://github.com/MmgTools/mmg): mesh adaptation library for adaptive remeshing. Bundled as a git submodule, no separate installation required (see below).
-    2. `Exodus`: For importing a mesh in the *ExodusII* format. Available as a part of
-    SEACAS project [https://github.com/gsjaardema/seacas/]
+These requirements describe Latest. For an older release, select its
+manual version and use the dependencies in that release's README. See the
+[current solver README](https://github.com/GeoFLAC/DynEarthSol#building-des)
+for platform package commands.
 
 ### Submodules (mmg, nanoflann, knn-bvh)
 
@@ -63,15 +57,6 @@ command above explicitly after cloning is recommended.
 
 ## Configuration
 
-### Required dependencies
-
-#### `boost::program_options`
-
-Modify `BOOST_ROOT_DIR` in Makefile if you manually built or installed
-boost library. If you followed the instructions above to build
-`Boost::Program_options` library, set `BOOST_ROOT_DIR` to the untarred
-boost directory.
-
 ### Build options
 
 | Parameter Name | Possible Values | Description |
@@ -85,9 +70,7 @@ boost directory.
 | `gprof`       | `0`, `1`        | Disable (`0`) or enable (`1`) profiling with gprof. |
 | `usemmg`       | `0`, `1`        | Disable (`0`) or enable (`1`) mesh optimization during remeshing with mmg. |
 | `useexo`       | `0`, `1`        | Disable (`0`) or enable (`1`) import of an .exo mesh, usually created with the meshing software, CUBIT. Note: Only a 3D mesh can be imported currently.|
-| `use_gpu_knn`  | `0`, `1`        | Enable GPU-accelerated k-nearest-neighbour search via BVH (requires `openacc = 1`). Reduces remeshing time by ~61 % on GPU. Requires the `knn-bvh` submodule. |
-| `SOA`          | `0`, `1`        | Enable Structure-of-Arrays memory layout for `Array2D`. Improves remeshing speed by >2× on CPU and is beneficial on GPU (H100). Default off. |
-| `hdf5`         | `0`, `1`        | Enable HDF5-based VTKHDF output (see [Visualizing outputs](./visualize)). Paths are auto-detected on Linux and macOS via `pkg-config` and the usual install layouts; override with `HDF5_INCLUDE_DIR` / `HDF5_LIB_DIR` if the wrong install is picked up or the build stops with install advice. |
+| `hdf5`         | `0`, `1`        | Enable HDF5-based VTKHDF output (see [Visualizing outputs](./visualize.md)). Paths are auto-detected on Linux and macOS via `pkg-config` and the usual install layouts; override with `HDF5_INCLUDE_DIR` / `HDF5_LIB_DIR` if the wrong install is picked up or the build stops with install advice. |
 
 ### Optional external libraries
 
@@ -116,7 +99,7 @@ often ~50% smaller, and viewable directly in ParaView without conversion):
   `pkg-config` and standard install layouts; set `HDF5_INCLUDE_DIR` and
   `HDF5_LIB_DIR` to override.
 
-See [Visualizing outputs](./visualize) for the VTKHDF file format and the
+See [Visualizing outputs](./visualize.md) for the VTKHDF file format and the
 `2vtk.py --update-vtkhdf` workflow.
 
 ## Building
@@ -127,19 +110,18 @@ $ make
 
 Build options can be set on the command line without editing `Makefile`: e.g.,
 
--   To build optimized executable (default optimization level, 1): `make`
+-   To build optimized executable (default optimization level, 2): `make`
 -   To build a debugging executable: `make opt=0` 
 -   To build the executable without `OpenMP`: `make openmp=0` 
     - This build is necessary to debug the code under `valgrind`.
 
 ### macOS (Apple Silicon)
 
-Apple's built-in Clang implements the OpenMP pragmas but ships no OpenMP
-runtime, and there is no system Boost either, so both have to come from a
-package manager. Install them with Homebrew:
+Apple's built-in Clang supports OpenMP compilation but ships no OpenMP
+runtime. Install the runtime with Homebrew:
 
 ```console
-brew install boost libomp
+brew install libomp
 ```
 
 Then a plain build finds everything on its own, no paths to edit and none
@@ -149,7 +131,7 @@ to pass on the command line:
 make ndims=2
 ```
 
-Boost and OpenMP are searched at the Homebrew prefix matching the machine's
+OpenMP is searched at the Homebrew prefix matching the machine's
 architecture (`/opt/homebrew` on Apple Silicon, `/usr/local` on Intel), not
 via `PATH`; this matters on a Mac that has ever used both prefixes, where
 `PATH` often points at an install of the wrong architecture. If a build picks
@@ -160,8 +142,8 @@ make config       # prints the compiler and every resolved dependency path
 make check-deps   # validates dependencies (fatal on macOS) without building
 ```
 
-`OPENMP_ROOT_DIR` / `BOOST_ROOT_DIR` can be set on the command line to force
-a specific install when the search doesn't find the right one.
+`OPENMP_ROOT_DIR` can be set on the command line to force
+a specific runtime install when the search doesn't find the right one.
 
 At startup, DES3D automatically sets `OMP_WAIT_POLICY=active` on macOS
 to avoid a performance regression caused by `libomp`'s default

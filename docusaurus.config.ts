@@ -104,9 +104,9 @@ const config: Config = {
     // Replace with your project's social card
     image: 'img/docusaurus-social-card.jpg',
     announcementBar: {
-      id: 'dynearthsol-sync-status-7',
+      id: 'dynearthsol-sync-status-8',
       content:
-        'These docs are synced with <a href="https://github.com/GeoFLAC/DynEarthSol" target="_blank" rel="noopener noreferrer">DynEarthSol</a> through <a href="https://github.com/GeoFLAC/DynEarthSol/pull/114" target="_blank" rel="noopener noreferrer">PR&nbsp;#114</a> (2026-10-31).',
+        'Latest docs include <a href="/des3d/docs/usage/pt">PT mechanics</a> from <a href="https://github.com/GeoFLAC/DynEarthSol/pull/106" target="_blank" rel="noopener noreferrer">PR&nbsp;#106</a> (2026-11-06). General sync baseline: <a href="https://github.com/GeoFLAC/DynEarthSol/pull/114" target="_blank" rel="noopener noreferrer">PR&nbsp;#114</a> (2026-10-31).',
       backgroundColor: 'var(--ifm-color-primary)',
       textColor: '#fff',
       isCloseable: true,
