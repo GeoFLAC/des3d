@@ -127,9 +127,10 @@ python analyze_pt.py elastic elastic-0 elastic-1 --source ..
 
 Each model writes a `.info` index, a `.manifest`, and save/checkpoint
 frames 0 through 3. The script reads the native output through the
-checkout's `Dynearthsol.py`. It checks every saved stress, strain and
-vertical velocity against the homogeneous reference, checks convergence
-records, and writes `elastic-0.csv`, `elastic-1.csv`,
+checkout's `Dynearthsol.py`. It checks all components of saved stress,
+strain, coordinates and velocity for finiteness, then compares axial stress,
+axial strain and vertical velocity against the homogeneous reference and
+checks convergence records. It writes `elastic-0.csv`, `elastic-1.csv`,
 `elastic-response.svg/.png` and `elastic-convergence.svg/.png`.
 
 ![Computed elastic compression and axial stress for both PT options.](/tutorial/pt/elastic-response.svg)
@@ -183,6 +184,8 @@ is 0.0353553 N/m. The residual is a projected nodal-force RMS, not a stress
 in Pa. `initial` describes the selected candidate; `warm_initial` can be
 much larger after the candidate comparison. All records state
 `stage=before_physical_updates`.
+For physical steps, this label follows any thermal diffusion update and
+precedes hydraulic transport, mesh motion and stress rotation.
 
 The saved `PT residual force` has this same diagnostic time level. Saved
 stress includes the later physical stress rotation, so independently

@@ -46,7 +46,8 @@ for history-dependent materials. See the manual for the limitations.
 The fixed mesh does not move. Equivalent top displacement is reconstructed
 by integrating velocity. Negative stress, strain and displacement denote
 compression. The analysis checks the supplied 0.01 s timestep and 3/100-step
-histories, all axial stress/strain/vertical-velocity values, and PT reports.
+histories, all components of stress/strain/coordinates/velocity for
+finiteness, axial stress/strain/vertical-velocity reference values, and PT reports.
 Reference CSVs in reference/ contain the checked 2D results. Figures are
 generated from solver output by analyze_pt.py; no output data are fabricated.
 

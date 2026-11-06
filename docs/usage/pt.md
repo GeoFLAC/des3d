@@ -23,15 +23,17 @@ mass scaling and timestep choices.
 ## Physical steps and pseudo iterations
 
 A physical step has a physical duration, controlled by the usual timestep
-settings such as `control.fixed_dt` (seconds). During its PT solve:
+settings such as `control.fixed_dt` (seconds). Thermal diffusion, when
+enabled, advances temperature once before the PT solve; temperature then
+remains fixed during the mechanical trials. During the PT solve:
 
 1. The reference mesh and the physical-start material history are held fixed.
 2. Each candidate velocity is constrained by the velocity boundary conditions.
 3. The constitutive law evaluates the candidate over the **same physical dt**,
    starting again from the physical-start history.
 4. The solver accepts one candidate when its projected force residual meets
-   the tolerance. Transport, mesh motion and stress rotation then follow in
-   their physical update stages.
+   the tolerance. Hydraulic transport, mesh motion and stress rotation then
+   follow in their physical update stages.
 
 Increasing the number of pseudo iterations does not repeatedly advance
 plastic strain, viscous relaxation or frictional aging. It also does not
@@ -156,7 +158,7 @@ This shortened record comes from the 2D elastic tutorial, option 0.
 | `initial` | Residual of the selected starting candidate. |
 | `warm_initial` | First warm candidate's residual; the reference for default relative convergence. |
 | `residual`, `threshold` | Accepted residual and its acceptance limit. |
-| `stage` | Diagnostic time level: before physical transport, mesh motion and stress rotation. |
+| `stage` | For physical steps: after any thermal update, before hydraulic transport, mesh motion and stress rotation. |
 
 The accepted vector is saved as `PT residual force`, supported by
 `Dynearthsol.py` and `2vtk.py`. Legacy `force` retains damping and support
@@ -168,8 +170,9 @@ these fields or recomputing force from saved stress.
 A stagnation warning does not stop the solve or relax the tolerance. Reaching
 `PT_max_iter` without convergence exits with **54**; a nonfinite candidate
 exits with **50**. Mechanical history is restored and the failed candidate
-does not proceed to output, transport or mesh motion. Review the loading,
-constraints, physical timestep and attainable tolerance before changing the
+does not proceed to output, hydraulic transport or mesh motion. This restores
+mechanical history; an earlier thermal update is not rolled back. Review the
+loading, constraints, physical timestep and attainable tolerance before changing the
 iteration limit.
 
 [Restart](./run.md#checkpointing-and-restart) requires an explicitly selected

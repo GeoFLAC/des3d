@@ -67,14 +67,16 @@ def read_model(Dynearthsol, prefix, kind):
     top_displacement = 0.0
     max_error = 0.0
     for index, frame in enumerate(model.frames):
-        strain = model.read_field(frame, "strain")[:, model.ndims - 1]
-        stress = model.read_field(frame, "stress")[:, model.ndims - 1]
-        coordinate = model.read_field(frame, "coordinate")
-        velocity = model.read_field(frame, "velocity")[:, model.ndims - 1]
-        reference_velocity = (coordinate[:, -1] + 1) * increments[index] / 0.01
-        for field in (strain, stress, coordinate, velocity):
+        fields = {name: model.read_field(frame, name)
+                  for name in ("strain", "stress", "coordinate", "velocity")}
+        for name, field in fields.items():
             if not np.isfinite(field).all():
-                raise ValueError(f"{prefix}: nonfinite field at frame {frame}")
+                raise ValueError(f"{prefix}: nonfinite {name} at frame {frame}")
+        strain = fields["strain"][:, model.ndims - 1]
+        stress = fields["stress"][:, model.ndims - 1]
+        coordinate = fields["coordinate"]
+        velocity = fields["velocity"][:, model.ndims - 1]
+        reference_velocity = (coordinate[:, -1] + 1) * increments[index] / 0.01
         max_error = max(max_error,
                         np.max(np.abs(strain - ref_strain[index])) / 0.01,
                         np.max(np.abs(stress - ref_stress[index])) / 1e5,

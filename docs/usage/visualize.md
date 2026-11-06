@@ -40,8 +40,11 @@ Accepted [PT solves](./pt.md) can save an optional nodal vector,
 
 The PT vector's free-rank RMS is the reported residual, in N/m in 2D or N
 in 3D. It describes the accepted solve on its reference geometry, **before**
-physical transport, mesh motion and stress rotation. This time level is
-retained even when other output fields are averaged. Force reassembled
+hydraulic transport, mesh motion and stress rotation. For physical steps
+with thermal diffusion enabled, temperature has already been advanced;
+the report's `stage=before_physical_updates` does not precede that thermal
+stage. This diagnostic time level is retained even when other output fields
+are averaged. Force reassembled
 from saved post-rotation stress can therefore differ from this diagnostic.
 
 The vector is absent before any accepted solve, after remeshing until a

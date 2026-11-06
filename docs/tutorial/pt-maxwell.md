@@ -50,9 +50,10 @@ its use for general viscous flow.
 python analyze_pt.py maxwell maxwell-0 maxwell-1 --source ..
 ```
 
-The script checks stress, strain and vertical velocity in every saved
-frame against the independent discrete reference below. It writes one
-CSV per model and `maxwell-response.svg/.png`. The checked 2D runs have
+The script checks every component of stress, strain, coordinates and
+velocity for finiteness in each saved frame, then compares axial stress,
+axial strain and vertical velocity against the independent discrete reference
+below. It writes one CSV per model and `maxwell-response.svg/.png`. The checked 2D runs have
 maximum normalized field errors below $2.2\times10^{-6}$, within the
 script's $5\times10^{-5}$ limit. Normalizers are 100 kPa for stress,
 0.01 for strain and 0.5 m/s for velocity.

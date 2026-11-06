@@ -29,8 +29,10 @@ Consequently, $k$ trials do not represent $k\Delta t$ of aging or viscous
 relaxation. Mixed stress correction is applied before candidate force
 evaluation. Acceptance commits the full constitutive candidate.
 
-Mesh motion, stress rotation, transport and remeshing occur outside this
-loop. Gradients, volumes, facet areas and normals remain on the reference
+Thermal diffusion advances temperature once before a physical PT solve,
+and temperature remains fixed during its trials. Hydraulic transport,
+mesh motion, stress rotation and remeshing follow accepted mechanics outside
+the loop. Gradients, volumes, facet areas and normals remain on the reference
 mesh during mechanics. For moving-mesh physical steps, height-dependent
 foundation, water and side-support pressures include the candidate vertical
 displacement in their height argument. This is an incremental pressure-load
@@ -115,7 +117,10 @@ is rejected for this initialization. Initial equilibrium precedes frame-zero
 output and monitor initialization, and completion is checkpointed.
 
 The saved `PT residual force` describes the accepted reference-geometry
-solve **before** subsequent physical updates. A force reconstructed from
+solve **before** hydraulic transport, mesh motion and stress rotation. For
+physical steps with thermal diffusion enabled, temperature has already been
+advanced. The report's `stage=before_physical_updates` refers to the later
+updates, not the preceding thermal stage. A force reconstructed from
 saved post-rotation stress can differ slightly, even on a fixed mesh.
 Remeshing invalidates this diagnostic until another solve is accepted.
 See [PT force output](../usage/visualize.md#pt-force-output).
