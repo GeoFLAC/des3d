@@ -4,6 +4,12 @@ sidebar_position: 1
 
 # Solution scheme in DES3D
 
+The dynamic equation and explicit time integration below describe the
+default `control.has_PT = no` path. Both paths share the spatial force
+discretization. With `control.has_PT = yes`,
+[pseudo-transient mechanics](./pt.md) instead seeks equilibrium within each
+physical timestep. See [solver selection](../usage/pt.md) for configuration.
+
 ## Equation of motion
 
 DES3D solves the equation of motion, i.e., linear momentum balance equation, in the following fully dynamic form:
@@ -124,7 +130,7 @@ $$
 \oint_{\partial\Omega_{e}}N_{a}^{e}dL=\frac{1}{M-1}L_s.
 $$
 
-## The Rest of the solution scheme
+## The rest of the explicit solution scheme
 
 We are interested in tectonic deformation, 
 which can be properly simulated in a quasi-static fashion. 

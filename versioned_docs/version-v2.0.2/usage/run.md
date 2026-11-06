@@ -53,8 +53,22 @@ the checkpoint:
 - `plastic strain-rate` (`delta_plstrain`), so a restarted run's diagnostic
   output matches a continuous one
 
-To restart from a checkpoint, run the executable with the same config
-file. DES3D detects the most recent checkpoint automatically.
+To restart, copy the original config and edit its existing `[sim]` section:
+
+```cfg
+[sim]
+modelname = result-r
+is_restarting = yes
+restarting_from_modelname = result
+restarting_from_frame = 10
+```
+
+Replace `result` and `10` with the original model prefix and an output frame
+that has both save and checkpoint files. Run the executable with this edited
+config, retaining the original physical controls and allowing enough steps
+or time to continue. Frame numbers are output-frame indices, not necessarily
+physical step numbers. Both restart-selection parameters are required;
+rerunning an unchanged fresh config does not automatically select a checkpoint.
 
 :::danger Checkpoint/output format revision 4
 The checkpoint and frame file format was bumped from revision 3 to 4.

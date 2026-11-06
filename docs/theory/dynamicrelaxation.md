@@ -4,6 +4,11 @@ sidebar_position: 2
 
 # Dynamic Relaxation
 
+This page describes damping in the default explicit momentum path
+(`control.has_PT = no`). PT's optional adaptive dynamic relaxation
+(`PT_option = 1`) has its own mass and damping construction; see
+[Pseudo-transient mechanics](./pt.md#relaxation-schemes).
+
 Given that our main interest is in long-term tectonic modeling,  high-frequency vibrations are not 
 relevant to the overall deformation pattern. A strong and efficient
 damping is necessary to achieve quasi-static solutions of the dynamic

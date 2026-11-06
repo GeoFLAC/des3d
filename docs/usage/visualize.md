@@ -24,7 +24,36 @@ The processed VTU (node and cell data) and VTP (marker data) files can
 be visualized with [ParaView](https://paraview.org) or
 [VisIt](https://visit-dav.github.io/visit-website/index.html).
 
-Some outputs can be disabled by editing `2vtk.py` and `output.cxx`.
+Choose saved fields with the `[sim]` output settings in
+`examples/defaults.cfg`, such as `has_marker_output` and
+`is_outputting_averaged_fields`.
+
+### PT force output
+
+Accepted [PT solves](./pt.md) can save an optional nodal vector,
+`PT residual force`. The Python reader and `2vtk.py` support this field.
+
+| Field | Meaning |
+|---|---|
+| `force` | Legacy force, including artificial damping and constrained reactions. |
+| `PT residual force` | Accepted undamped force projected onto admissible velocity perturbations. |
+
+The PT vector's free-rank RMS is the reported residual, in N/m in 2D or N
+in 3D. It describes the accepted solve on its reference geometry, **before**
+hydraulic transport, mesh motion and stress rotation. For physical steps
+with thermal diffusion enabled, temperature has already been advanced;
+the report's `stage=before_physical_updates` does not precede that thermal
+stage. This diagnostic time level is retained even when other output fields
+are averaged. Force reassembled
+from saved post-rotation stress can therefore differ from this diagnostic.
+
+The vector is absent before any accepted solve, after remeshing until a
+new solve is accepted, and at failed solves. New saves preserve it across
+restart; older saves remain readable and acquire it after the next accepted
+solve. It adds no checkpoint requirement. During binary-to-VTU conversion,
+`2vtk.py` reports once if selected frames lack it and preserves the field
+where available. An initial-frame notice can be expected in the
+[elastic tutorial](../tutorial/pt-elastic.md).
 
 ### Restarted models
 
@@ -43,7 +72,7 @@ parent's frames first, so the series runs from frame 0.
 
 Each frame also carries its own origin — which model and machine wrote it,
 and, on a restart, what it restarted from — as described in
-[Provenance](./run#provenance).
+[Provenance](./run.md#provenance).
 
 ## VTKHDF output format
 

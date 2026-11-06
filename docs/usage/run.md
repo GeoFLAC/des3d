@@ -22,6 +22,10 @@ dynearthsol3d input.cfg
 -   Execute the executable with `-h` flag to see the available input
     parameters and their descriptions.
 
+For a force-balanced mechanical solve within each physical timestep, see
+[Choosing a mechanical solver (PT)](./pt.md) and the
+[elastic-loading tutorial](../tutorial/pt-elastic.md).
+
 ## Progress reporting
 
 The `sim.info_display_step_interval` parameter controls how often
@@ -39,10 +43,10 @@ automatically and notify you if an adjustment is made.
 ## Checkpointing and restart
 
 DES3D writes checkpoint files at regular intervals so that a simulation
-can be resumed after interruption. As of 2026, restarts are
-**deterministic**: a restarted run produces bit-for-bit identical output
-to one that never stopped. The following state is now fully persisted in
-the checkpoint:
+can be resumed after interruption. With unchanged controls, the restart
+tests compare saved physical state with uninterrupted runs. Use one OpenMP
+thread for byte-exact PT continuation; multi-thread ADR reductions can
+change the last bits. The following state is persisted in the checkpoint:
 
 - `dt` and `dt_PT` (time step)
 - `max_global_vel_mag`
@@ -53,8 +57,31 @@ the checkpoint:
 - `plastic strain-rate` (`delta_plstrain`), so a restarted run's diagnostic
   output matches a continuous one
 
-To restart from a checkpoint, run the executable with the same config
-file. DES3D detects the most recent checkpoint automatically.
+Copy the original config and edit its existing `[sim]` section to select
+a checkpoint explicitly, giving the restart a distinct output name:
+
+```cfg
+[sim]
+modelname = result-r
+is_restarting = yes
+restarting_from_modelname = result
+restarting_from_frame = 10
+```
+
+Replace `result` and `10` with your original model prefix and an output
+frame that has both save and checkpoint files, then run the executable
+with that edited config. Checkpoint frame numbers are output-frame indices,
+not necessarily physical step numbers. Retain the original physical
+controls and set the stopping step/time to permit continuation. DES3D
+requires both restart-selection parameters; rerunning an unchanged fresh
+config does not automatically find a checkpoint.
+
+PT restores saved velocity, next-step dt and velocity scale, and does not
+repeat completed initial equilibration. Its optional running scale requires
+the stored history; old checkpoints without it cannot silently start a new
+history. Hydraulic checkpoints also require the pending signed pressure
+increment for the next mechanical step. Dry checkpoints do not require that
+hydraulic record. See [PT restart and limits](./pt.md#failure-restart-and-limits).
 
 :::danger Checkpoint/output format revision 4
 The checkpoint and frame file format was bumped from revision 3 to 4.
@@ -72,7 +99,7 @@ Checkpoints now also carry `nremesh`, `plstrain_remesh`, and, in MMG builds,
 `side_prof_*`). A checkpoint written before this change does not have these
 records, and restarting from it is a restart-mismatch error (`21`/`22`).
 Finish or discard runs on the old binary before upgrading. See
-[Conservative remeshing](../tutorial/usingmmg#conservative-remeshing-freeze--required-policy)
+[Conservative remeshing](../tutorial/usingmmg.md#conservative-remeshing-freeze--required-policy)
 for what changed in MMG remeshing itself.
 :::
 
@@ -153,6 +180,7 @@ The first digit is the category (`1x` is yours to fix, `2x` the environment,
 | `40` / `41` / `42` | Triangle or TetGen / MMG / mesh quality or topology |
 | `50` / `51` / `52` | NaN or non-finite value / marker or geometry lookup / resource exhausted |
 | `53` | GoSPL coupling step failed |
+| `54` | PT mechanical solve did not converge |
 | `60` / `61` | Assertion violated / unreachable branch |
 
 Errors in the configuration file stop the run with `10` or `11` and a message
@@ -166,7 +194,10 @@ the first bad element and node. A GPU build that finds no device at startup
 exits `52`, after appending its manifest record; see [Provenance](#provenance).
 A failed GoSPL coupling step (built with `usegospl=1`) stops the run with
 `53` instead of silently dropping that interval's erosion; see
-[Coupling with GoSPL](../tutorial/couplinggospl).
+[Coupling with GoSPL](../tutorial/couplinggospl.md).
+PT reaching its iteration limit exits with `54` after restoring the
+physical-start mechanical history; a nonfinite PT candidate exits with `50`.
+Stagnation warnings alone do not stop a PT solve. See [PT controls](./pt.md).
 Scripts that test for specific exit statuses need updating: earlier builds used
 `1`, `2`, `10`, `11` and `12` with different meanings.
 
