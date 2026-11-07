@@ -1,4 +1,5 @@
 ---
+slug: /theory/timeintegration
 sidebar_position: 6
 ---
 

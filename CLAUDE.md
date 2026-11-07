@@ -20,7 +20,7 @@ When asked to catch up the docs with recent DynEarthSol changes ("what's new", "
    - output / visualization format → `docs/usage/visualize.md`
    - meshing/remeshing behavior and parameters → `docs/theory/remeshing.md` (other `docs/theory/` pages as applicable)
    - workflow-level features (coupling, weak zones, MMG, etc.) → `docs/tutorial/`
-   - PT solver controls, theory and worked examples → `docs/pt/` and its `tutorials/` subsection. Keep related material in this chapter instead of adding separate entries across the general categories. Preserve published URLs when reorganizing pages.
+   - PT solver controls → `docs/usage/pt.md`; solution-scheme theory → `docs/theory/solution-scheme/`; PT worked examples → `docs/tutorial/pt/`. Keep the original Usage, Tutorial and Theory top-level structure, and group related pages within those sections. Preserve published URLs when reorganizing pages.
 6. **Use the DynEarthSol README as source of truth** for build/dependency wording — it's usually updated in the same PR:
    ```
    gh api repos/GeoFLAC/DynEarthSol/contents/README.md --jq '.content' | base64 -d

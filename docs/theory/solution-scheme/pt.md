@@ -1,17 +1,17 @@
 ---
-sidebar_position: 1
+sidebar_position: 3.5
 slug: /theory/pt
-title: Theory
+title: Pseudo-transient mechanics
 ---
 
-# Theory
+# Pseudo-transient mechanics
 
 With `control.has_PT = yes`, DES3D solves for quasi-static mechanical
 equilibrium within a physical timestep. The finite-element force assembly
-uses the [spatial discretization](../theory/theory.md#discretization) shared with the
+uses the [spatial discretization](./index.md#discretization) shared with the
 explicit momentum path. PT adds an inner relaxation loop whose candidates
 all refer to the same physical increment. Configuration and diagnostic
-details are in [Choosing a mechanical solver](./index.md).
+details are in [Choosing a mechanical solver](../../usage/pt.md).
 
 ## One physical increment, many trials
 
@@ -69,7 +69,7 @@ arbitrary contradictory prescriptions are not simultaneously enforced.
 The default acceptance threshold uses an absolute tolerance plus a relative
 tolerance times the first warm candidate's residual. The alternative
 running-scale criterion and its limitations are given in the
-[convergence reference](./index.md#understand-convergence).
+[convergence reference](../../usage/pt.md#understand-convergence).
 
 ## Starting candidates
 
@@ -84,7 +84,7 @@ could apply the same compression again. Zero free motion can represent its
 equilibrium. For a Maxwell material, however, zero velocity still permits
 constitutive relaxation over $\Delta t$ and need not satisfy the imposed
 traction. A new equilibrium velocity must then produce continued creep.
-The [elastic](./tutorials/elastic.md) and [Maxwell](./tutorials/maxwell.md)
+The [elastic](../../tutorial/pt/elastic.md) and [Maxwell](../../tutorial/pt/maxwell.md)
 tutorials demonstrate the distinction.
 
 ## Relaxation schemes
@@ -124,7 +124,7 @@ advanced. The report's `stage=before_physical_updates` refers to the later
 updates, not the preceding thermal stage. A force reconstructed from
 saved post-rotation stress can differ slightly, even on a fixed mesh.
 Remeshing invalidates this diagnostic until another solve is accepted.
-See [PT force output](../usage/visualize.md#pt-force-output).
+See [PT force output](../../usage/visualize.md#pt-force-output).
 
 Neither relaxation scheme can produce a stable quasi-static equilibrium
 where the model has none. Strain softening can introduce negative stiffness;

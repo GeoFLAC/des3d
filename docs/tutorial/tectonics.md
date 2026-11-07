@@ -287,7 +287,7 @@ Section by section:
   remesh.
 - **`[control]`** turns on surface diffusion and sets the mass scaling.
   `inertial_scaling` is the factor by which density is inflated to lengthen
-  the elastic time step; see [Mass scaling](../theory/massscaling.md). With no
+  the elastic time step; see [Mass scaling](../theory/solution-scheme/massscaling.md). With no
   viscosity in play, this parameter and the element size set `dt`.
 - **`[bc]`** pulls the two walls apart at 3.15 cm/yr each. The `vbc_y*`
   lines matter only in 3D. Water loading is off because the surface starts at

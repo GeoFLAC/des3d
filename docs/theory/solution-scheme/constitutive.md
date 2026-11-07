@@ -1,4 +1,5 @@
 ---
+slug: /theory/constitutive
 sidebar_position: 5
 ---
 

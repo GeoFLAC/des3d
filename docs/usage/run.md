@@ -23,8 +23,8 @@ dynearthsol3d input.cfg
     parameters and their descriptions.
 
 For a force-balanced mechanical solve within each physical timestep, see
-[Choosing a mechanical solver (PT)](../pt/index.md) and the
-[elastic-loading tutorial](../pt/tutorials/elastic.md).
+[Choosing a mechanical solver (PT)](./pt.md) and the
+[elastic-loading tutorial](../tutorial/pt/elastic.md).
 
 ## Progress reporting
 
@@ -81,7 +81,7 @@ repeat completed initial equilibration. Its optional running scale requires
 the stored history; old checkpoints without it cannot silently start a new
 history. Hydraulic checkpoints also require the pending signed pressure
 increment for the next mechanical step. Dry checkpoints do not require that
-hydraulic record. See [PT restart and limits](../pt/index.md#failure-restart-and-limits).
+hydraulic record. See [PT restart and limits](./pt.md#failure-restart-and-limits).
 
 :::danger Checkpoint/output format revision 4
 The checkpoint and frame file format was bumped from revision 3 to 4.
@@ -197,7 +197,7 @@ A failed GoSPL coupling step (built with `usegospl=1`) stops the run with
 [Coupling with GoSPL](../tutorial/couplinggospl.md).
 PT reaching its iteration limit exits with `54` after restoring the
 physical-start mechanical history; a nonfinite PT candidate exits with `50`.
-Stagnation warnings alone do not stop a PT solve. See [PT controls](../pt/index.md).
+Stagnation warnings alone do not stop a PT solve. See [PT controls](./pt.md).
 Scripts that test for specific exit statuses need updating: earlier builds used
 `1`, `2`, `10`, `11` and `12` with different meanings.
 
