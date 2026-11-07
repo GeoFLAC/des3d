@@ -1,4 +1,5 @@
 ---
+slug: /theory/nmd
 sidebar_position: 4
 ---
 

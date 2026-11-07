@@ -1,10 +1,10 @@
 ---
-sidebar_position: 0
+sidebar_position: 2.5
 slug: /usage/pt
-title: Pseudo-transient mechanics
+title: Choosing a mechanical solver (PT)
 ---
 
-# Pseudo-transient mechanics
+# Choosing a mechanical solver (PT)
 
 DES3D offers two mechanical solution paths. The default,
 `control.has_PT = no`, advances the explicit momentum equation using the
@@ -18,10 +18,10 @@ process; they do not resolve physical wave propagation. Assess a dynamic
 problem using the explicit momentum formulation and appropriate inertia,
 mass scaling and timestep choices.
 
-This page covers solver selection and controls. The [theory](./theory.md)
+This page covers solver selection and controls. The [theory](../theory/solution-scheme/pt.md)
 explains the method; the tutorials progress from
-[elastic loading and equilibrium](./tutorials/elastic.md) to
-[Maxwell creep under a held load](./tutorials/maxwell.md).
+[elastic loading and equilibrium](../tutorial/pt/elastic.md) to
+[Maxwell creep under a held load](../tutorial/pt/maxwell.md).
 
 ## Physical steps and pseudo iterations
 
@@ -41,7 +41,7 @@ remains fixed during the mechanical trials. During the PT solve:
 Increasing the number of pseudo iterations does not repeatedly advance
 plastic strain, viscous relaxation or frictional aging. It also does not
 improve physical-time resolution; check the physical timestep separately.
-See [PT mechanics](./theory.md) for the equations and acceptance contract.
+See [PT mechanics](../theory/solution-scheme/pt.md) for the equations and acceptance contract.
 
 ## Enable PT and choose an iteration scheme
 
@@ -165,7 +165,7 @@ This shortened record comes from the 2D elastic tutorial, option 0.
 
 The accepted vector is saved as `PT residual force`, supported by
 `Dynearthsol.py` and `2vtk.py`. Legacy `force` retains damping and support
-reactions. See [PT force output](../usage/visualize.md#pt-force-output) before comparing
+reactions. See [PT force output](./visualize.md#pt-force-output) before comparing
 these fields or recomputing force from saved stress.
 
 ## Failure, restart and limits
@@ -178,7 +178,7 @@ mechanical history; an earlier thermal update is not rolled back. Review the
 loading, constraints, physical timestep and attainable tolerance before changing the
 iteration limit.
 
-[Restart](../usage/run.md#checkpointing-and-restart) requires an explicitly selected
+[Restart](./run.md#checkpointing-and-restart) requires an explicitly selected
 checkpoint. With unchanged controls, PT restores the saved velocity,
 next-step dt and velocity scale without repeating completed initial
 equilibration. Running scale also requires its checkpointed history; old
@@ -190,7 +190,7 @@ multi-thread ADR reductions can differ in the last bits.
 PT establishes equilibrium on the reference configuration. It does not
 guarantee equilibrium after mesh motion, convergence through strain
 softening, or accuracy for arbitrary hydraulic coupling. Start with the
-[elastic tutorial](./tutorials/elastic.md), then the
-[Maxwell creep tutorial](./tutorials/maxwell.md). The
+[elastic tutorial](../tutorial/pt/elastic.md), then the
+[Maxwell creep tutorial](../tutorial/pt/maxwell.md). The
 [solver notes and validation limits](https://github.com/GeoFLAC/DynEarthSol/blob/master/doc/pt-solver.md)
 describe the available qualification in detail.

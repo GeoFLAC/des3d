@@ -1,4 +1,5 @@
 ---
+slug: /theory/massscaling
 sidebar_position: 3
 ---
 

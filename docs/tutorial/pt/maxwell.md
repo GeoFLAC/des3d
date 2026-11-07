@@ -127,5 +127,5 @@ The same inputs and analysis script apply.
 These homogeneous, dry, fixed-grid checks do not qualify moving meshes,
 localized softening, arbitrary irreversible loading or hydraulic coupling.
 For solver controls and known convergence limits, return to
-[Choosing a mechanical solver](../index.md) and the
+[Choosing a mechanical solver](../../usage/pt.md) and the
 [validation record](https://github.com/GeoFLAC/DynEarthSol/blob/master/doc/pt-validation-20261006.md).

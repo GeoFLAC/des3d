@@ -107,7 +107,7 @@ surface_process_option = 0
 `elastic-1`. The running scale keeps force precision tied to the applied
 load during subsequent held steps. It is an explicit tutorial setting;
 the solver default is `no`. Read its
-[scope and limitations](../index.md#optional-running-scale) before using
+[scope and limitations](../../usage/pt.md#optional-running-scale) before using
 it in another problem.
 
 ## Run and plot
