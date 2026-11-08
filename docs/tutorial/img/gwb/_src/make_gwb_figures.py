@@ -61,10 +61,12 @@ def subduction(d):
     ax[1].set_title('mattype_option = 936: GWB composition i is mattype i, on each marker',
                     loc='left')
     ax[2].triplot(tri, color='0.7', lw=0.3)
-    weak_outline(ax[2], tri, pls)
-    ax[2].set_title('weakzone_option = 936: weakzone_plstrain (green) in the elements of the '
-                    'plate-interface fault; %d elements' % len(conn), loc='left')
-    cbar_axes(ax[2]).axis('off')
+    w = pls > 0
+    pc = ax[2].tripcolor(mtri.Triangulation(tri.x, tri.y, tri.triangles[w]), facecolors=pls[w],
+                         cmap='viridis', vmin=0, vmax=pls.max())
+    fig.colorbar(pc, cax=cbar_axes(ax[2]), label='plastic strain')
+    ax[2].set_title('weakzone_option = 936, gwb_fault_is_gaussian: plastic strain in %d of %d '
+                    'elements' % (w.sum(), len(conn)), loc='left')
     for a in ax:
         a.set_ylabel('z (km)')
         a.set_xlim(0, 600)

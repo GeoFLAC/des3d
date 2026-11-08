@@ -151,24 +151,32 @@ also takes the bottom temperature as the largest initial temperature.
 `examples/gwb-subduction.cfg` and `.wb`: a 600 × 200 km cross section of a
 continental plate (35 km crust), an oceanic plate (7 km crust) and a slab
 descending from x = 250 km to about 180 km depth, with GWB's plate and
-mass-conserving slab temperatures, and a 6 km-thick fault along the slab top to
+mass-conserving slab temperatures, and a 12 km-thick fault along the slab top to
 80 km, the plate interface. All three options are on; the materials are
-0 oceanic crust, 1 continental crust and 2 mantle.
+0 oceanic crust, 1 continental crust and 2 mantle. The weak zone is Gaussian:
+
+```cfg
+weakzone_plstrain = 1
+gwb_fault_is_gaussian = yes
+weakzone_standard_deviation = 2.5e3   # the 12 km thickness is about 5 sigma
+```
 
 ```bash
 cd DynEarthSol/examples
 ../dynearthsol2d gwb-subduction.cfg
 ```
 
-![The 2D subduction example at t = 0: the GWB temperature at every node, the material of every marker, and the weak elements of the plate-interface fault](./img/gwb/gwb-subduction.png)
+![The 2D subduction example at t = 0: the GWB temperature at every node, the material of every marker, and the plastic strain of the Gaussian plate-interface weak zone](./img/gwb/gwb-subduction.png)
 
-The initial mesh has 5354 elements and 21 416 markers: 932 of oceanic crust,
-1140 of continental crust and 19 344 of mantle. 93 elements lie in the fault.
+The initial mesh has 5393 elements and 21 572 markers: 1006 of oceanic crust,
+1184 of continental crust and 19 382 of mantle. 196 elements lie in the fault,
+with plastic strain from 1 at the slab top down to 0.06 at the fault's edges,
+6 km away.
 The ragged isotherms above the slab follow a step in the world's temperature
 at the slab top: at x = 130 km it drops by 285 K within 1 km at 33 km depth,
 from the overriding plate's geotherm to the cold slab, and the 5 km mesh
-samples that step. The example runs 100 kyr with fixed walls in about 8 s on 4 threads: it shows the
-initial fields rather than subduction.
+samples that step. The example runs 100 kyr with fixed walls in about 8 s on
+4 threads: it shows the initial fields rather than subduction.
 
 ## Example 2: a weak zone alone, in a core complex
 
