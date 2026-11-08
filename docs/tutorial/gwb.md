@@ -58,7 +58,7 @@ DES's other options. (936 reads as "gwb": 9 is a g, 3 on its side a w, 6 a b.)
 |---|---|---|
 | `temperature_option = 936` | temperature of every node | GWB temperature |
 | `mattype_option = 936` | material of every marker | GWB composition *i* is mattype *i* |
-| `weakzone_option = 936` | `weakzone_plstrain` in the weak elements | the elements whose centroid lies in a GWB `fault` feature |
+| `weakzone_option = 936` | `weakzone_plstrain` in the weak elements, uniform or (with `gwb_fault_gaussian`) a Gaussian across the fault | the elements whose centroid lies in a GWB `fault` feature |
 
 ```cfg
 [ic]
@@ -125,6 +125,21 @@ A GWB fault's `thickness` is measured across the fault, while DES's
 A fault without composition or temperature models changes neither, so a
 plate-interface fault can be added on top of the materials and temperatures
 above it.
+
+By default every element in a fault gets the same `weakzone_plstrain`. With
+`ic.gwb_fault_gaussian = yes`, the plastic strain falls off away from the
+fault's plane as a Gaussian,
+
+```text
+plstrain = weakzone_plstrain × exp(−d² / 2σ²)
+```
+
+where *d* is the element centroid's distance from the plane (GWB measures it
+across the fault, like the thickness) and σ is `ic.weakzone_standard_deviation`,
+in metres. The fault's thickness still bounds the zone, so make it about 4–6 σ
+for the strain to fade before the edge. An element in several faults takes the
+largest value; GWB finds each fault's plane by its name, so the faults need
+distinct names.
 
 ### Temperature
 
@@ -216,6 +231,8 @@ mesh is remeshed often.
 | exit 11: `Error: Geodynamic World Builder, world '...': ...` | GWB rejected the world; its own message follows. In 2D, a world without a `cross section` is one cause |
 | exit 12: `... defines no material at x = (...)` | `mattype_option = 936` and a marker without a composition of at least 0.5 below `num_materials`; see [Every point needs a material](#every-point-needs-a-material) |
 | exit 12: `ic.weakzone_option 936 needs a fault feature` | the world has no `fault` |
+| exit 12: `ic.gwb_fault_gaussian needs the faults ... to have distinct names` | two faults share a name |
+| exit 11: `ic.gwb_fault_gaussian needs ic.weakzone_standard_deviation > 0` | σ is 0 or negative |
 
 ## Testing
 
