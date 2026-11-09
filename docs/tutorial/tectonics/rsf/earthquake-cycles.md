@@ -202,7 +202,13 @@ the scaling the run would need about $10^{13}$ steps at the event time step.
   earthquakes stop. Compare the recurrence interval and peak speed on the
   way.
 - **Record seismic moment.** Set `sim.seismic_moment_calculate_output = yes`
-  to write event start and end times to `seismic_moment_magnitude.txt`.
+  to write each event's start and end times and moment to
+  `seismic_moment_magnitude.txt`. The moment is per unit length out of the
+  plane in 2D (see [Earthquake output](../../../theory/rate-state-friction.md#earthquake-output)).
+  Each of the three earthquakes gives about $1.5\times10^{16}$ N·m/m, that
+  is 5 m of average slip on the 100 km layer; it is followed by a few short
+  entries five to seven orders of magnitude smaller, as the speed crosses the
+  thresholds again while the model rings down.
 - **Limit the state change per step.** Add
   `control.rsf_slip_rate_projection_option = 1` and
   `control.rsf_dtheta_max = 0.5` and check how much the event changes.

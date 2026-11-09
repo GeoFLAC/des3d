@@ -324,13 +324,23 @@ During an event, fields are written every
 `sim.earthquake_output_step_interval` steps (default 50) in addition to the
 regular output. With `sim.seismic_moment_calculate_output = yes` DES3D
 writes each event's start and end times to `seismic_moment_magnitude.txt`,
-together with a size measure $\sum G\,\Omega_e\,|\bar v_e|\,\Delta t$
-accumulated over elements (shear modulus $G$, element volume $\Omega_e$,
-mean element speed $\bar v_e$) and a magnitude
-$M_w = \tfrac23(\log_{10}M_0 - 9.1)$ from it
+together with the seismic moment accumulated over the event,
+
+$$
+M_0 = \sum_{\text{steps}} \sum_e 2\,G\,\Omega_e\,\Delta\varepsilon^p_e ,
+$$
+
+where $G$ is the shear modulus, $\Omega_e$ the element volume and
+$\Delta\varepsilon^p_e$ the element's plastic-strain increment of the step
+(the second invariant, $\gamma/2$ in simple shear, so each term is
+$G\,\Omega_e\,\gamma$). It needs no fault geometry: only elements that yield
+contribute, and rigid motion adds nothing. In 3D $M_0$ is in N·m and the file
+also gives $M_w = \tfrac23(\log_{10}M_0 - 9.1)$
 ([Hanks and Kanamori, 1979](https://doi.org/10.1029/JB084iB05p02348)).
-The size measure uses element speed rather than slip across the shear zone.
-Use it to compare events within one model, not as a seismic moment in N·m.
+In 2D $\Omega_e$ is the element area, so $M_0$ is per unit length out of the
+plane (N·m/m) and no $M_w$ is written. In the RSF earthquake example the main
+events give about $1.5\times10^{16}$ N·m/m, an average slip of 5 m on the
+100 km layer, which matches the loading of one cycle.
 
 The point monitor can record the friction coefficient and state at chosen
 points with `monitor.output_dynamic_friction` and
@@ -356,7 +366,7 @@ points with `monitor.output_dynamic_friction` and
 | `control.damping_option`, `control.damping_factor` | `1`, `0.8` | Force damping |
 | `sim.earthquake_start_factor`, `sim.earthquake_end_factor` | `5`, `2` | event thresholds relative to the boundary speed |
 | `sim.earthquake_output_step_interval` | `50` | output interval during an event (steps) |
-| `sim.seismic_moment_calculate_output` | `no` | write event times and size to `seismic_moment_magnitude.txt` |
+| `sim.seismic_moment_calculate_output` | `no` | write event times and seismic moment to `seismic_moment_magnitude.txt` |
 
 ## References
 
