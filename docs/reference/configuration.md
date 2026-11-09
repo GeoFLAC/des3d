@@ -43,8 +43,10 @@ material. A single value applies to every material.
 
 ## Finding a parameter
 
-The executable is the authoritative list for its own version. Run it with
-`-h` to print every parameter with its type and description:
+The [configuration parameters](./parameters.md) page lists every parameter
+with its type, default and description. It is generated from the
+executables, which remain the authoritative list for their own version. Run
+one with `-h` to print the same information for the build you are using:
 
 ```console
 ./dynearthsol2d -h
