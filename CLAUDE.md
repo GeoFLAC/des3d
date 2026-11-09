@@ -14,7 +14,7 @@ When asked to catch up the docs with recent DynEarthSol changes ("what's new", "
    ```
 3. **Drop CI/workflow-only PRs** (titles like `ci:`, GitHub Actions/token/workflow refactors) — no doc surface.
 4. **For each remaining PR**, `gh pr view <N> --repo GeoFLAC/DynEarthSol --json title,body,files` and judge whether it's user-facing (new parameter, build flag, output format, breaking change) vs. an invisible internal fix. Only document the former.
-5. **Map user-facing changes to the right page.** The manual has five sections (Getting started, User guide, Tutorials, Theory, Reference); see "Section layout" below.
+5. **Map user-facing changes to the right page.** The manual has six sections (Getting started, User guide, Tutorials, Theory, Reference, Developer guide); see "Section layout" below.
    - build options / dependencies → `docs/getting-started/installation.md`
    - basic running and progress output → `docs/getting-started/run.md`
    - checkpointing / restart behavior → `docs/user-guide/running/restart.md`
@@ -56,6 +56,7 @@ export PATH="$(pwd)/node20/bin:$PATH"
 | Tutorials | `docs/tutorial/` | reproducible worked examples, grouped by topic |
 | Theory | `docs/theory/` | formulation and numerical methods |
 | Reference | `docs/reference/` | configuration file and look-up material |
+| Developer guide | `docs/developer/` | source layout, testing, adding parameters, contributing, maintaining this manual |
 
 The build fails on broken links, anchors, Markdown links and images
 (`onBrokenLinks: 'throw'`). Link to other docs by relative file path
