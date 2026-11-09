@@ -14,13 +14,19 @@ When asked to catch up the docs with recent DynEarthSol changes ("what's new", "
    ```
 3. **Drop CI/workflow-only PRs** (titles like `ci:`, GitHub Actions/token/workflow refactors) — no doc surface.
 4. **For each remaining PR**, `gh pr view <N> --repo GeoFLAC/DynEarthSol --json title,body,files` and judge whether it's user-facing (new parameter, build flag, output format, breaking change) vs. an invisible internal fix. Only document the former.
-5. **Map user-facing changes to the right page:**
-   - build options / dependencies → `docs/usage/usage.md`
-   - running / checkpointing / restart behavior → `docs/usage/run.md`
-   - output / visualization format → `docs/usage/visualize.md`
-   - meshing/remeshing behavior and parameters → `docs/theory/remeshing.md` (other `docs/theory/` pages as applicable)
-   - workflow-level features (coupling, weak zones, MMG, etc.) → `docs/tutorial/`
-   - PT solver controls → `docs/usage/pt.md`; solution-scheme theory → `docs/theory/solution-scheme/`; PT worked examples → `docs/tutorial/pt/`. Keep the original Usage, Tutorial and Theory top-level structure, and group related pages within those sections. Preserve published URLs when reorganizing pages.
+5. **Map user-facing changes to the right page.** The manual has five sections (Getting started, User guide, Tutorials, Theory, Reference); see "Section layout" below.
+   - build options / dependencies → `docs/getting-started/installation.md`
+   - basic running and progress output → `docs/getting-started/run.md`
+   - checkpointing / restart behavior → `docs/user-guide/running/restart.md`
+   - provenance, run-time warnings, exit codes → `docs/user-guide/running/diagnostics.md`
+   - output / visualization format → `docs/getting-started/visualize.md`
+   - point monitors → `docs/user-guide/running/point-monitors.md`
+   - geometry, meshes, initial and boundary conditions, weak zones → `docs/user-guide/model-setup/`
+   - PT solver controls → `docs/user-guide/numerical-controls/solver.md`; MMG options → `docs/user-guide/numerical-controls/mmg.md`
+   - meshing/remeshing theory → `docs/theory/remeshing.md`; solution-scheme theory → `docs/theory/solution-scheme/`; RSF → `docs/theory/rate-state-friction.md`
+   - worked scientific examples → `docs/tutorial/` (`fundamentals/`, `tectonics/`, `tectonics/rsf/`, `advanced/`)
+   - new or renamed parameters also belong in the parameter tables of the relevant User guide or Theory page; `docs/reference/configuration.md` lists the sections and where each feature is documented.
+   Keep the top-level structure. Preserve published URLs when reorganizing pages: every moved page keeps its old URL through `slug:`, and a renamed category page needs a redirect in the `@docusaurus/plugin-client-redirects` entry of `docusaurus.config.ts`.
 6. **Use the DynEarthSol README as source of truth** for build/dependency wording — it's usually updated in the same PR:
    ```
    gh api repos/GeoFLAC/DynEarthSol/contents/README.md --jq '.content' | base64 -d
@@ -39,6 +45,21 @@ tar -xJf node20.tar.xz -C node20 --strip-components=1
 export PATH="$(pwd)/node20/bin:$PATH"
 ```
 `yarn --ignore-engines install` bypasses the `package.json` engines check for install, but the Docusaurus CLI itself hard-checks the Node version at build time regardless — the actual binary must be ≥20.
+
+## Section layout
+
+| Section | Folder | Contents |
+| --- | --- | --- |
+| Getting started | `docs/getting-started/` | overview (`/intro`), installation, running, visualizing |
+| User guide | `docs/user-guide/` | one feature per page: `model-setup/`, `numerical-controls/`, `running/` |
+| Tutorials | `docs/tutorial/` | reproducible worked examples, grouped by topic |
+| Theory | `docs/theory/` | formulation and numerical methods |
+| Reference | `docs/reference/` | configuration file and look-up material |
+
+The build fails on broken links, anchors, Markdown links and images
+(`onBrokenLinks: 'throw'`). Link to other docs by relative file path
+(`../user-guide/running/restart.md`), not by URL, so the check can follow
+them.
 
 ## Versioned docs
 

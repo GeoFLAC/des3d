@@ -19,9 +19,9 @@ This page gives the friction law, how DES3D measures slip rate in an
 element, and how the law enters the plastic update. It then describes
 global velocity scaling, which lets one model run through slow loading and
 fast rupture, and the other numerical controls.
-The tutorials check the law [in simple shear](../tutorial/rsf/simple-shear.md)
-and show it at work in [earthquake cycles](../tutorial/rsf/earthquake-cycles.md)
-and [slip events in a shear band](../tutorial/rsf/rate-state-friction.mdx).
+The tutorials check the law [in simple shear](../tutorial/tectonics/rsf/simple-shear.md)
+and show it at work in [earthquake cycles](../tutorial/tectonics/rsf/earthquake-cycles.md)
+and [slip events in a shear band](../tutorial/tectonics/rsf/rate-state-friction.mdx).
 
 ## Friction law
 
@@ -335,7 +335,7 @@ Use it to compare events within one model, not as a seismic moment in N·m.
 The point monitor can record the friction coefficient and state at chosen
 points with `monitor.output_dynamic_friction` and
 `monitor.output_state_variable`; see the
-[point monitor tutorial](../tutorial/pointmonitor.md).
+[point monitor tutorial](../user-guide/running/point-monitors.md).
 
 ## Parameters
 

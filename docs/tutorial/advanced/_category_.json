@@ -1,0 +1,9 @@
+{
+  "label": "Advanced applications",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "slug": "/category/advanced-applications",
+    "description": "Coupling DynEarthSol with other models"
+  }
+}
