@@ -1,0 +1,9 @@
+{
+  "label": "Numerical controls",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "slug": "/category/numerical-controls",
+    "description": "Choosing the mechanical solver and controlling remeshing"
+  }
+}

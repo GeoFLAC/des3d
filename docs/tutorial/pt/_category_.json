@@ -1,9 +1,0 @@
-{
-  "label": "Pseudo-transient mechanics",
-  "position": 0.5,
-  "link": {
-    "type": "generated-index",
-    "slug": "/category/tutorials",
-    "description": "Apply a load, hold elastic equilibrium, then explore continued Maxwell creep."
-  }
-}

@@ -33,8 +33,8 @@ export default function Home(): ReactNode {
   const {siteConfig} = useDocusaurusContext();
   return (
     <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="DES3D Documentation Site">
+      title="Home"
+      description="DynEarthSol documentation">
       <HomepageHeader />
       <main>
         <HomepageFeatures />
