@@ -93,7 +93,7 @@ View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" -g slope`.
 
 Rain fails the slope at a higher base pressure than pressure from the bedrock does: the perched table leaves suction (Bishop strength) above it and seepage parallel to the slope, instead of an upward seepage force through the whole layer. The time to failure is the same on both meshes. No exact solution exists; this is an application of the verified unsaturated flow, Bishop stress and effective-stress plasticity together.
 
-[Current-source coupling and fluid-content checks](../background/rainfall-audit.md)
+Current-source coupling and fluid-content checks
 
 To reproduce the whole study behind this figure, from the DES source folder:
 
