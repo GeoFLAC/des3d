@@ -28,7 +28,7 @@ case takes minutes on a laptop; the second about half an hour.
 | Build | `make ndims=2 usemmg=1` |
 | Run time | 12 minutes (rifting, to 100 kyr) and 22 minutes (subduction, to 5 Myr) on 6 threads |
 | Inputs | `examples/core-complex.cfg`, `examples/subduction.cfg` and the tutorial package |
-| Checked with | revision not recorded on this page |
+| Checked with | Part 1: DynEarthSol `68cc2a0` (relief, dip and element count as stated); Part 2: revision not recorded |
 
 :::
 
