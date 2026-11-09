@@ -19,8 +19,9 @@ This page gives the friction law, how DES3D measures slip rate in an
 element, and how the law enters the plastic update. It then describes
 global velocity scaling, which lets one model run through slow loading and
 fast rupture, and the other numerical controls.
-The [rate-and-state tutorial](../tutorial/rate-state-friction.mdx) shows
-the law at work in a shear-band model.
+The tutorials check the law [in simple shear](../tutorial/rsf/simple-shear.md)
+and show it at work in [earthquake cycles](../tutorial/rsf/earthquake-cycles.md)
+and [slip events in a shear band](../tutorial/rsf/rate-state-friction.mdx).
 
 ## Friction law
 
