@@ -26,6 +26,7 @@ When asked to catch up the docs with recent DynEarthSol changes ("what's new", "
    - meshing/remeshing theory → `docs/theory/remeshing.md`; solution-scheme theory → `docs/theory/solution-scheme/`; RSF → `docs/theory/rate-state-friction.md`
    - worked scientific examples → `docs/tutorial/` (`fundamentals/`, `tectonics/`, `tectonics/rsf/`, `advanced/`)
    - new or renamed parameters also belong in the parameter tables of the relevant User guide or Theory page; `docs/reference/configuration.md` lists the sections and where each feature is documented.
+   - any change to DynEarthSol's options (`input.cxx`): rebuild both executables at that revision and regenerate `docs/reference/parameters.md` with `scripts/generate_parameter_reference.py --exe2d … --exe3d … --source <rev>`. Never edit that page by hand; `--check` reports a stale page.
    Keep the top-level structure. Preserve published URLs when reorganizing pages: every moved page keeps its old URL through `slug:`, and a renamed category page needs a redirect in the `@docusaurus/plugin-client-redirects` entry of `docusaurus.config.ts`.
 6. **Use the DynEarthSol README as source of truth** for build/dependency wording — it's usually updated in the same PR:
    ```
