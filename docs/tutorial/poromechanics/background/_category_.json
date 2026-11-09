@@ -1,0 +1,9 @@
+{
+  "label": "Background notes",
+  "position": 10,
+  "link": {
+    "type": "generated-index",
+    "slug": "/category/poromechanics-background",
+    "description": "Derivations and audits referred to by the examples"
+  }
+}

@@ -1,0 +1,76 @@
+{
+ "problem": "A reservoir stands at the crest of the embankment and the slope is saturated. When the reservoir is drawn down quickly the water no longer supports the face, while the pore pressure inside falls only as the slope drains: the classic critical case for the upstream slope of a dam.",
+ "result": "250 s after drawdown DES brackets the factor of safety at 0.85–0.9 against 0.857 from Bishop on the same pore pressure; at 20000 s, 0.9–0.95 against 0.918. Largest gap between the bracket midpoint and Bishop: 2.5%. The slope that stands dry (FS 1.369) fails on rapid drawdown, and draining restores only part of its strength in this time.",
+ "scope": "2D, 1 m mesh, the embankment of the strength-reduction page, saturated (porosity 0.3, saturated unit weight 20 kN/m³), Gardner retention ($\\alpha=2.4\\times10^{-4}$ Pa$^{-1}$), Bishop $\\chi=S_e$, permeability 1e-13 m². The reservoir at the crest loads the face; the slope fills to hydrostatic (misfit 0.24% of the base pressure). Drawdown removes the load and drains the face and the toe platform; everything is explicit DES with the dry page's settings, because DES does not switch hydraulic formulation mid-run. Strength-reduction trials restart at each time with the pore pressure held (permeability frozen, pore fluid made compressible), as limit equilibrium assumes. Brackets: 250 s: 0.85–0.9 (Bishop 0.857); 1000 s: 0.85–0.9 (Bishop 0.877); 3000 s: 0.85–0.9 (Bishop 0.890); 6000 s: 0.9–0.95 (Bishop 0.902); 12000 s: 0.9–0.95 (Bishop 0.913); 20000 s: 0.9–0.95 (Bishop 0.918). (a) pore pressure; (b) factor of safety in time; (c) mechanism.",
+ "meaning": "This joins the verified pieces in the problem dam engineers check first: the undrained response to unloading, unsaturated drainage and effective-stress plasticity. Limit equilibrium needs the pore pressure as an input; DES computes it and finds the mechanism.",
+ "metric": 0.025342851284046786,
+ "metric_label": "FS midpoint vs Bishop",
+ "spacing_m": 1.0,
+ "evidence": {
+  "executable_sha256": "d26cc84f43d8a0cbd06017160e47add950f012ff885db1c8ecbbd46b79b262ff",
+  "source_commit": "50c40015997ae1793d88171d9156b794e05f4cec",
+  "hydrostatic_misfit": 0.0024289203031847536,
+  "states": [
+   {
+    "time": 249.9970789711224,
+    "fs_bishop": 0.857421604983511,
+    "bracket": [
+     0.85,
+     0.9
+    ],
+    "p_max": 190591.55232673124,
+    "p_min": -8.693893042503053
+   },
+   {
+    "time": 999.9990205637296,
+    "fs_bishop": 0.877221472292824,
+    "bracket": [
+     0.85,
+     0.9
+    ],
+    "p_max": 188528.50921169718,
+    "p_min": -25.522308124898505
+   },
+   {
+    "time": 2999.9970616911887,
+    "fs_bishop": 0.890221974755048,
+    "bracket": [
+     0.85,
+     0.9
+    ],
+    "p_max": 186054.3315410614,
+    "p_min": -68.50471738953061
+   },
+   {
+    "time": 5999.997691608791,
+    "fs_bishop": 0.9021372693451889,
+    "bracket": [
+     0.9,
+     0.95
+    ],
+    "p_max": 185142.91766416281,
+    "p_min": -131.3713469164112
+   },
+   {
+    "time": 11999.998951443991,
+    "fs_bishop": 0.9133527236140082,
+    "bracket": [
+     0.9,
+     0.95
+    ],
+    "p_max": 184244.84077184077,
+    "p_min": -259.0171328722499
+   },
+   {
+    "time": 19999.998252406655,
+    "fs_bishop": 0.9181176204504174,
+    "bracket": [
+     0.9,
+     0.95
+    ],
+    "p_max": 183283.06682679968,
+    "p_min": -432.0935028822913
+   }
+  ]
+ }
+}
