@@ -83,7 +83,7 @@ cover. Before starting, ensure you have:
   zone and Part 2 the plate interface with a segment one
 
 [Velocity boundary conditions (3D)](./vbc.md) and
-[Rate-and-state friction](./rate-state-friction.mdx) are not needed here: both
+[Rate-and-state friction](./rsf/rate-state-friction.mdx) are not needed here: both
 examples are 2D with steady wall velocities and no earthquake cycles. The
 next tutorial, [Coupling with GoSPL](./couplinggospl.md), adds surface processes
 to models like these.
