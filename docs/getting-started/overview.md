@@ -81,7 +81,7 @@ release from that list, or take its DOI from the
 
 ## Getting help
 
-Report problems and ask questions in the
+Check [Troubleshooting](./troubleshooting.md) first. Report problems and ask questions in the
 [DynEarthSol issue tracker](https://github.com/GeoFLAC/DynEarthSol/issues).
 
 :::tip Using an AI assistant to get oriented
