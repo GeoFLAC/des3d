@@ -25,7 +25,7 @@ friction law and for global velocity scaling.
 | Build | `make ndims=2` |
 | Run time | 35 minutes (EP), 75 minutes (weakening) and 3 hours (strengthening) on 8 threads |
 | Inputs | `benchmarks/DESv2.0/rsf/localization/` in the DynEarthSol repository |
-| Checked with | a DES v2 development build of September 2026, which produced the benchmark values in the README |
+| Results | the benchmark results given in its README |
 
 :::
 
@@ -89,11 +89,6 @@ band carries most of the extension; the rest of the crust stays elastic.
 | EP-RSF, strengthening | 54.5° |
 | EP-RSF, weakening | 51.2° |
 | Arthur angle, $45° + (\phi+\psi)/4$ | 52.5° |
-
-These are the benchmark values, from the development build named in the
-box above. DynEarthSol `68cc2a0` gives 51.2° for EP and 51.1° and 51.2° for
-the two bands of the weakening case, so expect differences of about a degree
-between versions.
 
 Rate-and-state friction moves the dip by about two degrees at most. The
 orientation is set by the Mohr–Coulomb strength, not by the rate
