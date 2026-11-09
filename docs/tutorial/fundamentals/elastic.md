@@ -13,6 +13,18 @@ analytical elastic response, and see why a held load does not produce
 repeated compression. Finish by restarting from a held state and applying
 a larger load.
 
+:::info At a glance
+
+| | |
+| --- | --- |
+| Dimension | 2D (a 3D variant is described at the end) |
+| Build | `make ndims=2 hdf5=0` |
+| Run time | under a second per case, one thread |
+| Inputs | the PT tutorial bundle (`elastic-0.cfg`, `elastic-1.cfg`, `analyze_pt.py`) |
+| Checked with | figures from DynEarthSol `707e481`; reproduced on `68cc2a0` |
+
+:::
+
 ## Build the checked solver
 
 Use a new terminal and a separate checkout. You need Git, Make, a C++17
