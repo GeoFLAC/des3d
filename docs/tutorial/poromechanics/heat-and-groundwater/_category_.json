@@ -1,0 +1,9 @@
+{
+  "label": "Heat and groundwater",
+  "position": 9,
+  "link": {
+    "type": "generated-index",
+    "slug": "/category/poromechanics-heat-and-groundwater",
+    "description": "Heat and groundwater: worked examples with their reference solutions"
+  }
+}
