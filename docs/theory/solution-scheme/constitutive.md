@@ -261,18 +261,9 @@ depending on which has a lower value of $J_2$.
 
 ## Rate-and-state friction controls
 
-For models that use rate-and-state friction (RSF), three options control how
-the slip rate is measured and how the state variable limits the time step:
-
-| Parameter | Default | Meaning |
-|-----------|---------|---------|
-| `rsf_slip_rate_projection_option` | `0` | `0`: slip rate from the maximum-shear projection (historical behavior). `1`: slip rate from the total-strain invariant of the element strain-rate tensor. |
-| `rsf_dtheta_max` | `0` | Upper bound on the aging-law state change per step, used to limit the time step with option `1`. `0` disables the constraint. |
-
-The rate used by the friction, aging-law and slip-law calculations has a floor
-of $10^{-16}$ m/s. With the default settings, results differ from earlier
-versions only below that threshold.
-
-The strain-invariant rate (option `1`) is rebuilt after a restart and follows
-the current boundary motion and mesh geometry. Output and checkpoint layouts
-are the same for both options.
+The `elasto-plastic-rsf` and `elasto-visco-plastic-rsf` rheologies use the
+update above with a Mohr–Coulomb friction angle set by rate-and-state
+friction. The friction law, the slip-rate measures
+(`control.rsf_slip_rate_projection_option`) and the state-change time-step
+limit (`control.rsf_dtheta_max`) are described in
+[Rate-and-state friction](../rate-state-friction.md).
