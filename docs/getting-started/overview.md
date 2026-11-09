@@ -48,7 +48,7 @@ See [Theory](/docs/category/theory) for the formulation.
 
 | If you want to | Read |
 | --- | --- |
-| Install and run a first model | [Installation](./installation.md) → [Running DynEarthSol](./run.md) → [Visualizing outputs](./visualize.md) |
+| Install and run a first model | [Installation](./installation.md) → [Quickstart](./quickstart.md) |
 | Set up your own model | [User guide](/docs/category/user-guide) and the [configuration file](../reference/configuration.md) |
 | Learn by example | [Tutorials](/docs/category/tutorial) |
 | Model earthquake cycles | [Rate-and-state theory](../theory/rate-state-friction.md) → [Simple-shear check](../tutorial/tectonics/rsf/simple-shear.md) → [Creep or earthquakes](../tutorial/tectonics/rsf/earthquake-cycles.md) |
