@@ -157,6 +157,7 @@ const config: Config = {
             {label: 'Tutorials', to: '/docs/category/tutorial'},
             {label: 'Theory', to: '/docs/category/theory'},
             {label: 'Reference', to: '/docs/category/reference'},
+            {label: 'Developer guide', to: '/docs/category/developer-guide'},
           ],
         },
         {
