@@ -235,7 +235,7 @@ It is off by default and, unlike Winkler/water loading, does not force
 `vbc_z0` to free; the two can be combined with an explicit Dirichlet
 condition if you choose to.
 
-See [Solution scheme in DES3D](../theory/theory#equation-of-motion) for the
+See [Solution scheme in DES3D](../theory/solution-scheme/index.md#equation-of-motion) for the
 Neumann boundary force derivation these all feed into.
 
 ## Slant boundaries (custom meshes)

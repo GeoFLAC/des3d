@@ -33,11 +33,11 @@ const config: Config = {
   projectName: 'des3d', // Usually your repo name.
   deploymentBranch: 'main',
 
-  onBrokenLinks: 'ignore', //throw',
-  // onBrokenMarkdownLinks: 'warn',
+  onBrokenLinks: 'throw',
+  onBrokenAnchors: 'throw',
   markdown: {
     hooks: {
-      onBrokenMarkdownLinks: 'warn', // or 'throw' if you want strict checking
+      onBrokenMarkdownLinks: 'throw',
     },
   },
 
