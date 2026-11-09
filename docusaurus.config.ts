@@ -5,7 +5,8 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
 // Maintainer sync record: general baseline DynEarthSol #114 (2026-10-31);
-// PT mechanics #106 and build requirements #122/#125 are also documented.
+// PT mechanics #106, build requirements #122/#125, and the macOS GoSPL
+// build fix #121 are also documented.
 
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
