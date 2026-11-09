@@ -24,6 +24,18 @@ simulation through centuries of loading and seconds of rupture. See
 [rate-and-state friction](../../../theory/rate-state-friction.md) for the
 equations and for global velocity scaling.
 
+:::info At a glance
+
+| | |
+| --- | --- |
+| Dimension | 2D |
+| Build | `make ndims=2` |
+| Run time | about 10 minutes per case on 3 threads |
+| Inputs | `examples/rate_and_state_friction/` in the DynEarthSol repository |
+| Checked with | DynEarthSol `68cc2a0` |
+
+:::
+
 ## Setup
 
 ![Model setup](../../img/rsf/cycles-setup.png)

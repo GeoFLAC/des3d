@@ -11,6 +11,18 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 This tutorial explains how to run DynEarthSol coupled with **GoSPL** (Global Scalable Paleo Landscape Evolution) to simulate the interaction between tectonic deformation and surface processes like erosion and sediment transport.
 
+:::info At a glance
+
+| | |
+| --- | --- |
+| Dimension | 3D |
+| Build | `make ndims=3 usegospl=1 usemmg=1`, with GoSPL installed |
+| Run time | depends on domain size; see the tips on shrinking the domain |
+| Inputs | `gospl_driver/examples/` in the DynEarthSol repository |
+| Checked with | revision not recorded on this page |
+
+:::
+
 ## What is GoSPL?
 
 [GoSPL](https://github.com/Geodels/gospl) is a Python-based landscape evolution model that simulates:

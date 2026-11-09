@@ -17,6 +17,18 @@ Use the same checked solver, Python environment, single-thread settings,
 and [tutorial bundle](/tutorial/pt/pt-tutorial.zip) as the elastic exercise.
 Run the commands below from `DynEarthSol-pt-tutorial/pt-tutorial`.
 
+:::info At a glance
+
+| | |
+| --- | --- |
+| Dimension | 2D |
+| Build | `make ndims=2 hdf5=0` |
+| Run time | under a second per case, one thread |
+| Inputs | the PT tutorial bundle (`maxwell-0.cfg`, `maxwell-1.cfg`, `analyze_pt.py`) |
+| Checked with | figures from DynEarthSol `707e481`; reproduced on `68cc2a0` |
+
+:::
+
 ## Change the material, keep the loading
 
 `maxwell-0.cfg` and `maxwell-1.cfg` retain the 1 m cell, roller sides,

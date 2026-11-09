@@ -25,6 +25,18 @@ The benchmark covers four groups:
 See [rate-and-state friction](../../../theory/rate-state-friction.md) for the
 equations used below.
 
+:::info At a glance
+
+| | |
+| --- | --- |
+| Dimension | 2D |
+| Build | `make ndims=2` |
+| Run time | about 30 s for all cases, one thread |
+| Inputs | `benchmarks/simple_shear_rsf/` in the DynEarthSol repository |
+| Checked with | DynEarthSol `68cc2a0` |
+
+:::
+
 ## Setup
 
 ![Benchmark setup and results](../../img/rsf/simple-shear-benchmark.png)

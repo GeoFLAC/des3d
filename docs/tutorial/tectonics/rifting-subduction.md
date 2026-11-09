@@ -20,6 +20,18 @@ Deformation localizes where plastic strain accumulates, and with MMG remeshing
 the mesh is refined there, so faults stay sharp as the model runs. The first
 case takes minutes on a laptop; the second about half an hour.
 
+:::info At a glance
+
+| | |
+| --- | --- |
+| Dimension | 2D |
+| Build | `make ndims=2 usemmg=1` |
+| Run time | 12 minutes (rifting, to 100 kyr) and 22 minutes (subduction, to 5 Myr) on 6 threads |
+| Inputs | `examples/core-complex.cfg`, `examples/subduction.cfg` and the tutorial package |
+| Checked with | revision not recorded on this page |
+
+:::
+
 ## What you will learn
 
 - How a DES `.cfg` file is organized and which sections matter for tectonics
