@@ -147,7 +147,7 @@ $$
 
 Rederived thickness-averaged Biot extension of Bear and Corapcioglu (1981); averaged_aquifer_reference.py. Independent checks cover radial finite-volume comparison, sealed balance, boundary conditions and limiting closed forms. The full theory note is bundled separately.
 
-[Full finite-annulus theory note](../background/averaged-aquifer.md).
+Full finite-annulus theory note.
 
 ## Validity and limits
 

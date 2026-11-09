@@ -93,7 +93,7 @@ View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" cell`.
 
 This checks plastic earthquake heating, including evolving EP-RSF strength, without introducing inertia or a rupture-front error. The plotted temperature and pressure are the physical fields; the pending numerical reservoirs are accounted for separately.
 
-[Implementation and energy ownership](../background/plastic-heat-implementation.md)
+Implementation and energy ownership
 
 [Every-step history and reference](/downloads/poromechanics/plastic-heat/history.csv) · `Time convergence`
 

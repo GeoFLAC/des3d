@@ -91,7 +91,7 @@ View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" -g wave`.
 
 This checks fluid storage and elastic wave coupling together; local fluid content is conserved to round-off. It does not test a GVS earthquake cycle.
 
-[Switching from explicit/GVS to physical inertia](../background/physical-inertia.md)
+Switching from explicit/GVS to physical inertia
 
 To reproduce the whole study behind this figure, from the DES source folder:
 

@@ -90,7 +90,7 @@ View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" terzaghi`.
 
 This checks fluid storage and elastic coupling together, through both pressure and settlement. It does not test a sudden load with GVS or large strain.
 
-[Partial unloading and material regimes](../background/terzaghi-pulse.md)
+Partial unloading and material regimes
 
 To reproduce the whole study behind this figure, from the DES source folder:
 

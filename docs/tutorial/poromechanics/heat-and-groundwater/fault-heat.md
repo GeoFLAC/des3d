@@ -92,7 +92,7 @@ View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" cell`.
 
 Ordinary explicit mechanics with physical mixture inertia and zero damping follows the thermal weakening path. Companion GVS runs and slow-to-fast physical restarts check the mass/timestep transition and retain pending plastic heat separately from kinetic energy.
 
-[Reference, method and transition checks](../background/fault-heat-reference.md)
+Reference, method and transition checks
 
 [Every saved state and reference](/downloads/poromechanics/fault-heat/history.csv) · `Time convergence` · `First physical intervals after GVS`
 

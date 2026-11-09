@@ -95,7 +95,7 @@ View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" -g slope`.
 
 Onset agrees with the poroelastic infinite-slope estimate. Slip develops through Davis’s non-associated estimate and accelerates well before the classical factor of safety, as zero-dilation flow predicts: limit-equilibrium design values overestimate the stability of such a slope. The rainfall page applies the same slope to infiltration.
 
-[Current-source coupling and fluid-content checks](../background/slope-audit.md)
+Current-source coupling and fluid-content checks
 
 To reproduce the whole study behind this figure, from the DES source folder:
 
