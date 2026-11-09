@@ -77,6 +77,7 @@ with a build-time warning.
 | `nprof`       | `0`, `1`        | Disable (`0`) or enable (`1`) profiling with nprof. |
 | `gprof`       | `0`, `1`        | Disable (`0`) or enable (`1`) profiling with gprof. |
 | `usemmg`       | `0`, `1`        | Disable (`0`) or enable (`1`) mesh optimization during remeshing with mmg. |
+| `usegwb`       | `0`, `1`        | Disable (`0`) or enable (`1`) initial conditions from a [Geodynamic World Builder](../tutorial/gwb.md) world. Needs an installed GWB; `GWB_DIR` names it (default `~/opt/WorldBuilder`). |
 | `useexo`       | `0`, `1`        | Disable (`0`) or enable (`1`) import of an .exo mesh, usually created with the meshing software, CUBIT. Note: Only a 3D mesh can be imported currently.|
 | `hdf5`         | `0`, `1`        | Enable HDF5-based VTKHDF output (see [Visualizing outputs](./visualize.md)). Paths are auto-detected on Linux and macOS via `pkg-config` and the usual install layouts; override with `HDF5_INCLUDE_DIR` / `HDF5_LIB_DIR` if the wrong install is picked up or the build stops with install advice. |
 
@@ -95,6 +96,26 @@ installation or path configuration is needed. To enable it:
 - set `usemmg = 1` (both `ndims=2` and `ndims=3` are supported).
 
 For further information, see [Adaptive mesh refinement with MMG](https://geoflac.github.io/des3d/docs/tutorial/usingmmg).
+
+#### `Geodynamic World Builder`
+To set the initial temperature, marker materials or weak zone from a
+[Geodynamic World Builder](https://geodynamicworldbuilder.github.io/) world
+(`ic.temperature_option`, `ic.mattype_option` or `ic.weakzone_option` 936):
+
+- build GWB (CMake 3.5 or newer, a C++14 compiler) as a shared library and
+  install it:
+  ```bash
+  git clone https://github.com/GeodynamicWorldBuilder/WorldBuilder.git
+  cmake -S WorldBuilder -B WorldBuilder/build -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_SHARED_LIBS=ON -DWB_ENABLE_TESTS=OFF -DWB_ENABLE_PYTHON=OFF \
+    -DWB_MAKE_FORTRAN_WRAPPER=OFF -DCMAKE_INSTALL_PREFIX=$HOME/opt/WorldBuilder
+  cmake --build WorldBuilder/build -j 4
+  cmake --install WorldBuilder/build
+  ```
+- set `usegwb = 1`, and `GWB_DIR` if GWB is installed elsewhere. GWB puts its
+  library in `bin/`, which `GWB_LIB_DIR` overrides.
+
+See [Initial conditions from Geodynamic World Builder](../tutorial/gwb.md).
 
 #### `HDF5`
 For outputting model results in the HDF5-based VTKHDF format (compressed,
