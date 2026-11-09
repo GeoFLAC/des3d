@@ -10,13 +10,48 @@ toc_max_heading_level: 2
 
 # Configuration parameters
 
-All parameters accepted by DynEarthSol at source revision `68cc2a0`, as printed by
+All parameters accepted by DynEarthSol at source revision `a0c4160`, as printed by
 `dynearthsol2d -h` and `dynearthsol3d -h`. A parameter is written in its section
 of the input file; see [Configuration file](./configuration.md). Defaults that
 differ between 2D and 3D are shown for both.
 
 Types: *integer*, *real*, *yes/no*, *text*, and *list* (bracketed values, one per
 material where the parameter is per material; a single value applies to all).
+
+## `[injection]`
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `enabled` | yes/no | no | Enable scheduled point sources. |
+| `num_points` | integer | 0 | Number of source points. |
+| `points_x` | list | [] | Point coordinates; in 2D points\_y is the legacy alias for points\_z. |
+| `points_y` | list | [] | Point coordinates; in 2D points\_y is the legacy alias for points\_z. |
+| `points_z` | list | [] | Point coordinates; in 2D points\_y is the legacy alias for points\_z. |
+| `points_unit` | text | m | Coordinate unit: mm, cm, m or km. |
+| `rate_model` | text | constant\_rate | Source schedule: constant\_rate or total\_amount. |
+| `rate` | list | [0] | Positive rate supplies fluid volume or heat; negative rate extracts. |
+| `total_amount` | list | [0] | Total fluid volume or heat over the scheduled interval. |
+| `start_time_in_yr` | list | [0] | Source start time in years. |
+| `end_time_in_yr` | list | [] | Finite end times in years; alternative to duration. |
+| `duration_in_yr` | list | [] | Positive schedule durations in years. |
+| `temperature` | list | [] | Temperature (K) of the injected fluid of each point; requires has\_fluid\_thermal\_advection. An injecting node gains rho\_f\*c\_f\*Q\*(T\_in - T); extraction leaves at the local temperature. Unset: the fluid source carries no enthalpy and a heat source must be given separately. |
+
+## `[heat_injection]`
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `enabled` | yes/no | no | Enable scheduled point sources. |
+| `num_points` | integer | 0 | Number of source points. |
+| `points_x` | list | [] | Point coordinates; in 2D points\_y is the legacy alias for points\_z. |
+| `points_y` | list | [] | Point coordinates; in 2D points\_y is the legacy alias for points\_z. |
+| `points_z` | list | [] | Point coordinates; in 2D points\_y is the legacy alias for points\_z. |
+| `points_unit` | text | m | Coordinate unit: mm, cm, m or km. |
+| `rate_model` | text | constant\_rate | Source schedule: constant\_rate or total\_amount. |
+| `rate` | list | [0] | Positive rate supplies fluid volume or heat; negative rate extracts. |
+| `total_amount` | list | [0] | Total fluid volume or heat over the scheduled interval. |
+| `start_time_in_yr` | list | [0] | Source start time in years. |
+| `end_time_in_yr` | list | [] | Finite end times in years; alternative to duration. |
+| `duration_in_yr` | list | [] | Positive schedule durations in years. |
 
 ## `[sim]`
 
@@ -42,7 +77,7 @@ Model name, run length, output, checkpoints and restart.
 | `earthquake_output_step_interval` | integer | 50 | Output step interval while earthquake mode is active. |
 | `earthquake_start_factor` | real | 5 | Earthquake start threshold factor: vmax &gt; factor \* max\_vbc\_val. |
 | `earthquake_end_factor` | real | 2 | Earthquake end threshold factor: vmax &lt; factor \* max\_vbc\_val. |
-| `seismic_moment_calculate_output` | yes/no | no | If true, seismic moment and magnitude are accumulated during earthquake mode. |
+| `seismic_moment_calculate_output` | yes/no | no | If true, the seismic moment, sum of 2 G V times the plastic-strain increment over all elements, is accumulated during earthquake mode and written with Mw at its end. In 2D V is the element area and M0 is per unit length out of the plane, without Mw. |
 | `hdf5_compression_level` | integer | 4 | HDF5 compression level (0-9). 0: no compression; 9: max. compression. A higher compression level could slow down the output speed. |
 
 ## `[monitor]`
@@ -58,7 +93,8 @@ Point monitors written as CSV time series.
 | `points_y` | list | [] | Monitoring y coordinates array '[y0, y1, ...]' (3D only; 2D legacy alias for monitor.points\_z). |
 | `points_z` | list | [] | Monitoring z coordinates array '[z0, z1, ...]' (2D second coordinate or 3D third coordinate). |
 | `points_unit` | text | m | Unit of monitor.points\_x/z in 2D, or monitor.points\_x/y/z in 3D: mm, cm, m, km. |
-| `remesh_rebind_mode` | text | pre\_remesh\_coord | Rebind mode after remesh: initial\_coord or pre\_remesh\_coord. |
+| `point_type` | text | particle | Each point follows the material through deformation, remeshing and restart. particle: values interpolated at the point; grid: values of the node and element nearest it. |
+| `remesh_output` | text | before | Rows at a remesh, marked in the last CSV column, row. before: the state before each remesh (row 1) unless that step already has a regular row (row 0); both: also the remapped state after it (row 2). |
 | `output_prefix` | text | monitor | Prefix of monitoring output files. |
 | `write_header` | yes/no | yes | Write CSV header row for monitoring outputs? |
 | `output_coord` | yes/no | yes | Output node coordinate columns. |
@@ -87,7 +123,7 @@ Domain size, mesh generation, resolution, quality checks and remeshing.
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
 | `meshing_option` | integer | 1 | How to create the new mesh? 1: rectangular box with roughly uniform resolution 2: rectangular box with rectangular zone of refined resolution 90: read the bounding polygon from a .poly file 91: same as 90, but the max. element size is normalized with resolution. 95: read the mesh from from a .exo file |
-| `meshing_elem_shape` | integer | 0 | Element shape for meshing. 0: tetrahedra; 1: hexahedra.; 2: equilateral tetrahedra. |
+| `meshing_elem_shape` | integer | 0 | Mesh layout. 0: unstructured triangles (2D) or tetrahedra (3D); 1: regular rectangular cells split into triangles/tetrahedra; 2: equilateral triangles (2D) or a regular tetrahedral layout (3D). All solver elements are simplices. |
 | `meshing_verbosity` | integer | -1 | Screen output of meshing and remeshing. -1: no stage log (default). 0: the stage log ([metric], [collapse], [freeze], [unfreeze], [require], [corner], [mmg], [restore], [GPU mem] lines: what a remesh re-sized, collapsed, froze, freed and restored) and the mesher's standard report. 1-3: Triangle/TetGen -V levels on top. Warnings print at every level. |
 | `meshing_sediment` | yes/no | no | Refine the elements with sediment marker during remeshing. |
 | `tetgen_optlevel` | integer | 3 | Optimization level for tetgen. 0: no optimization; 1: multiple edge filps; 2: 1 & free vertex deletion; 3: 2 & new vertex insertion. High optimization level could slow down the speed of mesh generation. For 3D only. |
@@ -104,13 +140,15 @@ Domain size, mesh generation, resolution, quality checks and remeshing.
 | `max_ratio` | real | 2 | Max. radius / length ratio of all tetrahedra, for 3D only |
 | `refined_zonex` | list | [0.4, 0.6] | Refining portion of xlength ([d0,d1]; 0&lt;=d0&lt;=d1&lt;=1), for meshing\_option=2 only |
 | `refined_zoney` | list | [0.4, 0.6] | Refining portion of ylength ([d0,d1]; 0&lt;=d0&lt;=d1&lt;=1), for meshing\_option=2 only, for 3D only |
-| `refined_zonez` | list | [0.8, 1] | Refining portion of zlength ([d0,d1]; 0&lt;=d0&lt;=d1&lt;=1), for meshing\_option=2 only |
-| `poly_filename` | text | mesh.poly | Filename of the input polygon, for meshing\_option=90 or 91 only. The file format is described in http://www.cs.cmu.edu/~quake/triangle.poly.html (2D) and http://wias-berlin.de/software/tetgen/fformats.poly.html (3D). Limitation: no point attributes, no boundary marker for points, no holes, and no regional attributes. Users still need to provide these parameters: mesh.xlength, mesh.ylength, and mesh.zlength. |
+| `refined_zonez` | list | [0.8, 1] | Refined depth interval [d0,d1] as fractions of zlength measured downward from the top (0 &lt;= d0 &lt;= d1 &lt;= 1); meshing\_option=2 only. |
+| `poly_filename` | text | mesh.poly | Input polygon filename for meshing\_option=90 or 91. Triangle .poly format in 2D; TetGen .poly format in 3D. Region attributes select materials when ic.mattype\_option=0. Point attributes, point boundary markers and holes are not supported. Also supply mesh.xlength, mesh.ylength and mesh.zlength. |
 | `exo_filename` | text | mesh.exo | Filename of the input polygon, for meshing\_option=95 only. Meshing software like Trelis is supposed to be used for creating a mesh in the ExodusII format. Limitation: Only box-like domains with six sides are supported. Users still need to provide these parameters: mesh.xlength, mesh.ylength, and mesh.zlength. |
 | `quality_check_step_interval` | integer | 100 | How often to check mesh quality? |
 | `min_quality` | real | 0.4 | Min. mesh quality before remeshing (between 0 and 1) |
 | `max_boundary_distortion` | real | 0.25 | Max. distance of boundary distortion before remeshing (in unit of mesh.resolution). |
-| `remeshing_option` | integer | 0 | How to deal with the boundaries during remeshing? 0: no modification on any boundary. 1: move all bottom nodes to initial depth and delete the side-wall nodes left just above or below it; other boundaries are intact. 2: create a new bottom boundary at the initial depth, other boundaries are intact (2D only, not with MMG remeshing). 10: no modification on any boundary, except small boundary segments might get merged (in 3D with TetGen, see smallest\_size). 11: move all bottom nodes to initial depth and delete the side-wall nodes left just above or below it; other boundaries are intact, except small boundary segments might get merged. 12: move all x0 (left) wall nodes to the x of the wall's top corner and delete the nodes left outside, other boundaries are intact. For a wall pushed over a fixed bottom with its push tapered toward it (vbc\_x0 = 3 with bottom\_shear\_zone\_thickness), whose foot lags its top. With MMG remeshing, 2D only. 13: move all bottom and side-wall nodes (left/right; also front/back in 3D) to initial dimensions, and give material entering through a side wall the structure recorded at that wall (its side profile). A wall receives while its nodes drift inward between remeshes (by any amount when its vbc at the remesh is inflow, else by more than min(1e-3, max\_boundary\_distortion) \* resolution). It keeps the column (2D) or wall face (3D) recorded when it started receiving (at run start when its vbc is inflow, else at the first remesh at which it receives), and drops it when it neither receives nor has an inflow vbc. Incoming material gets the recorded temperature, layering, radiogenic source, coord0 reference and zero strain at its depth below the wall's top point less the rise surface processes gave it, and in 3D at its along-strike position (a point off the recorded face takes the values of the face's nearest point). A deposit on the wall top gets the profile top's values. Markers a remesh creates in an element at the wall take the layering at the element's centroid and time 0; in an element centred in the deposit, mattype\_sediment and the time of a sediment marker of the element, else the remesh time. Temperatures are not re-conducted under a risen surface, so they can differ from the domain beside the wall by up to the near-surface temperature gradient times the rise. Requires MMG when meshing\_elem\_shape = 0: the restored wall accumulates sub-hmin elements that only MMG collapses. With MMG on an unstructured mesh, a Triangle/TetGen initial mesh first gets its restored-wall elements refined to ~resolution, whatever use\_mmg\_init says (in 3D under mattype\_option 0 this can move a regional-attribute boundary inside the wall band), and every remesh caps the size target at every restored-wall node at resolution (see mmg\_aniso\_wall\_ratio), so the walls can carry more elements than the cfg's sizes give. On an unstructured mesh (meshing\_elem\_shape = 0), options 1, 11 and 13 stop the run at a remesh (exit 42) when a top-surface node is within smallest\_size^(1/NDIMS) \* resolution of the restored bottom, or below it: the domain has necked through. |
+| `remeshing_option` | integer | 0 | How to deal with the boundaries during remeshing? 0: no modification on any boundary. 1: move all bottom nodes to initial depth and delete the side-wall nodes left just above or below it; other boundaries are intact. 2: create a new bottom boundary at the initial depth, other boundaries are intact (2D only, not with MMG remeshing). 10: no modification on any boundary, except small boundary segments might get merged (in 3D with TetGen, see smallest\_size). 11: move all bottom nodes to initial depth and delete the side-wall nodes left just above or below it; other boundaries are intact, except small boundary segments might get merged. 12: move all x0 (left) wall nodes to the x of the wall's top corner and delete the nodes left outside, other boundaries are intact. For a wall pushed over a fixed bottom with its push tapered toward it (vbc\_x0 = 3 with bottom\_shear\_zone\_thickness), whose foot lags its top. With MMG remeshing, 2D only. 13: move all bottom and side-wall nodes (left/right; also front/back in 3D) to initial dimensions, and give material entering through a side wall the structure recorded at that wall (its side profile). A wall receives while its nodes drift inward between remeshes (by any amount when its vbc at the remesh is inflow, else by more than min(1e-3, max\_boundary\_distortion) \* resolution). It keeps the column (2D) or wall face (3D) recorded when it started receiving (at run start when its vbc is inflow, else at the first remesh at which it receives), and drops it when it neither receives nor has an inflow vbc. Incoming material gets the recorded temperature, layering, radiogenic source, coord0 reference and zero strain at its depth below the wall's top point less the rise surface processes gave it, and in 3D at its along-strike position (a point off the recorded face takes the values of the face's nearest point). A deposit on the wall top gets the profile top's values. Markers a remesh creates in an element at the wall take the layering at the element's centroid and time 0; in an element centred in the deposit, mattype\_sediment and the time of a sediment marker of the element, else the remesh time. Temperatures are not re-conducted under a risen surface, so they can differ from the domain beside the wall by up to the near-surface temperature gradient times the rise. Requires MMG when meshing\_elem\_shape = 0: the restored wall accumulates sub-hmin elements that only MMG collapses. With MMG on an unstructured mesh, a Triangle/TetGen initial mesh first gets its restored-wall elements refined to ~resolution, whatever use\_mmg\_init says (in 3D under mattype\_option 0 this can move a regional-attribute boundary inside the wall band), and every remesh caps the size target at every restored-wall node at resolution (see mmg\_aniso\_wall\_ratio), so the walls can carry more elements than the cfg's sizes give. 14: restore selected reference-boundary components (2D unstructured meshes only; mesh.remeshing\_reset\_boundaries). On an unstructured mesh (meshing\_elem\_shape = 0), options 1, 11 and 13 stop the run at a remesh (exit 42) when a top-surface node is within smallest\_size^(1/NDIMS) \* resolution of the restored bottom, or below it: the domain has necked through. |
+| `num_remeshing_reset_boundaries` | integer | 0 | Number of selected boundary-marker bits for remeshing\_option=14. |
+| `remeshing_reset_boundaries` | list | [] | Boundary-marker bits to restore, e.g. [1,16]. Single faces restore normal components; two selected faces restore their corner fully. |
 | `mmg_remesh_active_plstrain` | real | 0.01 | Conservative MMG remeshing (always on with MMG): a remesh keeps quiet elements as they are (frozen) and rebuilds the rest. This key is the plastic-strain increment since the last remesh above which an element is refined: MMG may split it (not along an edge it shares with a frozen, MMG-required element) but keeps its existing nodes, so the band's plastic strain is carried verbatim. Distorted or tiny elements are repaired with node motion (see mmg\_remesh\_defensive\_quality\_ratio and mmg\_remesh\_defensive\_tiny\_ratio), and so is the mesh that restoring a boundary squashed or collapsed or that merging a short boundary segment (see smallest\_size) reshaped. Elements far from their size target are freed (see mmg\_remesh\_size\_recovery\_ratio), as is the band beside a receiving or outward-drifting restored wall (remeshing\_option 13). Boundary nodes stay pinned except the free-surface nodes a surface process moves by more than 1% of resolution per remesh interval (2D only, surface\_process\_option 1 or 102), the off-bottom nodes of unrestored side walls and slant boundaries, the nodes of repaired elements and the band nodes off an outward-drifting restored wall. Keep it &gt; 0: at 0, incidental yielding makes quiet far-field elements splittable at every remesh. Default 0.01, heuristic: above the increment of incidental yielding, below a localizing band's increment over a remesh interval. |
 | `mmg_remesh_defensive_tiny_ratio` | real | 1.5 | Gap, in element measure, between the tiny-element remesh trigger smallest\_vol (see smallest\_size) and the smallest elements MMG builds (usemmg=1, meshing\_elem\_shape = 0; remeshing and MMG-built initial meshes). MMG's minimum edge length is hmin \* ratio^(1/NDIMS) (hmin: see smallest\_size), so MMG aims to build every element at smallest\_vol \* ratio or more, which must shrink by this factor before it re-triggers, and a remesh rebuilds any element below smallest\_vol \* ratio. The ratio also sets MMG's metric floor one step higher, hmin \* ratio^(2/NDIMS) (at most MMG's hmax), and the post-remesh quality gate at smallest\_vol \* sqrt(ratio). Must be &gt;= 1 (at 1 a just-remeshed element re-triggers under any compression); a ratio at or above largest\_size / smallest\_size is capped just below it, with a warning. Default 1.5 (a 2/3 measure gap), heuristic. |
 | `mmg_remesh_defensive_quality_ratio` | real | 1.5 | MMG remeshing repairs (unfreezes, with its nodes movable except where disjoint material bodies meet) every element of quality below min\_quality \* this ratio, so a marginal element is rebuilt before it crosses the min\_quality remesh trigger instead of triggering another remesh a few steps later. The trigger itself stays at min\_quality. Must be &gt;= 1 (1: repair only below the trigger). Default 1.5, heuristic. |
@@ -162,7 +200,7 @@ Gravity, time stepping, mass scaling, damping, the PT solver, and heat and fluid
 | `surf_diff_ratio_terrig` | real | 1 | Ratio between terrigenous and standard Diffusition coefficients. |
 | `surf_diff_ratio_marine` | real | 1 | Ratio between marine and standard Diffusition coefficients. |
 | `surf_depo_universal` | real | 0 | Sedimentation rate of universal suspended deposite (in m/s). |
-| `surf_base_level` | real | 0 | Base level of surface processes. |
+| `surf_base_level` | real | 0 | Base level of surface processes (m); also the sea level used by bc.has\_water\_loading. |
 | `surface_process_gospl_config_file` | text |  | Configuration file path for GoSPL surface processes (used with surface\_process\_option = 11). |
 | `gospl_coupling_frequency` | integer | 1 | Run GoSPL coupling every N DES steps (used when gospl\_coupling\_mode = steps). |
 | `gospl_coupling_interval_in_yr` | real | 1000 | Run GoSPL coupling every T years (used when gospl\_coupling\_mode = time). E.g. 1000 = couple once per 1000 yr. |
@@ -181,6 +219,10 @@ Gravity, time stepping, mass scaling, damping, the PT solver, and heat and fluid
 | `pelagic_increasing_width` | real | 30 | Width of the suface increasing zone (m) |
 | `terrig_sediment_volume` | real | 1 | The volume of the sediment bring from continent source (in m^3/s). 5e7 ton/yr ~= 1 m^3/s |
 | `terrig_sediment_area` | real | 3.17e-07 | The are of the sediment bring from continent source (=10 m^2/yr) (in m^2/s). Assuming the width of the channel is 50 km, 5e7 ton/yr ~= 2.e-5 m^2/s |
+| `has_thermal_pressurization` | yes/no | no | Couple thermal expansion to solid stress and fluid content; requires hydraulic and thermal diffusion. |
+| `has_shear_heating` | yes/no | no | Convert accepted viscous/plastic work to heat. Pending energy is deposited at the next physical thermal update, independently of changes in timestep; initial PT equilibration does not generate heat. All computed nonelastic work is converted (unit heat fraction). |
+| `has_fluid_thermal_advection` | yes/no | no | Transport heat with Darcy flow using combined rock/water heat capacity; requires hydraulics. |
+| `has_poroelastic_pressure_feedback` | yes/no | yes | Include mechanical volumetric/mean-stress changes in the hydraulic source; transport remains active when false. |
 | `has_thermal_diffusion` | yes/no | yes | Does the model have thermal diffusion? If not, temperature is advected, but not diffused. |
 | `has_hydraulic_diffusion` | yes/no | no | Does the model have hydraulic diffusion? If not, pore pressure is advected, but not diffused. |
 | `has_hydration_processes` | yes/no | no | Does the model have hydration processes? It is required to model some types of phase changes. |
@@ -206,6 +248,24 @@ Velocity, traction, thermal and hydraulic boundary conditions, and surface proce
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
+| `tbc_x0` | integer | 0 | Thermal boundary: 0 insulated, 1 fixed temperature. |
+| `tbc_val_x0` | real | nan | Fixed boundary temperature in K; defaults to surface\_temperature (mantle\_temperature at z0). It is applied at initialization, so a value that differs from the initial temperature is part of the initial state, not a thermal load; to heat a boundary at t &gt; 0, restart with the new value. |
+| `tbc_x1` | integer | 0 | Thermal boundary: 0 insulated, 1 fixed temperature. |
+| `tbc_val_x1` | real | nan | Fixed boundary temperature in K; defaults to surface\_temperature (mantle\_temperature at z0). It is applied at initialization, so a value that differs from the initial temperature is part of the initial state, not a thermal load; to heat a boundary at t &gt; 0, restart with the new value. |
+| `tbc_y0` | integer | 0 | Thermal boundary: 0 insulated, 1 fixed temperature. |
+| `tbc_val_y0` | real | nan | Fixed boundary temperature in K; defaults to surface\_temperature (mantle\_temperature at z0). It is applied at initialization, so a value that differs from the initial temperature is part of the initial state, not a thermal load; to heat a boundary at t &gt; 0, restart with the new value. |
+| `tbc_y1` | integer | 0 | Thermal boundary: 0 insulated, 1 fixed temperature. |
+| `tbc_val_y1` | real | nan | Fixed boundary temperature in K; defaults to surface\_temperature (mantle\_temperature at z0). It is applied at initialization, so a value that differs from the initial temperature is part of the initial state, not a thermal load; to heat a boundary at t &gt; 0, restart with the new value. |
+| `tbc_z0` | integer | 0 | Thermal boundary: 0 insulated, 1 fixed temperature. |
+| `tbc_val_z0` | real | nan | Fixed boundary temperature in K; defaults to surface\_temperature (mantle\_temperature at z0). It is applied at initialization, so a value that differs from the initial temperature is part of the initial state, not a thermal load; to heat a boundary at t &gt; 0, restart with the new value. |
+| `tbc_z1` | integer | 1 | Thermal boundary: 0 insulated, 1 fixed temperature. |
+| `tbc_val_z1` | real | nan | Fixed boundary temperature in K; defaults to surface\_temperature (mantle\_temperature at z0). It is applied at initialization, so a value that differs from the initial temperature is part of the initial state, not a thermal load; to heat a boundary at t &gt; 0, restart with the new value. |
+| `hbc_val_x0` | real | nan | Research-input compatibility: finite value with hbc=1 maps to prescribed pressure (hbc=2). |
+| `hbc_val_x1` | real | nan | Research-input compatibility: finite value with hbc=1 maps to prescribed pressure (hbc=2). |
+| `hbc_val_y0` | real | nan | Research-input compatibility: finite value with hbc=1 maps to prescribed pressure (hbc=2). |
+| `hbc_val_y1` | real | nan | Research-input compatibility: finite value with hbc=1 maps to prescribed pressure (hbc=2). |
+| `hbc_val_z0` | real | nan | Research-input compatibility: finite value with hbc=1 maps to prescribed pressure (hbc=2). |
+| `hbc_val_z1` | real | nan | Research-input compatibility: finite value with hbc=1 maps to prescribed pressure (hbc=2). |
 | `surface_temperature` | real | 273 | Surface temperature (in Kelvin) |
 | `mantle_temperature` | real | 1600 | Mantle temperature (in Kelvin) |
 | `has_winkler_foundation` | yes/no | yes | Using Winkler foundation for the bottom boundary? |
@@ -214,26 +274,40 @@ Velocity, traction, thermal and hydraulic boundary conditions, and surface proce
 | `elastic_foundation_constant` | real | 1e+11 | Elastic constant for elastic foundation. |
 | `has_water_loading` | yes/no | yes | Applying water loading for top boundary that is below sea level? |
 | `sea_water_density` | real | 1030 | Density of the loading water (in kg/m^3). Used for the top-boundary water load and for the free-surface stress pin that must match it. |
-| `hbc_x0` | integer | 0 | Type of boundary condition for the left/western side0 indicates no flow boundary condition.1 indicates initial pore pressure is fixed. |
-| `hbc_x1` | integer | 0 | Type of boundary condition for the right/eastern side |
-| `hbc_y0` | integer | 0 | Type of boundary condition for the front/southern side |
-| `hbc_y1` | integer | 0 | Type of boundary condition for the back/northern side |
-| `hbc_z0` | integer | 0 | Type of boundary condition for the bottom side |
-| `hbc_z1` | integer | 0 | Type of boundary condition for the top side |
-| `stress_bc_x0` | integer | 0 | Type of boundary condition for the left/western side. 0: no traction boundary condition, 1: traction in the x direction, 2: traction in the y direction, 3: traction in the z direction. |
-| `stress_bc_x1` | integer | 0 | Type of boundary condition for the right/eastern side |
-| `stress_bc_y0` | integer | 0 | Type of boundary condition for the front/southern side |
-| `stress_bc_y1` | integer | 0 | Type of boundary condition for the back/northern side |
-| `stress_bc_z0` | integer | 0 | Type of boundary condition for the bottom side |
-| `stress_bc_z1` | integer | 0 | Type of boundary condition for the top side |
-| `stress_val_x0` | real | 0 | Magnitude of stress at the left/western side (in Pa). |
-| `stress_val_x1` | real | 0 | Magnitude of stress at the right/eastern side (in Pa). |
-| `stress_val_y0` | real | 0 | Magnitude of stress at the front/southern side (in Pa). |
-| `stress_val_y1` | real | 0 | Magnitude of stress at the back/northern side (in Pa). |
-| `stress_val_z0` | real | 0 | Magnitude of stress at the bottom side (in Pa). |
-| `stress_val_z1` | real | 0 | Magnitude of stress at the top side (in Pa). |
+| `hbc_x0` | integer | 0 | Hydraulic boundary type. 0: no normal flow; 1: hold the initial nodal pressure; 2: prescribed bc.hbc\_pressure entry (Pa), multiplied by the boundary schedule; 3: prescribed bc.hbc\_flux entry (m/s, positive outward), multiplied by the boundary schedule. Lists use x0 x1 y0 y1 z0 z1 order; y sides apply only in 3D. |
+| `hbc_x1` | integer | 0 | Hydraulic boundary type. 0: no normal flow; 1: hold the initial nodal pressure; 2: prescribed bc.hbc\_pressure entry (Pa), multiplied by the boundary schedule; 3: prescribed bc.hbc\_flux entry (m/s, positive outward), multiplied by the boundary schedule. Lists use x0 x1 y0 y1 z0 z1 order; y sides apply only in 3D. |
+| `hbc_y0` | integer | 0 | Hydraulic boundary type. 0: no normal flow; 1: hold the initial nodal pressure; 2: prescribed bc.hbc\_pressure entry (Pa), multiplied by the boundary schedule; 3: prescribed bc.hbc\_flux entry (m/s, positive outward), multiplied by the boundary schedule. Lists use x0 x1 y0 y1 z0 z1 order; y sides apply only in 3D. |
+| `hbc_y1` | integer | 0 | Hydraulic boundary type. 0: no normal flow; 1: hold the initial nodal pressure; 2: prescribed bc.hbc\_pressure entry (Pa), multiplied by the boundary schedule; 3: prescribed bc.hbc\_flux entry (m/s, positive outward), multiplied by the boundary schedule. Lists use x0 x1 y0 y1 z0 z1 order; y sides apply only in 3D. |
+| `hbc_z0` | integer | 0 | Hydraulic boundary type. 0: no normal flow; 1: hold the initial nodal pressure; 2: prescribed bc.hbc\_pressure entry (Pa), multiplied by the boundary schedule; 3: prescribed bc.hbc\_flux entry (m/s, positive outward), multiplied by the boundary schedule. Lists use x0 x1 y0 y1 z0 z1 order; y sides apply only in 3D. |
+| `hbc_z1` | integer | 0 | Hydraulic boundary type. 0: no normal flow; 1: hold the initial nodal pressure; 2: prescribed bc.hbc\_pressure entry (Pa), multiplied by the boundary schedule; 3: prescribed bc.hbc\_flux entry (m/s, positive outward), multiplied by the boundary schedule. Lists use x0 x1 y0 y1 z0 z1 order; y sides apply only in 3D. |
+| `hbc_pressure` | list | [0,0,0,0,0,0] | Pressure in Pa for hbc=2, ordered x0 x1 y0 y1 z0 z1. |
+| `hbc_flux` | list | [0,0,0,0,0,0] | Outward Darcy flux in m/s for hbc=3, ordered x0 x1 y0 y1 z0 z1. |
+| `num_hbc_schedule` | integer | 1 | Number of shared boundary schedule points. |
+| `hbc_schedule_time_in_yr` | list | [0] | Boundary schedule times in years, nondecreasing; repeated times are steps. |
+| `hbc_schedule_ratio` | list | [1] | Ratios multiplying prescribed pressure and flux. |
+| `num_wells` | integer | 0 | Number of vertical rate-controlled wells. Requires control.has\_hydraulic\_diffusion. |
+| `well_x` | list | [] | x coordinate of each well (in m). |
+| `well_y` | list | [] | y coordinate of each well (in m, 3D only). |
+| `well_z_top` | list | [] | Top of each well screen (in m). |
+| `well_z_bottom` | list | [] | Bottom of each well screen (in m), below its top. |
+| `well_rate` | list | [] | Fluid volume extracted by each well at schedule ratio 1, spread uniformly over the screen: m^3/s in 3D, m^2/s per unit out-of-plane length in 2D. Negative injects. |
+| `num_well_schedule` | integer | 1 | Number of points in the well rate schedule. |
+| `well_schedule_time_in_yr` | list | [0] | Non-decreasing well schedule times (in yr). A repeated time is a step. |
+| `well_schedule_ratio` | list | [1] | Rate multiplier at each schedule time: linear in between, held outside. Each step applies its exact time average, so the volume pumped is independent of dt. |
+| `stress_bc_x0` | integer | 0 | Stress boundary type. 0: no added traction; 1: x normal-stress component; 2: y normal-stress component (3D only); 3: z normal-stress component; 4: facet-normal stress on any orientation. Use the corresponding bc.stress\_val\_\* in Pa; tension is positive and compression negative. |
+| `stress_bc_x1` | integer | 0 | Stress boundary type. 0: no added traction; 1: x normal-stress component; 2: y normal-stress component (3D only); 3: z normal-stress component; 4: facet-normal stress on any orientation. Use the corresponding bc.stress\_val\_\* in Pa; tension is positive and compression negative. |
+| `stress_bc_y0` | integer | 0 | Stress boundary type. 0: no added traction; 1: x normal-stress component; 2: y normal-stress component (3D only); 3: z normal-stress component; 4: facet-normal stress on any orientation. Use the corresponding bc.stress\_val\_\* in Pa; tension is positive and compression negative. |
+| `stress_bc_y1` | integer | 0 | Stress boundary type. 0: no added traction; 1: x normal-stress component; 2: y normal-stress component (3D only); 3: z normal-stress component; 4: facet-normal stress on any orientation. Use the corresponding bc.stress\_val\_\* in Pa; tension is positive and compression negative. |
+| `stress_bc_z0` | integer | 0 | Stress boundary type. 0: no added traction; 1: x normal-stress component; 2: y normal-stress component (3D only); 3: z normal-stress component; 4: facet-normal stress on any orientation. Use the corresponding bc.stress\_val\_\* in Pa; tension is positive and compression negative. |
+| `stress_bc_z1` | integer | 0 | Stress boundary type. 0: no added traction; 1: x normal-stress component; 2: y normal-stress component (3D only); 3: z normal-stress component; 4: facet-normal stress on any orientation. Use the corresponding bc.stress\_val\_\* in Pa; tension is positive and compression negative. |
+| `stress_val_x0` | real | 0 | Prescribed stress value (Pa): positive in tension, negative in compression; the corresponding bc.stress\_bc\_\* selects the component or facet-normal direction. |
+| `stress_val_x1` | real | 0 | Prescribed stress value (Pa): positive in tension, negative in compression; the corresponding bc.stress\_bc\_\* selects the component or facet-normal direction. |
+| `stress_val_y0` | real | 0 | Prescribed stress value (Pa): positive in tension, negative in compression; the corresponding bc.stress\_bc\_\* selects the component or facet-normal direction. |
+| `stress_val_y1` | real | 0 | Prescribed stress value (Pa): positive in tension, negative in compression; the corresponding bc.stress\_bc\_\* selects the component or facet-normal direction. |
+| `stress_val_z0` | real | 0 | Prescribed stress value (Pa): positive in tension, negative in compression; the corresponding bc.stress\_bc\_\* selects the component or facet-normal direction. |
+| `stress_val_z1` | real | 0 | Prescribed stress value (Pa): positive in tension, negative in compression; the corresponding bc.stress\_bc\_\* selects the component or facet-normal direction. |
 | `vbc_x0` | integer | 1 | Type of velocity boundary condition for the left/western side. Odd number indicates the normal component of the velocity is fixed. Possible type is 0: all velocity components free; 1: normal component fixed, shear components free; 2: normal component free, shear components fixed at 0; 3: normal component fixed, shear components fixed at 0; 4: normal component free, shear component (not z) fixed, z component fixed at 0, only in 3D; 5: normal component fixed at 0, shear component (not z) fixed, z component fixed at 0, only in 3D; 6: normal component fixed (bc.vbc\_val\_\*), shear component (not z) fixed (bc.vbc\_val\_\*\_l), z component free; 7: normal component fixed, shear component (not z) fixed at 0, z component free, only in 3D; 11: horizontal normal component fixed, z component and horizontal shear component free, only in 3D; 13: horizontal normal component fixed, z component and horizontal shear component fixed at 0, only in 3D; |
-| `vbc_x1` | integer | 1 | Type of boundary condition for the right/eastern side |
+| `vbc_x1` | integer | 1 | Velocity boundary type; see bc.vbc\_x0 for the type definitions and dimensional restrictions. The prescribed value is bc.vbc\_val\_x1. |
 | `vbc_val_x0` | real | -1e-09 | Value of boundary condition for left/western side (if velocity, unit is m/s; if stress, unit is Pa) |
 | `vbc_val_x0_l` | real | 0 | Lateral shear velocity for left/western side (used with bc type 6, unit is m/s) |
 | `vbc_val_division_x0_min` | real | 1 | Ratio of first rate change division from the top to the right boundary width (for option = 8) |
@@ -256,8 +330,8 @@ Velocity, traction, thermal and hydraulic boundary conditions, and surface proce
 | `vbc_val_x1_ratio1` | real | 1 | Ratio of the velocity at the vbc\_val\_division\_x0\_min of the right boundary width (for option = 1 and 3) |
 | `vbc_val_x1_ratio2` | real | 1 | Ratio of the velocity at the vbc\_val\_division\_x1\_max of the right boundary width (for option = 1 and 3) |
 | `vbc_val_x1_ratio3` | real | 1 | Ratio of the velocity at the bottom of the right boundary width (for option = 1 and 3) |
-| `vbc_y0` | integer | 0 | Type of boundary condition for the southern side |
-| `vbc_y1` | integer | 0 | Type of boundary condition for the northern side |
+| `vbc_y0` | integer | 0 | Velocity boundary type; see bc.vbc\_x0 for the type definitions and dimensional restrictions. The prescribed value is bc.vbc\_val\_y0. |
+| `vbc_y1` | integer | 0 | Velocity boundary type; see bc.vbc\_x0 for the type definitions and dimensional restrictions. The prescribed value is bc.vbc\_val\_y1. |
 | `vbc_val_y0` | real | 0 | Value of boundary condition for the southern side (if velocity, unit is m/s; if stress, unit is Pa) |
 | `vbc_val_y0_l` | real | 0 | Lateral shear velocity for southern side (used with bc type 6, unit is m/s) |
 | `vbc_val_y1` | real | 0 | Value of boundary condition for the northern side (if velocity, unit is m/s; if stress, unit is Pa) |
@@ -268,8 +342,8 @@ Velocity, traction, thermal and hydraulic boundary conditions, and surface proce
 | `vbc_period_y1_time_in_yr` | list | [1.e6] | Times of the y1 velocity period table (in yr, 3D only), as for x0 |
 | `vbc_period_y0_ratio` | list | [1.] | Ratio of vbc\_val\_y0 at each time of the y0 period table (3D only), as for x0 |
 | `vbc_period_y1_ratio` | list | [1.] | Ratio of vbc\_val\_y1 at each time of the y1 period table (3D only), as for x0 |
-| `vbc_z0` | integer | 0 | Type of boundary condition for the bottom side |
-| `vbc_z1` | integer | 0 | Type of boundary condition for the top side |
+| `vbc_z0` | integer | 0 | Bottom velocity boundary type. 0: all components free; 1: prescribed vertical velocity bc.vbc\_val\_z0, horizontal free; 2: vertical free, horizontal zero; 3: prescribed vertical velocity, horizontal zero; 4: prescribed x velocity and zero vertical velocity (2D only). |
+| `vbc_z1` | integer | 0 | Top velocity boundary type. 0: all components free; 1: prescribed vertical velocity bc.vbc\_val\_z1, horizontal free; 2: vertical free, horizontal zero; 3: prescribed vertical velocity, horizontal zero; 4: prescribed x velocity and zero vertical velocity (2D only); 8: rigid frictionless platen with one shared free vertical velocity; load it with bc.stress\_bc\_z1. |
 | `vbc_val_z0` | real | 0 | Value of boundary condition for the bottom side (if velocity, unit is m/s; if stress, unit is Pa) |
 | `vbc_val_z1` | real | 0 | Value of boundary condition for the top side (if velocity, unit is m/s; if stress, unit is Pa) |
 | `vbc_val_z1_loading_period` | real | 1.79769e+308 | Loading period for the velocity on the top side |
@@ -324,7 +398,7 @@ Initial temperature, stress, weak zones and material layout.
 | `weakzone_segments_depth_max` | list | [1] | Depth lower (deeper) bound for each segment (between 0 and 1, in unit of mesh.zlength), '[v0, v1, ...]' |
 | `weakzone_segments_y_min` | list | [0] | Y lower bound for each segment (between 0 and 1, in unit of mesh.ylength), '[v0, v1, ...]' (3D only) |
 | `weakzone_segments_y_max` | list | [1] | Y upper bound for each segment (between 0 and 1, in unit of mesh.ylength), '[v0, v1, ...]' (3D only) |
-| `temperature_option` | integer | 0 | How to set the initial temperature? 0: uniform half-space cooling. 1: continental thermal gradient. 2: equilibrium temperature for crustal radiogenic heating. 3: continental thermal gradient with adiabatic mantle. 90: temperature read from an external grid |
+| `temperature_option` | integer | 0 | How to set the initial temperature? 0: uniform half-space cooling. 1: continental thermal gradient. 2: equilibrium temperature for crustal radiogenic heating. 3: continental thermal gradient with adiabatic mantle. 4: uniform ic.temp\_background plus a Gaussian anomaly. 5: linear conduction from bc.surface\_temperature at the top to bc.mantle\_temperature at the bottom (mesh.zlength), plus the same Gaussian anomaly. 90: temperature read from an external grid |
 | `oceanic_plate_age_in_yr` | real | 6e+07 | Age of the oceanic plate (in years), used for the temperature profile on the plate. |
 | `num_radiogenic_heat_layer` | integer | 1 | Number of radiogenic heat layers |
 | `radiogenic_heat_boundry` | list | [-1,-1] | The layer boundry of radiogenic heating from the top to the bottom (depth -&gt; positive, in meters). Using -1 to indicate the top and bottom of the model. |
@@ -341,11 +415,22 @@ Initial temperature, stress, weak zones and material layout.
 | `radiogenic_heat_dome_width` | real | 0 | Dome half width, used for the temperature profile on the plate. |
 | `radiogenic_heat_dome_width_y` | real | 0 | Dome half width in y-axis, used for the temperature profile on the plate (3D). 0: Isotropic (uses radiogenic\_heat\_dome\_width for both axes). &gt;0: Specific width for y-axis (elliptical dome). &lt;0: Infinite width; thermal profile is uniform along y-axis (ridge/hinge). |
 | `radiogenic_heat_dome_azimuth` | real | 0 | Dome azimuth (rotation angle), used for the temperature profile on the plate (in degree) (3D). |
+| `temp_background` | real | 273 | Uniform background temperature in K for temperature\_option=4. |
+| `temp_anomaly_amplitude` | real | 0 | Gaussian temperature amplitude in K. |
+| `temp_anomaly_xcenter` | real | 0 | Gaussian thermal anomaly x coordinate in m. |
+| `temp_anomaly_ycenter` | real | 0 | Gaussian thermal anomaly y coordinate in m. |
+| `temp_anomaly_zcenter` | real | 0 | Gaussian thermal anomaly z coordinate in m. |
+| `temp_anomaly_xsemi_axis` | real | 1 | Positive Gaussian x scale in m. |
+| `temp_anomaly_ysemi_axis` | real | 1 | Positive Gaussian y scale in m. |
+| `temp_anomaly_zsemi_axis` | real | 1 | Positive Gaussian z scale in m. |
 | `Temp_filename` | text | Thermal.dat | Filename of the input thermal field, for temperature\_option=90. The file format is: &lt;x-coord y-coord (if 3D) z-coord temperature&gt;. Can be generated by COMSOL. |
 | `Nodes_filename` | text | Coord.dat | Filename of the mesh coordinates, for temperature\_option=90. The nodes may be ordered differently with the thermal file. The file format is: &lt;x-coord y-coord (if 3D) z-coord&gt;. Can be generated by COMSOL. |
 | `Connectivity_filename` | text | Connectivity.dat | Filename of the mesh connectivity, for temperature\_option = 90 only. The file format is: &lt;#ofnode0 #ofnode1 #ofnode2 #ofnode3 (if 3D)&gt;. Can be generated by COMSOL. |
 | `isostasy_adjustment_time_in_yr` | real | 0 | Time for spinning up isostasy adjustment. |
 | `excess_pore_pressure` | real | 0 | Initial excess\_pore\_pressure except for boundary. |
+| `pore_pressure_option` | integer | 0 | Initial pressure: 0 hydrostatic/excess, 1 linear x profile between prescribed pressure faces, 2 uniform. |
+| `pore_pressure_value` | real | 0 | Uniform initial pressure in Pa for pore\_pressure\_option=2. |
+| `water_table_z` | real | 0 | Height of the initial hydrostatic water table (m): p = -rho\_f\*g\*(z - water\_table\_z), negative (suction) above it. The default 0 is the original surface. |
 | `has_body_force_adjustment` | yes/no | no | Conducting PT loop to get initial stress field from inital guess |
 | `initial_stress_option` | integer | 0 | How to initialize stress? 0: use the legacy gravity-dependent initialization. 1: prescribe a homogeneous absolute Cauchy stress tensor; requires gravity=0. |
 | `initial_stress` | list | 2D: [0,0,0]<br/>3D: [0,0,0,0,0,0] | Homogeneous absolute Cauchy stress [sxx,szz,sxz] in Pa; compression is negative. Plane strain initializes syy=(sxx+szz)/2. |
@@ -408,14 +493,29 @@ Rheology and material properties. List values hold one entry per material.
 | `friction_angle1` | list | [5] | Friction angle of the materials when weakening saturates '[d0, d1, d2, ...]' (in degree) |
 | `dilation_angle0` | list | [0] | Dilation angle of the materials when weakening starts '[d0, d1, d2, ...]' (in degree) |
 | `dilation_angle1` | list | [0] | Dilation angle of the materials when weakening saturates '[d0, d1, d2, ...]' (in degree) |
+| `porosity_model` | integer | 0 | Porosity: 0 fixed, 1 Eulerian Biot volume/grain-pressure evolution. |
+| `permeability_model` | integer | 0 | Permeability: 0 fixed, 1 Kozeny-Carman, 2 power law from current porosity. |
+| `permeability_exponent` | list | [3] | Positive dimensionless exponent n in k=k0\*(phi/phi0)^n for permeability\_model=2. Material exponents are averaged by marker count. |
+| `pore_healing_time` | list | [0] | Reference recovery time of plastic pore dilation (s); 0 disables recovery. Requires porosity\_model=1. |
+| `pore_healing_temperature` | list | [293] | Reference absolute temperature for pore recovery (K). |
+| `pore_healing_energy` | list | [0] | Nonnegative activation energy for pore recovery (J/mol); tau=tau0\*(T/T0)\*exp(E/R\*(1/T-1/T0)). |
 | `porosity` | list | [0.0] | Porosity of the materials '[d0, d1, d2, ...]' (no unit) |
 | `hydraulic_perm` | list | [1e-14] | Intrinsic permeability of the materials '[d0, d1, d2, ...]' (m^2) |
-| `fluid_rho0` | list | [1000] | Density of the fluids at 0 Pa and 273 K '[d0, d1, d2, ...]' (in kg/m^3) |
+| `matrix_storage` | list | [0] | Immobile matrix reservoir storage per bulk volume in 1/Pa. |
+| `matrix_exchange` | list | [0] | Explicit exchange coefficient between transport and matrix pressure in 1/(Pa s). |
+| `permeability_tensor` | list | [1,1,1,0,0,0] | Dimensionless SPD permeability tensor [xx,yy,zz,xy,xz,yz], multiplying hydraulic\_perm. |
+| `fluid_rho0` | list | [1000] | Reference fluid density for Darcy gravity and saturated mixture weight '[d0, d1, d2, ...]' (kg/m^3) |
+| `fluid_heat_capacity` | list | [4180] | Fluid heat capacity '[d0, d1, ...]' in J/kg/K, for groundwater heat transport. |
+| `derive_biot_coeff_from_bulk_moduli` | yes/no | no | Use biot\_coeff=1-bulk\_modulus/bulk\_modulus\_s with finite positive ordered moduli. |
 | `fluid_alpha` | list | [2.07e-4] | Thermal expansivity of the fluids at 0 Pa and 293 K '[d0, d1, d2, ...]' (in K^-1) |
 | `fluid_bulk_modulus` | list | [2.17e9] | Bulk modulus of the fluids at 0 Pa and 293 K '[d0, d1, d2, ...]' (in Pa) |
-| `fluid_visc` | list | [1.002e-3] | Dynamic viscosity of the fluids at 0 Pa and 293 K '[d0, d1, d2, ...]' (in Pa) |
+| `fluid_visc` | list | [1.002e-3] | Dynamic viscosity of the fluids at 0 Pa and 293 K '[d0, d1, d2, ...]' (in Pa s). |
 | `biot_coeff` | list | [1.0] | Biot-Willis coefficient (HM coupling coeff) '[d0, d1, d2, ...]' (no unit) |
 | `bulk_modulus_s` | list | [37e9] | Bulk modulus of the solid grains or minerals '[d0, d1, d2, ...]' (Pa) |
+| `retention_model` | list | [0] | Retention law of the materials '[m0, m1, ...]': 0 saturated, 1 van Genuchten-Mualem, 2 Brooks-Corey-Burdine, 3 Gardner exponential. |
+| `retention_alpha` | list | [1e-4] | Retention alpha of the materials '[d0, d1, ...]' (1/Pa); 1/alpha is the Brooks-Corey air-entry pressure. |
+| `retention_n` | list | [2] | Retention exponent '[d0, d1, ...]': van Genuchten n &gt; 1, or the Brooks-Corey pore-size index &gt; 0. Unused by Gardner. |
+| `residual_saturation` | list | [0] | Residual saturation of the materials '[d0, d1, ...]', 0 &lt;= Sr &lt; 1. |
 | `direct_a` | list | [0.020] | rate-and-state friction parameter a '[d0, d1, d2, ...]' (-) |
 | `evolution_b` | list | [0.025] | rate-and-state friction parameter b '[d0, d1, d2, ...]' (-) |
 | `characteristic_velocity` | list | [1e-6] | rate-and-state friction parameter V0 '[d0, d1, d2, ...]' (-) |
