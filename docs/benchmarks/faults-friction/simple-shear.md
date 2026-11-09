@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-slug: /tutorial/rsf-simple-shear
+slug: /benchmarks/rsf-simple-shear
 title: Checking the friction law in simple shear
 description: Run DES's two-element simple-shear benchmark and compare elastoplastic, steady-state and aging-law RSF stress with their closed-form solutions.
 ---
@@ -22,7 +22,7 @@ The benchmark covers four groups:
 | Aging-law RSF (`state_var_model = 1`) | 3 | $D_c = 10^{-3}, 3\times10^{-3}, 10^{-2}$ m |
 | Healing at zero slip rate | 1 | – |
 
-See [rate-and-state friction](../../../theory/rate-state-friction.md) for the
+See [rate-and-state friction](../../theory/rate-state-friction.md) for the
 equations used below.
 
 :::info At a glance
@@ -39,7 +39,7 @@ equations used below.
 
 ## Setup
 
-![Benchmark setup and results](../../img/rsf/simple-shear-benchmark.png)
+![Benchmark setup and results](../img/simple-shear-benchmark.png)
 
 *Figure 1.* (a) The cell: two triangles in a 1 m square. The bottom nodes are
 fixed and the top nodes move at $v_x = 10^{-5}$ m/s. (b–d) Shear stress
@@ -195,4 +195,4 @@ dependence or the coupling between slip and elastic unloading that controls
 earthquake nucleation. Under PT, the prescribed motion balances the forces
 at the first iteration, so the PT run checks the accepted constitutive
 history, not iterative convergence. The [earthquake-cycle
-tutorial](./earthquake-cycles.md) adds those effects.
+tutorial](../../tutorial/tectonics/rsf/earthquake-cycles.md) adds those effects.

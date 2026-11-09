@@ -51,9 +51,9 @@ See [Theory](/docs/category/theory) for the formulation.
 | Install and run a first model | [Installation](./installation.md) → [Quickstart](./quickstart.md) |
 | Set up your own model | [User guide](/docs/category/user-guide) and the [configuration file](../reference/configuration.md) |
 | Learn by example | [Tutorials](/docs/category/tutorial) |
-| Model earthquake cycles | [Rate-and-state theory](../theory/rate-state-friction.md) → [Simple-shear check](../tutorial/tectonics/rsf/simple-shear.md) → [Creep or earthquakes](../tutorial/tectonics/rsf/earthquake-cycles.md) |
+| Model earthquake cycles | [Rate-and-state theory](../theory/rate-state-friction.md) → [Simple-shear check](../benchmarks/faults-friction/simple-shear.md) → [Creep or earthquakes](../tutorial/tectonics/rsf/earthquake-cycles.md) |
 | Solve for equilibrium | [Choosing a mechanical solver](../user-guide/numerical-controls/solver.md) → [Fundamental mechanics](/docs/category/fundamental-mechanics) |
-| Check or change the code | [Verification and benchmarks](../theory/verification.md), [Developer guide](/docs/category/developer-guide) |
+| Check or change the code | [Benchmarks](../benchmarks/index.md), [Developer guide](/docs/category/developer-guide) |
 
 ## Versions
 

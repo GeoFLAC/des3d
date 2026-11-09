@@ -1,0 +1,9 @@
+{
+  "label": "Faults and friction",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "slug": "/category/benchmarks-faults-friction",
+    "description": "Friction laws compared with closed-form solutions"
+  }
+}

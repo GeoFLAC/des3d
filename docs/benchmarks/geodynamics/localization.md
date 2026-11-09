@@ -1,6 +1,6 @@
 ---
-sidebar_position: 4
-slug: /tutorial/rsf-localization
+sidebar_position: 1
+slug: /benchmarks/shear-band-localization
 title: Shear bands with and without rate-and-state friction
 description: Extend a brittle crust from a weak seed and compare the shear bands of static friction, velocity-strengthening and velocity-weakening rate-and-state friction.
 ---
@@ -8,13 +8,13 @@ description: Extend a brittle crust from a weak seed and compare the shear bands
 # Shear bands with and without rate-and-state friction
 
 A brittle crust pulled apart from a weak seed localizes into shear bands.
-This tutorial runs the same model three times, with static Mohr–Coulomb
+This benchmark runs the same model three times, with static Mohr–Coulomb
 friction (EP) and with rate-and-state friction that is velocity
 strengthening or velocity weakening (EP-RSF). It asks two questions: does
 rate-and-state friction change where and at what angle the bands form, and
 does it change how they slip? The inputs are the DES v2 benchmark in
 `benchmarks/DESv2.0/rsf/localization/`; see
-[rate-and-state friction](../../../theory/rate-state-friction.md) for the
+[rate-and-state friction](../../theory/rate-state-friction.md) for the
 friction law and for global velocity scaling.
 
 :::info At a glance
@@ -77,7 +77,7 @@ starts at the seed centre; points 0 and 2 lie near the side walls.
 
 ### Where the bands form
 
-![Plastic strain gained since the start, after 12,000 years, for EP, velocity-strengthening and velocity-weakening EP-RSF. Dashed lines: straight fits to the band between 2 and 8 km depth.](../../img/rsf/localization-plastic-strain.png)
+![Plastic strain gained since the start, after 12,000 years, for EP, velocity-strengthening and velocity-weakening EP-RSF. Dashed lines: straight fits to the band between 2 and 8 km depth.](../img/localization-plastic-strain.png)
 
 All three models break the crust along a band that rises from the seed to
 the surface on the right, with a fainter conjugate band on the left. The
@@ -128,7 +128,7 @@ whole depth range.
 
 ### How the bands slip
 
-![Displacement of the seed monitor point and the stress invariant in the seed element over 12,000 years](../../img/rsf/localization-histories.png)
+![Displacement of the seed monitor point and the stress invariant in the seed element over 12,000 years](../img/localization-histories.png)
 
 The monitor at the seed (`_monitor_point_1.csv`) shows three different
 ways of slipping on almost the same band. The stress invariant is

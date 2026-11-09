@@ -1,31 +1,40 @@
 ---
-sidebar_position: 9
-slug: /theory/verification
-title: Verification and benchmarks
-description: The checks that compare DynEarthSol with reference solutions, the regression tests that guard its results, and the older benchmark inputs.
+sidebar_position: 0
+slug: /benchmarks
+title: Benchmarks
+description: How DynEarthSol compares with analytical, theoretical and independent solutions, and the regression and functional tests that guard its results.
 ---
 
-# Verification and benchmarks
+# Benchmarks
 
-DynEarthSol is checked at three levels: against reference solutions for
-individual processes, against stored results to catch unintended changes,
-and by functional tests that run in continuous integration. All of them live
-in the DynEarthSol repository.
+Each benchmark runs DES on a problem with a known answer, an analytical
+solution, a theoretical prediction or an independent calculation, and shows
+how close DES comes and where the comparison stops. The inputs are in the
+DynEarthSol repository; each page says how to run them and what to expect.
 
-## Comparisons with reference solutions
+DynEarthSol is also checked against stored results to catch unintended
+changes, and by functional tests that run in continuous integration; both are
+listed below.
 
-These checks have a script that runs DES, computes an independent reference
-and reports the difference.
+## Benchmarks in this section
+
+| Benchmark | Compared with | Inputs |
+| --- | --- | --- |
+| [Shear bands with and without rate-and-state friction](./geodynamics/localization.md) | Band dips against the Arthur angle | `benchmarks/DESv2.0/rsf/localization/` |
+| [Checking the friction law in simple shear](./faults-friction/simple-shear.md) | Closed-form stresses for static friction and steady-state and aging-law RSF | `benchmarks/simple_shear_rsf/` |
+
+## Other comparisons with reference solutions
+
+These checks compare DES with a reference solution inside a tutorial or a
+functional test.
 
 | Check | What it tests | Where | Documented in |
 | --- | --- | --- | --- |
-| Simple shear, elastoplastic and RSF | Stress of static-friction, steady-state and aging-law RSF against closed-form solutions; zero-velocity healing against the discrete update | `benchmarks/simple_shear_rsf/` | [Checking the friction law in simple shear](../tutorial/tectonics/rsf/simple-shear.md) |
 | Confined elastic loading (PT) | Stress and strain of a confined cell against the constrained-modulus solution, for both PT schemes | PT tutorial bundle | [Elastic loading and equilibrium](../tutorial/fundamentals/elastic.md) |
 | Maxwell creep (PT) | Continued creep under a held load against a discrete Maxwell reference | PT tutorial bundle | [Maxwell creep](../tutorial/fundamentals/maxwell.md) |
-| Shear-band localization | Band dips in EP and EP-RSF extension against the Arthur angle (52.5°) | `benchmarks/DESv2.0/rsf/localization/` | [Shear bands with and without rate-and-state friction](../tutorial/tectonics/rsf/localization.md) |
 | Plane-strain elastic update | The 2D plane-strain stress update, including the out-of-plane stress | `tests/functional/plane_strain_elastic/` | – |
 | Homogeneous initial stress | `ic.initial_stress_option = 1` produces the prescribed tensor | `tests/functional/initial_stress/` | [Initial stress](../user-guide/model-setup/initial-stress.md) |
-| RSF controls | Slip-rate options and the state-change time-step limit | `tests/functional/rsf_controls/` | [Rate-and-state friction](./rate-state-friction.md) |
+| RSF controls | Slip-rate options and the state-change time-step limit | `tests/functional/rsf_controls/` | [Rate-and-state friction](../theory/rate-state-friction.md) |
 
 Under `tests/residual-assembly-test/`, component checks call the production
 routines directly. They cover nodal force assembly (cancellation, traction,
