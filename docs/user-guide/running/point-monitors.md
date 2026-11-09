@@ -30,27 +30,29 @@ output_stress    = yes
 ```
 
 This writes `output/monitor_point_0.csv` and `output/monitor_point_1.csv`,
-one row every 10 steps, each row holding the step, time, the matched
-node/element id, and the requested fields.
+one row every 10 steps, each row holding the step, time, the point's current
+position, the node and element sampled, the requested fields and the row
+kind (see [Remeshing and restart](#remeshing-and-restart)).
 
 `monitor.enabled = yes` requires `num_points > 0` and at least one
 `output_*` flag on; otherwise the run stops at input.
 
 ## How points are located
 
-Each query point is matched **independently** to the nearest mesh *node*
-(for node-based fields) and the nearest *element centroid* (for
-element-based fields) — a plain nearest-neighbor search, not interpolation.
-The matched ids are written every row as `matched_node`/`matched_elem`, so
-you can tell which mesh entity actually produced each row, and they can
-differ from each other since the search is independent.
+Each monitor point is a tracer, like a marker. It is placed at
+`points_x`/`points_y`/`points_z`, keeps its position inside its element as
+the mesh moves, and so follows the material through deformation, remeshing
+and restart. `monitor.point_type` chooses what a row reports:
 
-Because there's no interpolation, a query point that doesn't sit exactly on
-a node gets the *nearest* node's values, not an interpolated value at the
-exact point. If you need an exact match, place `points_x`/`points_y`/`points_z`
-at a known mesh vertex — e.g., a `.poly` file vertex — and compare the
-`query_*` columns against `coord_*` (with `output_coord = yes`) to confirm
-how close the match actually is.
+| `point_type` | Node fields (velocity, temperature, ...) | Element fields (stress, plastic strain, ...) |
+| --- | --- | --- |
+| `particle` (default) | interpolated at the point | from the element that contains the point |
+| `grid` | from the node nearest the point | from the element whose centroid is nearest the point |
+
+The columns `query_*` hold the point's current position, and
+`matched_node`/`matched_elem` the node and element that were sampled. A point
+that leaves the mesh reports NaN (particle) or its nearest node (grid), with
+one warning.
 
 - `points_x`, `points_z`: in 2D, the two in-plane coordinates.
 - `points_x`, `points_y`, `points_z`: in 3D, all three.
@@ -65,9 +67,6 @@ depth/vertical coordinate as `points_z`, not `points_y`, to avoid relying on
 the alias.
 :::
 
-Matching runs once at startup and again after every remesh — not every
-write — so it's cheap even with many points on a large mesh.
-
 ## What gets written
 
 One file per point: `<output_prefix>_point_<i>.csv`, where `i` is the
@@ -76,11 +75,14 @@ point's 0-based index in `points_x`/`points_y`/`points_z`. Every row has:
 | Column(s) | Always present | Meaning |
 |---|---|---|
 | `step`, `time_s` | yes | Solver step and model time (seconds) |
-| `query_x`[, `query_y`], `query_z` | yes | The coordinate (metres) actually used for this row's search — the original point, or its rebind coordinate after a remesh (see below) |
-| `matched_node`, `matched_elem` | yes | The node/element id the row's fields came from |
+| `query_x`[, `query_y`], `query_z` | yes | The point's current position (metres) |
+| `matched_node`, `matched_elem` | yes | The node nearest the point, and the element sampled (see [How points are located](#how-points-are-located)) |
+| `row` | yes, last column | `0` regular, `1` before a remesh, `2` after a remesh (see [Remeshing and restart](#remeshing-and-restart)) |
 
-The remaining columns appear only if their `output_*` flag is on. Node-based
-fields read from `matched_node`; element-based fields from `matched_elem`.
+The remaining columns appear only if their `output_*` flag is on, between
+`matched_elem` and `row`. Node-based fields are interpolated at the point
+(`particle`) or read from `matched_node` (`grid`); element-based fields come
+from `matched_elem`.
 Any field a flag requests that the run doesn't actually have (e.g. pore
 pressure without poroelasticity) comes out as `nan`, like a missing or
 out-of-range match (`matched_node`/`matched_elem = -1`) would.
@@ -96,7 +98,7 @@ out-of-range match (`matched_node`/`matched_elem = -1`) would.
 | `output_pore_pressure` | `pore_pressure` | Poroelastic models only |
 | `output_bcflag` | `bcflag` | Boundary-condition flag bitmask, as an integer |
 
-**Element-based**, using the matched element's centroid:
+**Element-based**, from the sampled element:
 
 | Flag | Column(s) | Source |
 |---|---|---|
@@ -121,49 +123,37 @@ Every numeric value is written in full double precision
 (`%.17e`); `nan`/`inf`/`-inf` are spelled out literally rather than left
 blank.
 
-## Rebinding across a remesh
+## Remeshing and restart
 
-A remesh renumbers nodes and elements, so a monitor point's `matched_node`/
-`matched_elem` from before the remesh is meaningless afterward. The monitor
-re-runs its nearest-neighbor search right after every remesh, and
-`remesh_rebind_mode` controls what coordinate it searches *from*:
+A remesh rebuilds the mesh, so each point is located again at the position
+it had just before the remesh. A remesh also remaps element fields, which
+smooths them slightly. To show that, the last CSV column, `row`, marks what
+each row records:
 
-- **`pre_remesh_coord`** (default): just before the remesh, the monitor
-  records the current physical position of its *previously* matched node
-  (or element centroid), and searches from there afterward. The point keeps
-  following the same material location as the model deforms — a Lagrangian
-  marker that gets re-anchored to the nearest mesh entity at every remesh.
-- **`initial_coord`**: always searches from the original `points_x`/`y`/`z`
-  value you configured, ignoring how far the model has deformed since. A
-  large amount of accumulated deformation can make the matched node/element
-  jump across the domain at a remesh, back to whatever is now nearest the
-  original fixed coordinate — effectively a fixed-in-space (Eulerian) query
-  point, re-sampled at each remesh.
+| `row` | Written |
+| --- | --- |
+| `0` | every `step_interval` steps: the regular series |
+| `1` | just before a remesh that falls between monitor steps |
+| `2` | just after a remesh, with the remapped values (only with `remesh_output = both`) |
 
-Between remeshes, the match never changes — the monitor always follows
-whichever node/element it last matched, step after step, regardless of this
-setting. `remesh_rebind_mode` only decides where it looks right after a
-remesh.
+`monitor.remesh_output = before` (default) writes rows 0 and 1;
+`both` also writes row 2. A remesh on a monitor step needs no row 1: the
+regular row already records that state. Filter on `row == 0` for an evenly
+spaced series, and compare rows 1 and 2 of one step to see how much a remesh
+changed a value.
 
-## Known limitations
+The checkpoint stores each point's position and element, so a restart
+continues the same points. Restarting keeps the rows a CSV already holds up
+to the restart step and continues the series in the same file.
 
-:::danger Restarting overwrites existing monitor CSVs
-Each monitor file is opened in overwrite mode at startup, including on a
-restart (`-r`). If you restart a run with the same `output_prefix`, the
-CSVs from before the restart are truncated, not appended to, and the
-restarted run's rows start from wherever it resumes — leaving a gap. Copy
-or rename the existing `*_point_*.csv` files before restarting a monitored
-run, or give the restart leg its own `output_prefix` and concatenate the
-files afterward.
-:::
+## Notes
 
-- **No interpolation.** See [How points are located](#how-points-are-located)
-  above; a query point snaps to the nearest node/element, not a weighted
-  blend of its neighbors.
 - **The initial state is always written once.** At `step = 0` (a fresh
   start, not a restart), every point's row is written immediately,
   regardless of `step_interval`.
 - `step_interval` must be `>= 1`; `num_points` must be `>= 0`.
+- Rows `1` and `2` fall between monitor steps, so a series that includes them
+  is not evenly spaced in steps or time.
 
 ## Try it
 
