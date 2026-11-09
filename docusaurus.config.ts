@@ -6,6 +6,7 @@ import rehypeKatex from 'rehype-katex';
 
 // Maintainer sync record: general baseline DynEarthSol #114 (2026-10-31);
 // PT mechanics #106 and build requirements #122/#125 are also documented.
+// RSF theory and tutorials cover #91; tutorial figures come from master 68cc2a0.
 
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)

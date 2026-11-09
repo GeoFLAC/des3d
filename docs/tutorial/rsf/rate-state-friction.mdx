@@ -1,6 +1,7 @@
 ---
-sidebar_position: 4
-title: Rate-and-state friction (2D)
+sidebar_position: 2
+slug: /tutorial/rate-state-friction
+title: Slip events in a shear band
 description: Run and interpret slow loading, rapid slip and VS–VW–VS creep in a finite-width shear band.
 ---
 
@@ -165,7 +166,7 @@ of 4 and 6 km. The upper boundary moves in the positive x direction at
 10⁻⁹ m/s and has zero vertical velocity; the bottom is fixed. The side boundaries
 do not impose a velocity. Both examples use the same geometry and loading.
 
-![Figure 1: model geometry, monitor positions and the friction contrast in both examples.](./img/des-rsf/01_model_and_friction.png)
+![Figure 1: model geometry, monitor positions and the friction contrast in both examples.](../img/des-rsf/01_model_and_friction.png)
 
 *Figure 1.* (a) Model geometry, boundary loading and monitor positions;
 depth is exaggerated by 2.5×. P0 and P1 sample the upper and lower faces of the
@@ -375,7 +376,7 @@ represent numerical controls rather than physical material properties.
 <details>
 <summary>Reference result and interpretation — Figure 2</summary>
 
-![Figure 2: speed, mean solver time step, monitor-estimated pseudo-density, displacement, shear stress and state over 850 model years.](./img/des-rsf/02_full_history.png)
+![Figure 2: speed, mean solver time step, monitor-estimated pseudo-density, displacement, shear stress and state over 850 model years.](../img/des-rsf/02_full_history.png)
 
 *Figure 2.* Six panels from the supplied Example 1 reference run. Read
 vertically at each event: speed rises, mean solver dt shrinks, estimated
@@ -436,7 +437,7 @@ not a recurrence distribution. Then compare with the reference below.
 <details>
 <summary>Reference result and interpretation — Figure 3</summary>
 
-![Figure 3: the first uniform-VW event from slow loading through rapid slip to recovery.](./img/des-rsf/03_event_mechanics.png)
+![Figure 3: the first uniform-VW event from slow loading through rapid slip to recovery.](../img/des-rsf/03_event_mechanics.png)
 
 *Figure 3.* Time is measured from the sampled speed peak. The continuous
 symlog axis is linear within ±10 s and logarithmic outside, so both slow tails
@@ -567,14 +568,14 @@ Open the reference to inspect its spatial distribution and animation.
 <details>
 <summary>Reference result and interpretation — Figure 4</summary>
 
-![Figure 4: divergence and out-of-plane curl of velocity during the first VS–VW–VS event.](./img/des-rsf/04_divergence_curl.png)
+![Figure 4: divergence and out-of-plane curl of velocity during the first VS–VW–VS event.](../img/des-rsf/04_divergence_curl.png)
 
 *Figure 4.* Top: divergence of velocity. Bottom: its out-of-plane curl. Times
 are seconds after the first event's analysis threshold crossing. The bracket
 marks the central VW interval. The full band is visible, with values beyond
 each fixed colour range saturated.
 
-[View the velocity-gradient animation](./img/des-rsf/04_divergence_curl.gif).
+[View the velocity-gradient animation](../img/des-rsf/04_divergence_curl.gif).
 Its frames have nonuniform physical time intervals; read their timestamps
 rather than interpreting playback speed as physical time.
 
@@ -668,7 +669,7 @@ offsets obscure the comparison? Then open the reference below.
 <details>
 <summary>Reference result and interpretation — Figure 5</summary>
 
-![Figure 5: successive displacement profiles and displacement histories at the VS flanks and VW centre.](./img/des-rsf/05_vs_vw_comparison.png)
+![Figure 5: successive displacement profiles and displacement histories at the VS flanks and VW centre.](../img/des-rsf/05_vs_vw_comparison.png)
 
 *Figure 5.* Top strip: positions of the VS flanks and central VW patch.
 Upper plot: cumulative across-band horizontal displacement versus x at
