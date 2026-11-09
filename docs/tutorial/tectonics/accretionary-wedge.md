@@ -25,7 +25,7 @@ Lee, Tan & Chang (2024), cut down so that each run takes about 5 minutes on
 | Build | `make ndims=2 usemmg=1` |
 | Run time | about 5 minutes per run on 4 threads |
 | Inputs | the wedge and ramp `.cfg`/`.poly` downloads and `wedge_figures.py` |
-| Checked with | revision not recorded on this page |
+| Checked with | DynEarthSol `68cc2a0`: widths and heights within 0.3 km of the table below |
 
 :::
 
