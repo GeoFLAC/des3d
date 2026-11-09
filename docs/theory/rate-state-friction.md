@@ -16,7 +16,9 @@ The approach follows
 a related invariant formulation.
 
 This page gives the friction law, how DES3D measures slip rate in an
-element, how the law enters the plastic update, and the numerical controls.
+element, and how the law enters the plastic update. It then describes
+global velocity scaling, which lets one model run through slow loading and
+fast rupture, and the other numerical controls.
 The [rate-and-state tutorial](../tutorial/rate-state-friction.mdx) shows
 the law at work in a shear-band model.
 
@@ -167,42 +169,98 @@ state and friction, since it is an instantaneous response with no time for
 healing. The state is saved in checkpoints as `friction state variable`; the
 friction coefficient is recomputed from it on restart.
 
-## Time step and inertia
+## Global velocity scaling
 
-### Global velocity scaling
+### Why RSF needs it
 
-An earthquake cycle spans slow loading over years and rupture over seconds.
-RSF models therefore run with global velocity scaling
-(`control.use_global_velocity_scaling`). DES3D turns it on for any RSF
-rheology. The mass-scaled wave speed follows the fastest velocity in the
-model:
+An earthquake cycle spans loading at plate rates, about $10^{-9}$ m/s for
+hundreds of years, and slip near 1 m/s for seconds. With physical density,
+an explicit step is limited by the elastic wave speed to milliseconds, and a
+300-year interseismic period would need about $10^{12}$ steps. Ordinary
+[mass scaling](./solution-scheme/massscaling.md) fixes the scaled wave
+speed from the boundary velocity, $c\,v_{bc}$. That keeps loading
+quasi-static, but a fault slipping $10^9$ times faster than the boundary
+then moves faster than the scaled waves, and inertia dominates the event.
+
+Global velocity scaling (GVS) ties the mass scaling to the fastest motion
+in the model at every step. `control.use_global_velocity_scaling = yes`
+enables it, and DES3D turns it on for any RSF rheology.
+
+### Scaled wave speed and density
+
+At each step DES3D finds the largest speed $v_{\max}$ (nodal or boundary)
+and sets
 
 $$
 c_f = \min\!\left(c\,v_{\max},\ \sqrt{M/\rho}\right),
 \qquad
-\rho_f = K/c_f^2,
+\rho_f = \frac{K}{c_f^{2}},
 $$
 
-where $c$ is `control.inertial_scaling`, $v_{\max}$ the largest nodal speed
-(at least the boundary speed), $\rho$ the physical density, $K$ the bulk
-modulus and $M$ the shear or bulk modulus chosen by
-`control.mass_scaling_reference_speed` (see
-[mass scaling](./solution-scheme/massscaling.md)). The step follows from the
-same speed, $\Delta t = 0.5\,l_{\min}/(c\,v_{\max})$, and is never smaller
-than the step for the physical wave speed.
+where $c$ is `control.inertial_scaling`, $K$ the bulk modulus, $\rho$ the
+physical density and $M$ the modulus chosen by
+`control.mass_scaling_reference_speed` (`shear`: $G$, the default;
+`bulk`: $K$). The nodal masses are rebuilt from $\rho_f$ every step.
 
-During interseismic loading $v_{\max}$ is small, so density is scaled up and
-steps are long. When an element accelerates toward rupture, $v_{\max}$
-rises, the scaled density drops toward the physical density, and the step
-shrinks. Rupture is then resolved with near-physical inertia, and the model
-returns to long steps after the event.
+While $c\,v_{\max}$ is below the cap, the scaled waves always travel $c$
+times faster than the fastest material point. Stress therefore spreads
+through the model ahead of the motion, and the model is as close to
+quasi-static during accelerating slip as during loading. When $c\,v_{\max}$
+reaches the cap, the wave speed is the physical shear or bulk wave speed.
+With the `bulk` ceiling the density is then the physical density. With the
+default `shear` ceiling it is $\rho K/G$, still larger than $\rho$.
+
+### Time step
+
+The elastic step follows the same speed:
+
+$$
+\Delta t = \frac{0.5\,l_{\min}}{c\,v_{\max}},
+\qquad
+\Delta t \ge \frac{0.2\,l_{\min}}{\sqrt{M/\rho}},
+$$
+
+where $l_{\min}$ is the smallest element size. The fastest point therefore
+moves at most $0.5\,l_{\min}/c$ per step, a fixed fraction of an element,
+whatever its speed. The lower bound is the stable step at the capped wave speed.
+Other limits (Maxwell relaxation, heat and fluid diffusion, the state limit
+below) still apply, and `control.dt_fraction` scales the result.
+
+For example, with $l_{\min}=100$ m, $c=10^5$, $G=30$ GPa and
+$\rho=2700$ kg/m³ (shear speed 3.3 km/s):
+
+| Stage | $v_{\max}$ | $c_f$ | $\Delta t$ |
+| --- | --- | --- | --- |
+| Interseismic loading | $10^{-9}$ m/s | $10^{-4}$ m/s | $5\times10^{5}$ s (6 days) |
+| Rupture | 1 m/s | 3.3 km/s (cap) | $6\times10^{-3}$ s |
+
+The step changes by eight orders of magnitude within one cycle and returns
+to long steps after the event, without user intervention.
+
+### Damping
+
+Force damping (`control.damping_option`, default `1` with
+`control.damping_factor = 0.8`) acts in every step, including during events.
+Ruptures in DES3D are therefore damped, as in the quasi-dynamic
+simulations of [Tong and Lavier (2018)](https://doi.org/10.1038/s41467-018-06390-z).
+`control.damping_option = 0` removes the damping.
+
+### Output during events
+
+With GVS, regular output follows `sim.output_time_interval_in_yr` or
+`sim.output_step_interval` as usual, and events add frames every
+`sim.earthquake_output_step_interval` steps (see
+[earthquake output](#earthquake-output)). A long cycle model therefore saves
+sparse interseismic frames and dense coseismic frames.
 
 ### Limiting the state change per step
 
 The explicit state update is accurate only if the slip in one step is small
-compared with $D_c$. For the aging law, the update is stable only if
-$\Delta t\,V/D_c<2$. `control.rsf_dtheta_max` $=f$ adds two bounds over
-all elements:
+compared with $D_c$. GVS limits the slip per step to $0.5\,l_{\min}/c$,
+which is set by the element size, not by $D_c$. For the aging law, the
+update is stable only if $\Delta t\,V/D_c<2$. When $0.5\,l_{\min}/c$ is
+not small compared with $D_c$, set `control.rsf_dtheta_max` $=f$. It adds
+two bounds over all elements:
 
 $$
 \Delta t \le f\,\frac{D_c}{V},
@@ -291,7 +349,10 @@ points with `monitor.output_dynamic_friction` and
 | `mat.friction_angle0`, `mat.friction_angle1` | `[30]`, `[5]` | reference friction angle $\phi_0$ (degrees) before and after plastic weakening |
 | `control.rsf_slip_rate_projection_option` | `0` | `0` velocity projection, `1` strain-rate invariant |
 | `control.rsf_dtheta_max` | `0` | state-change limit $f$ on the time step, in $[0,2)$ |
-| `control.inertial_scaling` | `1e5` | $c$ in the scaled wave speed |
+| `control.use_global_velocity_scaling` | `no` | Global velocity scaling; forced on for RSF |
+| `control.inertial_scaling` | `1e5` | $c$: scaled wave speed over the fastest speed |
+| `control.mass_scaling_reference_speed` | `shear` | Wave-speed cap: `shear` ($G$) or `bulk` ($K$) |
+| `control.damping_option`, `control.damping_factor` | `1`, `0.8` | Force damping |
 | `sim.earthquake_start_factor`, `sim.earthquake_end_factor` | `5`, `2` | event thresholds relative to the boundary speed |
 | `sim.earthquake_output_step_interval` | `50` | output interval during an event (steps) |
 | `sim.seismic_moment_calculate_output` | `no` | write event times and size to `seismic_moment_magnitude.txt` |
