@@ -8,7 +8,7 @@ description: Build DynEarthSol, run a small 2D rifting model in about two minute
 # Quickstart
 
 This page takes you from source code to a result in a few minutes. You will
-build the 2D executable, run the shipped example `examples/core-complex.cfg`,
+build the 2D executable, run the shipped example `examples/tectonics/core-complex.cfg`,
 and look at the normal fault that forms as a brittle crust is pulled apart.
 
 ## 1. Build
@@ -31,7 +31,7 @@ Run the example in its own folder so the output stays together:
 ```console
 mkdir quickstart
 cd quickstart
-cp ../examples/core-complex.cfg .
+cp ../examples/tectonics/core-complex.cfg .
 OMP_NUM_THREADS=4 ../dynearthsol2d core-complex.cfg
 ```
 

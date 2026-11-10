@@ -32,7 +32,7 @@ equations used below.
 | Dimension | 2D |
 | Build | `make ndims=2` |
 | Run time | about 30 s for all cases, one thread |
-| Inputs | `benchmarks/simple_shear_rsf/` in the DynEarthSol repository |
+| Inputs | `benchmarks/faults-friction/simple_shear_rsf/` in the DynEarthSol repository |
 | Checked with | DynEarthSol `68cc2a0` |
 
 :::
@@ -106,7 +106,7 @@ independently.
 Build `dynearthsol2d` in the DES root, then:
 
 ```bash
-cd benchmarks/simple_shear_rsf
+cd benchmarks/faults-friction/simple_shear_rsf
 python3 run_simple_shear_benchmark.py --clean --aging-transient --healing
 python3 plot_simple_shear_benchmark.py -o simple_shear_benchmark.png
 ```

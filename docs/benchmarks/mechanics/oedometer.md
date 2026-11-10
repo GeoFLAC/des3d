@@ -20,7 +20,7 @@ on that path.
 | Dimension | 2D, plane strain |
 | Build | `make ndims=2` |
 | Run time | about 1 s |
-| Inputs | `benchmarks/oedometer-2d.cfg` in the DynEarthSol repository |
+| Inputs | `benchmarks/mechanics/oedometer/oedometer-2d.cfg` in the DynEarthSol repository |
 | Checked with | DynEarthSol `68cc2a0` |
 
 :::
@@ -61,12 +61,12 @@ updates the cell's geometry every step.
 ## Input and how to run
 
 ```bash
-cd benchmarks
-../dynearthsol2d oedometer-2d.cfg
+cd benchmarks/mechanics/oedometer
+../../../dynearthsol2d oedometer-2d.cfg
 ```
 
 The run writes 51 frames, `result.save.*`, one every 40 steps.
-`benchmarks/oedometer-2d-plot.py` plots the shortening of the right side
+`benchmarks/mechanics/oedometer/oedometer-2d-plot.py` plots the shortening of the right side
 against $\sigma_{xx}$ with the reference path; it was written for an older
 Matplotlib and needs small changes to run with a current one.
 

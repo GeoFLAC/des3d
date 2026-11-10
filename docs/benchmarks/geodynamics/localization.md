@@ -13,7 +13,7 @@ friction (EP) and with rate-and-state friction that is velocity
 strengthening or velocity weakening (EP-RSF). It asks two questions: does
 rate-and-state friction change where and at what angle the bands form, and
 does it change how they slip? The inputs are the DES v2 benchmark in
-`benchmarks/DESv2.0/rsf/localization/`; see
+`benchmarks/geodynamics/localization/`; see
 [rate-and-state friction](../../theory/rate-state-friction.md) for the
 friction law and for global velocity scaling.
 
@@ -24,7 +24,7 @@ friction law and for global velocity scaling.
 | Dimension | 2D |
 | Build | `make ndims=2` |
 | Run time | 35 minutes (EP), 75 minutes (weakening) and 3 hours (strengthening) on 8 threads |
-| Inputs | `benchmarks/DESv2.0/rsf/localization/` in the DynEarthSol repository |
+| Inputs | `benchmarks/geodynamics/localization/` in the DynEarthSol repository |
 | Results | the benchmark results given in its README |
 
 :::
@@ -61,11 +61,11 @@ Build `dynearthsol2d` in the DES root, then run each input from the
 benchmark folder:
 
 ```bash
-cd benchmarks/DESv2.0/rsf/localization
+cd benchmarks/geodynamics/localization
 mkdir -p output
-OMP_NUM_THREADS=8 ../../../../dynearthsol2d ep_phi30_psi0.cfg
-OMP_NUM_THREADS=8 ../../../../dynearthsol2d ep_rsf_strengthening_phi30_psi0.cfg
-OMP_NUM_THREADS=8 ../../../../dynearthsol2d ep_rsf_weakening_phi30_psi0.cfg
+OMP_NUM_THREADS=8 ../../../dynearthsol2d ep_phi30_psi0.cfg
+OMP_NUM_THREADS=8 ../../../dynearthsol2d ep_rsf_strengthening_phi30_psi0.cfg
+OMP_NUM_THREADS=8 ../../../dynearthsol2d ep_rsf_weakening_phi30_psi0.cfg
 ```
 
 Each writes to `output/` under its own name: frames `<name>.save.*`,

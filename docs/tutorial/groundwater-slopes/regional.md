@@ -94,9 +94,9 @@ This applies the verified pumping and averaged-aquifer physics at field scale, w
 To reproduce the whole study behind this figure, from the DES source folder:
 
 ```bash
-python3 benchmarks/hydromechanics/regional_subsidence.py dynearthsol3d OUT-mesh --spacings 100 50 25
-python3 benchmarks/hydromechanics/regional_subsidence.py dynearthsol3d OUT-steps416 --spacings 50 --steps 416
-python3 benchmarks/hydromechanics/regional_subsidence.py dynearthsol3d OUT-h25-s416 --spacings 25 --steps 416
+python3 benchmarks/poromechanics/regional_subsidence.py dynearthsol3d OUT-mesh --spacings 100 50 25
+python3 benchmarks/poromechanics/regional_subsidence.py dynearthsol3d OUT-steps416 --spacings 50 --steps 416
+python3 benchmarks/poromechanics/regional_subsidence.py dynearthsol3d OUT-h25-s416 --spacings 25 --steps 416
 ```
 
 The study’s full numbers: [record.json](/downloads/poromechanics/regional/record.json).

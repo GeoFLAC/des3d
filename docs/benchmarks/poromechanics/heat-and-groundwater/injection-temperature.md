@@ -96,7 +96,7 @@ This checks the injected-enthalpy term with open outflow (Avdonin) and with outf
 To reproduce the whole study behind this figure, from the DES source folder:
 
 ```bash
-python3 benchmarks/hydromechanics/avdonin_reference.py
+python3 benchmarks/poromechanics/avdonin_reference.py
 python3 tests/functional/hydromechanics/check_injection_temperature.py dynearthsol2d OUT/mesh --spacings 0.2 0.1
 python3 tests/functional/hydromechanics/check_injection_temperature.py dynearthsol2d OUT/mesh-coarse --spacings 0.4
 python3 tests/functional/hydromechanics/check_injection_temperature.py dynearthsol2d OUT/steps200 --spacings 0.2 --steps 200

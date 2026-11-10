@@ -104,8 +104,8 @@ This checks Mohr–Coulomb plasticity and explicit quasi-static equilibrium in t
 To reproduce the whole study behind this figure, from the DES source folder:
 
 ```bash
-python3 benchmarks/hydromechanics/bishop_reference.py
-python3 benchmarks/hydromechanics/strength_reduction_slope.py dynearthsol2d OUT --spacings 1 0.5 0.25
+python3 benchmarks/poromechanics/bishop_reference.py
+python3 benchmarks/poromechanics/strength_reduction_slope.py dynearthsol2d OUT --spacings 1 0.5 0.25
 ```
 
 The study’s full numbers: [record.json](/downloads/poromechanics/embankment/record.json).

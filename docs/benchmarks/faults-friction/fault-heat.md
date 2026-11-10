@@ -99,8 +99,8 @@ Reference, method and transition checks
 To reproduce the whole study behind this figure, from the DES source folder:
 
 ```bash
-python3 benchmarks/hydromechanics/fault_heat.py --exe ./dynearthsol2d --output OUT --mode physical --strain 10 --samples 600
-python3 benchmarks/hydromechanics/fault_heat.py --exe ./dynearthsol2d --output OUT-switch --mode gvs --scaling 1e5 --velocity 1e-5 --strain .02 --physical-transition
+python3 benchmarks/poromechanics/fault_heat.py --exe ./dynearthsol2d --output OUT --mode physical --strain 10 --samples 600
+python3 benchmarks/poromechanics/fault_heat.py --exe ./dynearthsol2d --output OUT-switch --mode gvs --scaling 1e5 --velocity 1e-5 --strain .02 --physical-transition
 ```
 
 The study’s full numbers: [record.json](/downloads/poromechanics/fault-heat/record.json).

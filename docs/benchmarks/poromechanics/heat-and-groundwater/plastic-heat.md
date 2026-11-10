@@ -101,7 +101,7 @@ To reproduce the whole study behind this figure, from the DES source folder:
 
 ```bash
 python3 tests/functional/hydromechanics/check_heat_restart.py dynearthsol2d OUT --ndims 2 --study --coupled --dt 0.0002 --steps 1000
-python3 benchmarks/hydromechanics/plastic_heat.py --exe dynearthsol2d --dimensions 2 --output OUT-ep
+python3 benchmarks/poromechanics/plastic_heat.py --exe dynearthsol2d --dimensions 2 --output OUT-ep
 ```
 
 The study’s full numbers: [record.json](/downloads/poromechanics/plastic-heat/record.json).
