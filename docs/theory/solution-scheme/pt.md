@@ -30,10 +30,13 @@ Consequently, $k$ trials do not represent $k\Delta t$ of aging or viscous
 relaxation. Mixed stress correction is applied before candidate force
 evaluation. Acceptance commits the full constitutive candidate.
 
-Thermal diffusion advances temperature once before a physical PT solve,
-and temperature remains fixed during its trials. Hydraulic transport,
-mesh motion, stress rotation and remeshing follow accepted mechanics outside
-the loop. Gradients, volumes, facet areas and normals remain on the reference
+With the default hydraulic content model, temperature advances once before
+a physical PT solve and remains fixed during its trials. The optional
+finite-density model instead advances its heat and water inventories after
+accepted mechanics. Hydraulic transport, mesh motion, stress rotation and
+remeshing remain outside the trial loop; see
+[Poromechanics](../poromechanics.md#coupling-in-time). Gradients, volumes,
+facet areas and normals remain on the reference
 mesh during mechanics. For moving-mesh physical steps, height-dependent
 foundation, water and side-support pressures include the candidate vertical
 displacement in their height argument. This is an incremental pressure-load

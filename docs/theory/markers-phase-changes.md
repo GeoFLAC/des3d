@@ -24,8 +24,8 @@ located in the new mesh.
 `markers.markers_per_element` markers randomly in each element (seeded by
 `markers.random_seed`); `2` places them on a regular grid with spacing
 `markers.init_marker_spacing`, in units of `mesh.resolution`. Their
-material comes from `mat.mattype_option`: `0` takes the region of a
-`.poly` mesh, `1` assigns horizontal layers at `mat.mattype_layer_depths`
+material comes from `ic.mattype_option`: `0` takes the region of a
+`.poly` mesh, `1` assigns horizontal layers at `ic.mattype_layer_depths`
 (in units of `mesh.zlength`), and `101` calls a custom routine in the
 source.
 

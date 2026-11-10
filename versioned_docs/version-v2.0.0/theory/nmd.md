@@ -27,11 +27,10 @@ $$
 
 where $\textrm{dev}(\cdot)$ represents an operator returning the
 deviatoric tensor, $\textrm{tr}(\cdot)$ is an operator returning the
-trace of the tensor, $D$ is the number of diagonal terms of the tensor
-(2 for 2D case and 3 for 3D or plain strain cases), and $\mathbf{I}$ is
-an appropriate identity tensor. (When plane strain description is used,
-that is, $\epsilon_{yy}=0$ and ${\dot\epsilon}_{yy}=0$, but
-$\sigma_{yy}$ can be non-zero and must be included in the calculation.)
+trace of the projected tensor. $D=2$ for the in-plane projection in 2D
+and $D=3$ in 3D. This is the dimension of the projected field, not the
+number of physical normal stresses. A plane-strain assumption does not add
+an out-of-plane component to this strain-rate projection.
 
 The basic idea is to average volumetric strain rate over a group of
 neighboring elements and then replace each element's volumetric strain
