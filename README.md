@@ -32,7 +32,7 @@ yarn clear       # clean .docusaurus/ and build/ when something looks stale
 
 | Path | Contents |
 |---|---|
-| `docs/` | The current ("Latest") manual, organized into Usage, Tutorial and Theory. Related topics form subsections, such as `theory/solution-scheme/` and `tutorial/pt/`. |
+| `docs/` | The current ("Latest") manual: Getting started, Theory, User guide, Tutorials, Benchmarks, Reference and Developer guide. |
 | `sidebars.ts` | Sidebar structure for `docs/`. |
 | `versioned_docs/version-X.Y.Z/`, `versioned_sidebars/`, `versions.json` | Frozen snapshots of the docs matching already-tagged DynEarthSol releases (currently v2.0.0 and v2.0.2). Independent copies, not derived from `docs/`, see [CLAUDE.md](./CLAUDE.md) before editing one. |
 | `static/` | Images and other files served as-is. |
