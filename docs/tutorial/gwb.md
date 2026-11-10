@@ -146,6 +146,17 @@ distinct names.
 Set `bc.mantle_temperature` to the world's `potential mantle temperature`. DES
 also takes the bottom temperature as the largest initial temperature.
 
+### Initial stress
+
+DES starts from a lithostatic stress, the reference pressure of
+`control.ref_pressure_option`, which the side walls and the Winkler bottom also
+use. The examples take it from the mantle (`ref_pressure_option = 0`,
+`mat.mattype_ref = 2`). PREM's (option 1) is interpolated between table rows
+35 km apart whose rounding gives each interval a slightly different density;
+the excess over the model's own weight then steps at every row, which shows as
+horizontal stripes, at 80, 115, 150 and 185 km depth, in a quiet model's strain
+rate.
+
 ## Example 1: a 2D subduction zone
 
 `examples/gwb-subduction.cfg` and `.wb`: a 600 × 200 km cross section of a
@@ -223,10 +234,12 @@ along its top to 60 km depth. In 3D the world has no cross section.
 ![A vertical section through the 3D example at y = 50 km: the temperature at the nodes, and the markers by material with the weak elements of the fault](./img/gwb/gwb-slab-3d.png)
 
 The mesh has 10 131 elements and 40 524 markers (3089 oceanic crust, 1807
-continental crust, 35 628 mantle); 427 elements lie in the fault. The example
-runs 5 kyr in about 30 s on 4 threads. Run it longer and the dense slab sinks
-along the weak interface at velocities far above the 3.15 cm/yr push, and the
-mesh is remeshed often.
+continental crust, 35 628 mantle); 427 elements lie in the fault. The front and
+back faces are free slip: left free, they bulge outward, since the plates and
+the slab weigh differently and no one reference pressure holds them all. The
+example runs 5 kyr in about 6 s on 4 threads. Run it longer and the dense slab
+sinks along the weak interface at velocities far above the 3.15 cm/yr push, and
+the mesh is remeshed often.
 
 ## Errors
 
