@@ -1,6 +1,6 @@
 # Rapid drawdown, selected 0.5 m mesh
 
-Use a 2D DynEarthSol executable from source revision 4ec082f543a3bbdbeabb21adcf2c0ebaff85ea80.
+Use a 2D DynEarthSol executable from source revision 3774df00ba1708a4f70a836d2073f845653aac64.
 The supplied reservoir frame is the hydrostatic starting state at 25000 s.
 Preserve its save, checkpoint and info files together with slope.poly.
 Run from this directory:

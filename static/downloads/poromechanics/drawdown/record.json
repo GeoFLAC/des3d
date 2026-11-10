@@ -8,7 +8,7 @@
   "spacing_m": 0.5,
   "evidence": {
     "executable_sha256": "b8028481dd0d74f6e5909c466623ebe130e9fd40f94c12c5735898a9ae727566",
-    "source_commit": "4ec082f543a3bbdbeabb21adcf2c0ebaff85ea80",
+    "reproduction_revision": "3774df00ba1708a4f70a836d2073f845653aac64",
     "hydrostatic_misfit": 0.002477762065749487,
     "contained": [
       false,
