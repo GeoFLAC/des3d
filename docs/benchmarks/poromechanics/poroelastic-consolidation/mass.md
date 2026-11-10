@@ -86,7 +86,7 @@ View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" column`.
 
 ![Result](../img/mass/result.png)
 
-2D unit cell, 0.01/s logarithmic compression to 0.1 s, 4,000 physical steps. (a) DES and the implicit sealed-cell solution; (b) physical mass defect and negative numerical buffer. The temporal table retains 1,000 and 2,000 steps.
+2D unit cell, 0.01/s logarithmic compression to 0.1 s, 4,000 physical steps. (a) DES and the implicit sealed-cell solution; (b) physical water-mass residual and the split-coupling correction. The temporal table retains 1,000 and 2,000 steps.
 
 The stabilised split conserves M+R. R is a numerical lag, contributes no density or heat capacity, and must not be described as physical water. Native/HDF5, 3D, restart, remap, source and transport controls are supporting evidence.
 

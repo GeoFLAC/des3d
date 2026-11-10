@@ -95,7 +95,7 @@ This checks thermal pressurization of pore water and the heat equation with a su
 To reproduce the whole study behind this figure, from the DES source folder:
 
 ```bash
-python3 benchmarks/poromechanics/thermal_cell.py dynearthsol2d OUT/2d --dt .01 --figures
+python3 benchmarks/poromechanics/thermal_cell.py dynearthsol2d OUT/2d --dt .01
 python3 benchmarks/poromechanics/thermal_cell.py dynearthsol2d OUT/2d-fine --methods pt --boundaries fixed --dt .000625
 python3 benchmarks/poromechanics/thermal_cell.py dynearthsol3d OUT/3d --ndims 3 --dt .01
 ```

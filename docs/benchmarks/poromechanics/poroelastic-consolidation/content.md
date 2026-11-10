@@ -96,7 +96,7 @@ Stored water is computed from the pressure and volume strain integrated over the
 To reproduce the whole study behind this figure, from the DES source folder:
 
 ```bash
-python3 benchmarks/poromechanics/fluid_content.py dynearthsol2d OUT/spatial-pt --spacings .2 .1 .05 --dt .005 --duration 4 --figures
+python3 benchmarks/poromechanics/fluid_content.py dynearthsol2d OUT/spatial-pt --spacings .2 .1 .05 --dt .005 --duration 4
 python3 benchmarks/poromechanics/fluid_content.py dynearthsol2d OUT/time-coarse --spacings .05 --dt 0.02 --duration 1
 python3 benchmarks/poromechanics/fluid_content.py dynearthsol2d OUT/time-medium --spacings .05 --dt 0.01 --duration 1
 python3 benchmarks/poromechanics/fluid_content.py dynearthsol2d OUT/time-fine --spacings .05 --dt 0.005 --duration 1
