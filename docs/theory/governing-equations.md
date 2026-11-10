@@ -45,9 +45,9 @@ See [Solution scheme](./solution-scheme/index.md).
 
 The stress follows the strain history through the material's rheology:
 elastic, viscous, Maxwell, elasto-plastic or elasto-visco-plastic, with
-optional rate-and-state friction. The stress rate is objective: each step
-the stress and strain are rotated by the element's spin (the Jaumann rate)
-before the constitutive update. See [Rheology](./rheology.md) for the laws,
+optional rate-and-state friction. The stress rate is objective: after the
+constitutive update of each step, the stress and strain are rotated by the
+element's spin (the Jaumann rate). See [Rheology](./rheology.md) for the laws,
 [Constitutive update](./solution-scheme/constitutive.md) for their
 integration and [Rate-and-state friction](./rate-state-friction.md).
 
