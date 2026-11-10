@@ -14,7 +14,7 @@ When asked to catch up the docs with recent DynEarthSol changes ("what's new", "
    ```
 3. **Drop CI/workflow-only PRs** (titles like `ci:`, GitHub Actions/token/workflow refactors) — no doc surface.
 4. **For each remaining PR**, `gh pr view <N> --repo GeoFLAC/DynEarthSol --json title,body,files` and judge whether it's user-facing (new parameter, build flag, output format, breaking change) vs. an invisible internal fix. Only document the former.
-5. **Map user-facing changes to the right page.** The manual has six sections (Getting started, User guide, Tutorials, Theory, Reference, Developer guide); see "Section layout" below.
+5. **Map user-facing changes to the right page.** The manual has seven sections (Getting started, Theory, User guide, Tutorials, Benchmarks, Reference, Developer guide); see "Section layout" below.
    - build options / dependencies → `docs/getting-started/installation.md`
    - basic running and progress output → `docs/getting-started/run.md`
    - checkpointing / restart behavior → `docs/user-guide/running/restart.md`
@@ -25,6 +25,7 @@ When asked to catch up the docs with recent DynEarthSol changes ("what's new", "
    - PT solver controls → `docs/user-guide/numerical-controls/solver.md`; MMG options → `docs/user-guide/numerical-controls/mmg.md`
    - meshing/remeshing theory → `docs/theory/remeshing.md`; solution-scheme theory → `docs/theory/solution-scheme/`; RSF → `docs/theory/rate-state-friction.md`
    - worked scientific examples → `docs/tutorial/` (`fundamentals/`, `tectonics/`, `tectonics/rsf/`, `advanced/`)
+   - comparisons with analytical, theoretical or independent solutions → `docs/benchmarks/`, grouped by field (`geodynamics/`, `faults-friction/`, `mechanics/`, `heat/`, ...); list each one in `docs/benchmarks/index.md`
    - new or renamed parameters also belong in the parameter tables of the relevant User guide or Theory page; `docs/reference/configuration.md` lists the sections and where each feature is documented.
    - any change to DynEarthSol's options (`input.cxx`): rebuild both executables at that revision and regenerate `docs/reference/parameters.md` with `scripts/generate_parameter_reference.py --exe2d … --exe3d … --source <rev>`. Never edit that page by hand; `--check` reports a stale page.
    Keep the top-level structure. Preserve published URLs when reorganizing pages: every moved page keeps its old URL through `slug:`, and a renamed category page needs a redirect in the `@docusaurus/plugin-client-redirects` entry of `docusaurus.config.ts`.
@@ -52,9 +53,10 @@ export PATH="$(pwd)/node20/bin:$PATH"
 | Section | Folder | Contents |
 | --- | --- | --- |
 | Getting started | `docs/getting-started/` | overview (`/intro`), installation, running, visualizing |
-| User guide | `docs/user-guide/` | one feature per page: `model-setup/`, `numerical-controls/`, `running/` |
-| Tutorials | `docs/tutorial/` | reproducible worked examples, grouped by topic |
 | Theory | `docs/theory/` | formulation and numerical methods |
+| User guide | `docs/user-guide/` | one feature per page: `model-setup/`, `numerical-controls/`, `running/` |
+| Tutorials | `docs/tutorial/` | reproducible worked examples that build a model for a geoscience problem, grouped by topic |
+| Benchmarks | `docs/benchmarks/` | DES compared with analytical, theoretical or independent solutions, grouped by field; overview in `index.md` |
 | Reference | `docs/reference/` | configuration file and look-up material |
 | Developer guide | `docs/developer/` | source layout, testing, adding parameters, contributing, maintaining this manual |
 
