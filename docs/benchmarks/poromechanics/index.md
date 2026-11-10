@@ -17,3 +17,14 @@ Terms: DES is DynEarthSol. PT is its pseudo-transient solver, which iterates eac
 Pressure is compression-positive; stress and volumetric strain are tension/expansion-positive.
 
 These examples need DynEarthSol built from the poromechanics source.
+
+## Water and energy inventories
+
+- [Finite-density water in a sealed cell](./poroelastic-consolidation/mass.md).
+- [Heat and pressure in a drained cell](./heat-and-groundwater/drained-heat.md).
+- [Injection and mixing in a storing cell](./heat-and-groundwater/mixing.md).
+- [Three-dimensional convection cells](./heat-and-groundwater/convection-3d.md).
+
+The figures use recorded runs. Each download keeps its executable and data hashes; `reproduction_revision` names the public source to build for reproducing the example.
+
+[Version and file hashes](/downloads/poromechanics/manifest.json).

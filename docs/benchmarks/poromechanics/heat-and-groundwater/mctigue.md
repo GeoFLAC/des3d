@@ -15,7 +15,7 @@ The drained surface of a fluid-saturated half-space is suddenly heated. Pore wat
 | Dimension | 2D |
 | Build | `make ndims=2` from the poromechanics source |
 | Inputs | [mctigue.zip](/downloads/poromechanics/mctigue.zip) |
-| Checked with | DynEarthSol `97f9794` (poromechanics branch) |
+| Reproduce with | DynEarthSol [`3774df0`](https://github.com/GeoFLAC/DynEarthSol/tree/3774df00ba1708a4f70a836d2073f845653aac64) |
 
 :::
 

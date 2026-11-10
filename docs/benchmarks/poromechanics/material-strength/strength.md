@@ -15,7 +15,7 @@ An affine material cell is extended in one direction and compressed equally in a
 | Dimension | 3D |
 | Build | `make ndims=3` from the poromechanics source |
 | Inputs | [strength.zip](/downloads/poromechanics/strength.zip) |
-| Checked with | DynEarthSol `97f9794` (poromechanics branch) |
+| Reproduce with | DynEarthSol [`3774df0`](https://github.com/GeoFLAC/DynEarthSol/tree/3774df00ba1708a4f70a836d2073f845653aac64) |
 
 :::
 

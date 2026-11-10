@@ -15,7 +15,7 @@ Steady groundwater carries heat from a hot inlet along a saturated column while 
 | Dimension | 3D |
 | Build | `make ndims=3` from the poromechanics source |
 | Inputs | [heat.zip](/downloads/poromechanics/heat.zip) |
-| Checked with | DynEarthSol `97f9794` (poromechanics branch) |
+| Reproduce with | DynEarthSol [`3774df0`](https://github.com/GeoFLAC/DynEarthSol/tree/3774df00ba1708a4f70a836d2073f845653aac64) |
 
 :::
 

@@ -15,7 +15,7 @@ Water in a porous box heated from below becomes lighter at the base. Above a cri
 | Dimension | 2D |
 | Build | `make ndims=2` from the poromechanics source |
 | Inputs | [convection.zip](/downloads/poromechanics/convection.zip) |
-| Checked with | DynEarthSol `97f9794` (poromechanics branch) |
+| Reproduce with | DynEarthSol [`3774df0`](https://github.com/GeoFLAC/DynEarthSol/tree/3774df00ba1708a4f70a836d2073f845653aac64) |
 
 :::
 
