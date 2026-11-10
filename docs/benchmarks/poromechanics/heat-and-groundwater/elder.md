@@ -14,9 +14,9 @@ the grid. This page therefore compares DES with an independent solution
 of the same equations on several grids and shows both as they come out;
 nothing is tuned to make them agree.
 
-**At $\tau$ = 0.1 the finest DES mesh and the finest reference grid reach
-the same pattern, one plume on the axis spreading under the top, and the
-heat content of the layer agrees within 1 %. Early, while the first plumes
+**The reference converges between its two finest grids. Against it, the
+finest DES mesh reaches the same plume pattern at $\tau$ = 0.05 and 0.1, with
+the heat content of the layer within 1 %. Early, while the first plumes
 form, DES grows more of them and its heat content is up to 14 % higher.**
 
 :::info At a glance
@@ -61,7 +61,8 @@ $\tau$ = 0.005, 0.01, 0.02, 0.05, 0.075 and 0.1.
 
 **Reference.** `elder_reference.py` solves the same equations, written for
 the stream function, with central differences on uniform grids of
-32 × 64, 64 × 128 and 128 × 256 cells and third-order Runge–Kutta steps.
+32 × 64, 64 × 128, 128 × 256 and 256 × 512 cells and third-order
+Runge–Kutta steps.
 It checks its own heat budget without buoyancy and that plumes form with
 it.
 
@@ -71,33 +72,39 @@ it.
 
 ![Heat content of the layer against time: reference grids (lines) and DES meshes (symbols)](../img/elder/heat.png)
 
-| $\tau$ | Heat content, DES $h$ = 1/16 | 1/32 | 1/64 | Reference 128 × 256 |
+| $\tau$ | Heat content, DES $h$ = 1/16 | 1/32 | 1/64 | Reference 256 × 512 |
 | --- | ---: | ---: | ---: | ---: |
 | 0.005 | 0.110 | 0.094 | 0.093 | 0.089 |
 | 0.02 | 0.386 | 0.314 | 0.299 | 0.262 |
-| 0.05 | 0.628 | 0.523 | 0.501 | 0.507 |
-| 0.1 | 0.758 | 0.617 | 0.597 | 0.591 |
+| 0.05 | 0.628 | 0.523 | 0.501 | 0.506 |
+| 0.1 | 0.758 | 0.617 | 0.597 | 0.590 |
 
 - **Convergence.** DES approaches the reference as the mesh is refined;
   the coarsest mesh carries too much heat at every time.
-- **Late times.** At $\tau$ = 0.1 the finest DES mesh and the finest
-  reference grid both show one plume on the axis that spreads under the
-  top. The coarser reference grids and the coarsest DES mesh show a plume
-  away from the axis: the pattern itself depends on resolution, in both
-  codes.
+- **Late times.** At $\tau$ = 0.05 and 0.1 the finest DES mesh and the two
+  finest reference grids show the same pattern: at $\tau$ = 0.05 a plume on
+  the axis, a second plume over the heater and the outer plume bent out
+  under the top, which by $\tau$ = 0.1 have become one broad plume on the
+  axis spreading under the top. The two
+  coarsest reference grids and the coarsest DES mesh show a plume away from
+  the axis instead: the pattern itself depends on resolution, in both
+  codes. The largest temperature difference from the finest grid is 0.14
+  at $\tau$ = 0.05 and 0.23 at $\tau$ = 0.1 (RMS 0.03 and 0.05).
 - **Early times.** At $\tau$ = 0.01–0.02 DES grows more and narrower
   plumes along the heater, and its heat content is 4–14 % higher. Where
   the first plumes start depends on small disturbances; an unstructured
   triangle mesh and a regular grid seed them differently.
-- **The reference itself.** Its finest two grids differ by up to 0.08 in
-  temperature through $\tau$ = 0.01, and by up to 0.6 after $\tau$ = 0.05,
-  where their plume patterns differ.
+- **The reference itself.** Its 64 × 128 and 128 × 256 grids differ by up
+  to 0.6 in temperature after $\tau$ = 0.05, where their plume patterns
+  differ; its 128 × 256 and 256 × 512 grids differ by at most 0.12 at every
+  time, and their heat contents agree within 0.5 %.
 
 ## Limits
 
-- **No unique answer.** Beyond the first plumes the solution is not
-  unique at this Rayleigh number; agreement of the pattern at
-  $\tau$ = 0.1 is not proof of convergence.
+- **Other branches.** The reference converges on one branch within
+  $\tau \le 0.1$, but at this Rayleigh number other flow patterns exist,
+  and coarser grids of both codes fall onto them; later times were not
+  compared.
 - **Half box.** The symmetric half excludes asymmetric patterns of the
   full box.
 - **Slightly compressible fluid.** The reference is incompressible; DES
