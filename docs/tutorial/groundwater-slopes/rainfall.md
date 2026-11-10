@@ -1,8 +1,8 @@
 ---
-sidebar_position: 4
-title: "Application: rainfall triggers a shallow slide"
+sidebar_position: 3
+title: "Rainfall triggers a shallow slide"
 ---
-# Application: rainfall triggers a shallow slide
+# Rainfall triggers a shallow slide
 
 Rain falls on a partly saturated soil layer over impermeable bedrock. The water spreads down to the bedrock, a perched water table rises, and the slope fails when the pore pressure on the bedrock is high enough.
 
@@ -21,7 +21,7 @@ Rain falls on a partly saturated soil layer over impermeable bedrock. The water 
 
 ## Problem setup
 
-![Setup](../img/rainfall/setup.png)
+![Setup](./img/rainfall/setup.png)
 
 **Slope.** The slope of the pressure-driven page (2 m of soil on 20° bedrock, 40 m long, strong ends, gravity applied as a load), with a weaker soil: $c=1$ kPa, $\phi=30^\circ$, no dilation.
 
@@ -65,7 +65,7 @@ dynearthsol2d input.cfg
 
 DES writes `slope.info` (one line per saved frame: frame, step, time in seconds), `slope.save.NNNNNN` (the fields of each saved frame) and `slope.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
 
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../../benchmarks/poromechanics/running.md) before using the Python reader or converter.
 
 | Field | What to look at |
 | --- | --- |
@@ -87,7 +87,7 @@ View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" -g slope`.
 
 ## Result: DES and the analytical solution
 
-![Result](../img/rainfall/result.png)
+![Result](./img/rainfall/result.png)
 
 (a) Pore pressure in the middle of the slope at the last time step for which PT finds equilibrium; the black line p = 0 is the perched water table, with suction above it. (b) Mean plastic strain of the basal 0.6 m against the bedrock pore pressure under rain (solid) and for the same soil loaded by pressure from the bedrock (dashed), on each mesh, with the pointwise-yield and Davis non-associated estimates. (c) Pore pressure along the bedrock at five times; the shaded ends are the strong blocks.
 
@@ -138,4 +138,4 @@ No exact solution: an application. DES has no runoff or ponding, so the rain rat
 
 ## Reproduction
 
-[Commands, solver hashes and portable inputs](../running.md).
+[Commands, solver hashes and portable inputs](../../benchmarks/poromechanics/running.md).

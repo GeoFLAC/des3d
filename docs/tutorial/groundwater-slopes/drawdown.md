@@ -1,8 +1,8 @@
 ---
-sidebar_position: 2
-title: "Application: rapid drawdown of a reservoir against an embankment"
+sidebar_position: 4
+title: "Rapid drawdown of a reservoir against an embankment"
 ---
-# Application: rapid drawdown of a reservoir against an embankment
+# Rapid drawdown of a reservoir against an embankment
 
 A reservoir stands at the crest of the embankment and the slope is saturated. When the reservoir is drawn down quickly the water no longer supports the face, while the pore pressure inside falls only as the slope drains: the classic critical case for the upstream slope of a dam.
 
@@ -21,7 +21,7 @@ A reservoir stands at the crest of the embankment and the slope is saturated. Wh
 
 ## Problem setup
 
-![Setup](../img/drawdown/setup.png)
+![Setup](./img/drawdown/setup.png)
 
 **Slope.** The embankment of the strength-reduction page ($H=10$ m, 2:1, $c=10$ kPa, $\phi=20^\circ$, $\psi=0$), saturated: porosity 0.3, saturated unit weight $20\ \mathrm{kN/m^3}$, $k=10^{-13}\ \mathrm{m^2}$, Gardner retention ($\alpha=2.4\times10^{-4}$ Pa$^{-1}$), Bishop $\chi=S_e$.
 
@@ -73,7 +73,7 @@ dynearthsol2d trial.cfg
 
 DES writes `drawdown.info` (one line per saved frame: frame, step, time in seconds), `drawdown.save.NNNNNN` (the fields of each saved frame) and `drawdown.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
 
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../../benchmarks/poromechanics/running.md) before using the Python reader or converter.
 
 | Field | What to look at |
 | --- | --- |
@@ -95,7 +95,7 @@ View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" -g drawdown`.
 
 ## Result: DES and the analytical solution
 
-![Result](../img/drawdown/result.png)
+![Result](./img/drawdown/result.png)
 
 (a) Pore pressure at the first comparison time after drawdown, with the zero-pressure contour and Bishop's critical circle on the same pore pressure. (b) Factor of safety against time after drawdown: Bishop's method on the DES pore pressure (line and circles) and the DES strength-reduction bracket, from the last F at rest to the first F sliding (bars). (c) Displacement in the first sliding trial at the first comparison time, with Bishop's circle.
 
@@ -143,4 +143,4 @@ No exact solution: Bishop’s method needs the pore pressure as an input, here t
 
 ## Reproduction
 
-[Commands, solver hashes and portable inputs](../running.md).
+[Commands, solver hashes and portable inputs](../../benchmarks/poromechanics/running.md).

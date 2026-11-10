@@ -21,7 +21,7 @@ The standard slope-stability problem of geotechnical practice: how far can the s
 
 ## Problem setup
 
-![Setup](../img/embankment/setup.png)
+![Setup](./img/embankment/setup.png)
 
 **Slope.** A homogeneous slope $H=10$ m high with a 2:1 face, on a foundation $H$ deep; toe platform and crest 20 m long; plane strain. The base is fixed and the sides are rollers.
 
@@ -73,7 +73,7 @@ dynearthsol2d srf1.300.cfg
 
 DES writes `srf1.360.info` (one line per saved frame: frame, step, time in seconds), `srf1.360.save.NNNNNN` (the fields of each saved frame) and `srf1.360.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
 
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../../benchmarks/poromechanics/running.md) before using the Python reader or converter.
 
 | Field | What to look at |
 | --- | --- |
@@ -95,7 +95,7 @@ View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" -g srf1.360`.
 
 ## Result: DES and the analytical solution
 
-![Result](../img/embankment/result.png)
+![Result](./img/embankment/result.png)
 
 (a) Displacement on the finest mesh in the first trial that keeps sliding, with Bishop's critical circle dashed: the mechanism passes through the toe. (b) Largest displacement against mass-scaled time for each strength-reduction factor on the finest mesh; dashed lines are trials still sliding at the end. (c) Final largest displacement against the factor F on each mesh, open circles at rest and filled squares sliding, with Bishop's factor of safety as a vertical dashed line.
 
@@ -146,4 +146,4 @@ Bishop’s method satisfies moment equilibrium of a circular mechanism, so it is
 
 ## Reproduction
 
-[Commands, solver hashes and portable inputs](../running.md).
+[Commands, solver hashes and portable inputs](../../benchmarks/poromechanics/running.md).

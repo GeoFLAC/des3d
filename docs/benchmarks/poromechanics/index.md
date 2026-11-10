@@ -1,12 +1,14 @@
 ---
 sidebar_position: 0
-slug: /tutorial/poromechanics
+slug: /benchmarks/poromechanics
 title: Overview
 ---
 
-# Poromechanics examples
+# Poromechanics benchmarks
 
-Worked examples of coupled fluid flow, heat and deformation in DES. Each page sets up one problem, gives the input file and the commands to run it, says which output to look at, and compares the result with an analytical or independent reference solution, with the limits of that comparison.
+Benchmarks of coupled fluid flow, heat and deformation in DES. Each page sets up one problem, gives the input file and the commands to run it, says which output to look at, and compares the result with an analytical or independent reference solution, with the limits of that comparison.
+
+The applications built on these checks, slides, rapid drawdown, embankment stability and land subsidence, are in the [Groundwater and slopes](../../tutorial/groundwater-slopes/embankment.md) tutorials.
 
 Every example ships its input file and any mesh or restart files it needs, so it runs as is with DES built from this source. See [Running the examples](./running.md).
 

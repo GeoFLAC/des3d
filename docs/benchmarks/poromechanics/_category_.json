@@ -1,0 +1,9 @@
+{
+  "label": "Poromechanics",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "slug": "/category/benchmarks-poromechanics",
+    "description": "Coupled fluid flow, heat and deformation compared with analytical and independent solutions"
+  }
+}

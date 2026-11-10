@@ -25,6 +25,9 @@ listed below.
 | [Elastoplastic oedometer test](./mechanics/oedometer.md) | Closed-form Mohr–Coulomb stress path under uniaxial strain | `benchmarks/oedometer-2d.cfg` |
 | [Maxwell stress build-up in pure shear](./mechanics/maxwell.md) | Maxwell response at a constant strain rate | `benchmarks/maxwell.cfg` |
 | [Cooling of a half-space](./heat/half-space-cooling.md) | Error-function profile in 2D and 3D | `benchmarks/diffusion.cfg` |
+| [Rate-and-state friction under a velocity step](./faults-friction/rsf-velocity-step.md) | Closed-form RSF response to a step in slip rate | `benchmarks/hydromechanics/` |
+| [Fault-zone heating at fixed normal traction](./faults-friction/fault-heat.md) | Thermal weakening by shear heating: shear resistance, temperature and pore pressure against a differential reference | `benchmarks/hydromechanics/` |
+| [Poromechanics](./poromechanics/index.md), 32 benchmarks | Consolidation, groundwater and unsaturated flow, openings, injection and heat transport against analytical and independent solutions | `benchmarks/hydromechanics/`, `tests/functional/hydromechanics/` |
 
 ## Other comparisons with reference solutions
 

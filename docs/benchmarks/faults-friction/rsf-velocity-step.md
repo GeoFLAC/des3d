@@ -1,5 +1,5 @@
 ---
-sidebar_position: 6
+sidebar_position: 2
 title: "Rate-and-state friction under a velocity step"
 ---
 # Rate-and-state friction under a velocity step
@@ -21,7 +21,7 @@ A pressurized cell sheared at yield sees its loading rate rise tenfold. Rate-and
 
 ## Problem setup
 
-![Setup](../img/rsf/setup.png)
+![Setup](./img/rsf-velocity-step/setup.png)
 
 **Cell.** The material-strength unit cell: every node prescribed, normal extension rates $\pm\dot e$, plane strain, initial stress $-C\mathbf{I}$ with $C=1$ MPa and a fixed pore pressure of 0.8 MPa ($\alpha=1$), cohesion 100 kPa, no dilation.
 
@@ -67,7 +67,7 @@ dynearthsol2d step.cfg
 
 DES writes `cell.info` (one line per saved frame: frame, step, time in seconds), `cell.save.NNNNNN` (the fields of each saved frame) and `cell.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
 
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../poromechanics/running.md) before using the Python reader or converter.
 
 | Field | What to look at |
 | --- | --- |
@@ -89,7 +89,7 @@ View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" cell`.
 
 ## Result: DES and the analytical solution
 
-![Result](../img/rsf/result.png)
+![Result](./img/rsf-velocity-step/result.png)
 
 (a) Friction coefficient across the tenfold step in loading rate, against time from the step: solid line, continuum solution; thin stepped line, the forward-Euler recursion at the same time step; symbols, DES at the finest time step. (b) Principal shear stress at yield, which follows the friction coefficient through the Mohr–Coulomb load. (c) Largest friction error against the continuum solution after the step, for each time step, with a first-order reference slope.
 
@@ -139,4 +139,4 @@ Aging law and the total-strain-rate slip projection only; constant pore pressure
 
 ## Reproduction
 
-[Commands, solver hashes and portable inputs](../running.md).
+[Commands, solver hashes and portable inputs](../poromechanics/running.md).
