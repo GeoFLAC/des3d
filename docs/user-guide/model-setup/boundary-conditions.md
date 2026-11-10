@@ -112,7 +112,7 @@ Type `6` is the only one that lets you set both the normal and
 lateral-shear velocity to independent non-zero values, useful for
 transtensional/transpressional setups. See
 [Velocity boundary conditions (3D)](../tutorial/vbc) for a worked example
-with `examples/oblique-rift-3d.cfg`.
+with `examples/tectonics/oblique-rift-3d.cfg`.
 
 ### Time-varying velocity
 

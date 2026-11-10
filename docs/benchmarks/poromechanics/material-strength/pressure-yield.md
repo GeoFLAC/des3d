@@ -96,7 +96,7 @@ This checks effective-stress plasticity in a boundary-value problem driven by po
 To reproduce the whole study behind this figure, from the DES source folder:
 
 ```bash
-python3 benchmarks/hydromechanics/pressure_yield_reference.py
+python3 benchmarks/poromechanics/pressure_yield_reference.py
 python3 tests/functional/hydromechanics/check_pressure_yield.py dynearthsol2d OUT/mesh --spacings 0.2 0.1 0.05 --steps 400
 python3 tests/functional/hydromechanics/check_pressure_yield.py dynearthsol2d OUT/steps1600 --spacings 0.05 --steps 1600
 python3 tests/functional/hydromechanics/check_pressure_yield.py dynearthsol2d OUT/pt1-steps1600 --spacings 0.05 0.025 --steps 1600 --pt-option 1

@@ -95,8 +95,8 @@ Partial unloading and material regimes
 To reproduce the whole study behind this figure, from the DES source folder:
 
 ```bash
-python3 benchmarks/hydromechanics/consolidation_refinement.py --output OUT/history-2d --dimensions 2 --spacings 1 0.5 0.25 --timesteps 1 0.5 0.25 --spatial-dt 0.25 --temporal-spacing 0.5 --duration 8400 --sample-interval 1200 --timeout 30000
-python3 benchmarks/hydromechanics/consolidation_refinement.py --output OUT/sanity-3d --dimensions 3 --spacings 1 0.5 0.25 --timesteps 1 0.5 0.25 --spatial-dt 0.25 --temporal-spacing 1 --duration 8400 --sample-interval 1200 --timeout 30000
+python3 benchmarks/poromechanics/consolidation_refinement.py --output OUT/history-2d --dimensions 2 --spacings 1 0.5 0.25 --timesteps 1 0.5 0.25 --spatial-dt 0.25 --temporal-spacing 0.5 --duration 8400 --sample-interval 1200 --timeout 30000
+python3 benchmarks/poromechanics/consolidation_refinement.py --output OUT/sanity-3d --dimensions 3 --spacings 1 0.5 0.25 --timesteps 1 0.5 0.25 --spatial-dt 0.25 --temporal-spacing 1 --duration 8400 --sample-interval 1200 --timeout 30000
 ```
 
 The study’s full numbers: [record.json](/downloads/poromechanics/terzaghi/record.json).

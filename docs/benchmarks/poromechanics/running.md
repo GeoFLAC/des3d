@@ -58,7 +58,7 @@ run that restarted from another, to include the frames before the restart.
 ## Reproduce a figure
 
 Each page names the script that ran the whole study behind its figure (all
-meshes and time steps). The scripts are in `benchmarks/hydromechanics/` and
+meshes and time steps). The scripts are in `benchmarks/poromechanics/` and
 `tests/functional/hydromechanics/`. Each page's *At a glance* box records the
 source revision its published figures were made with. For an exact
 reproduction, use that revision; a newer solver can contain corrections absent from the archived run.

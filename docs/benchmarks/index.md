@@ -20,14 +20,14 @@ listed below.
 
 | Benchmark | Compared with | Inputs |
 | --- | --- | --- |
-| [Shear bands with and without rate-and-state friction](./geodynamics/localization.md) | Band dips against the Arthur angle | `benchmarks/DESv2.0/rsf/localization/` |
-| [Checking the friction law in simple shear](./faults-friction/simple-shear.md) | Closed-form stresses for static friction and steady-state and aging-law RSF | `benchmarks/simple_shear_rsf/` |
-| [Elastoplastic oedometer test](./mechanics/oedometer.md) | Closed-form Mohr–Coulomb stress path under uniaxial strain | `benchmarks/oedometer-2d.cfg` |
-| [Maxwell stress build-up in pure shear](./mechanics/maxwell.md) | Maxwell response at a constant strain rate | `benchmarks/maxwell.cfg` |
-| [Cooling of a half-space](./heat/half-space-cooling.md) | Error-function profile in 2D and 3D | `benchmarks/diffusion.cfg` |
-| [Rate-and-state friction under a velocity step](./faults-friction/rsf-velocity-step.md) | Closed-form RSF response to a step in slip rate | `benchmarks/hydromechanics/` |
-| [Fault-zone heating at fixed normal traction](./faults-friction/fault-heat.md) | Thermal weakening by shear heating: shear resistance, temperature and pore pressure against a differential reference | `benchmarks/hydromechanics/` |
-| [Poromechanics](./poromechanics/index.md), 32 benchmarks | Consolidation, groundwater and unsaturated flow, openings, injection and heat transport against analytical and independent solutions | `benchmarks/hydromechanics/`, `tests/functional/hydromechanics/` |
+| [Shear bands with and without rate-and-state friction](./geodynamics/localization.md) | Band dips against the Arthur angle | `benchmarks/geodynamics/localization/` |
+| [Checking the friction law in simple shear](./faults-friction/simple-shear.md) | Closed-form stresses for static friction and steady-state and aging-law RSF | `benchmarks/faults-friction/simple_shear_rsf/` |
+| [Elastoplastic oedometer test](./mechanics/oedometer.md) | Closed-form Mohr–Coulomb stress path under uniaxial strain | `benchmarks/mechanics/oedometer/oedometer-2d.cfg` |
+| [Maxwell stress build-up in pure shear](./mechanics/maxwell.md) | Maxwell response at a constant strain rate | `benchmarks/mechanics/maxwell/maxwell.cfg` |
+| [Cooling of a half-space](./heat/half-space-cooling.md) | Error-function profile in 2D and 3D | `benchmarks/heat/half-space-cooling/diffusion.cfg` |
+| [Rate-and-state friction under a velocity step](./faults-friction/rsf-velocity-step.md) | Closed-form RSF response to a step in slip rate | `benchmarks/poromechanics/` |
+| [Fault-zone heating at fixed normal traction](./faults-friction/fault-heat.md) | Thermal weakening by shear heating: shear resistance, temperature and pore pressure against a differential reference | `benchmarks/poromechanics/` |
+| [Poromechanics](./poromechanics/index.md), 32 benchmarks | Consolidation, groundwater and unsaturated flow, openings, injection and heat transport against analytical and independent solutions | `benchmarks/poromechanics/`, `tests/functional/hydromechanics/` |
 
 ## Other comparisons with reference solutions
 
@@ -49,11 +49,11 @@ OpenMP, AddressSanitizer and OpenACC builds.
 
 ## Regression tests
 
-`benchmarks-cores/` guards against unintended changes in results. A run of a
+`tests/regression/` guards against unintended changes in results. A run of a
 reference case is stored, and later runs are compared field by field:
 
 ```console
-cd benchmarks-cores
+cd tests/regression
 make set                 # run once with the current executable and store the result
 make cmp                 # rerun and compare with the stored result
 make fresh-restart-cmp   # run, restart from a checkpoint and compare: restart determinism

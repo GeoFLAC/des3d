@@ -93,7 +93,7 @@ This checks dry elastic stress, strain, curved-surface traction and symmetry con
 To reproduce the whole study behind this figure, from the DES source folder:
 
 ```bash
-python3 benchmarks/hydromechanics/kirsch_reference.py
+python3 benchmarks/poromechanics/kirsch_reference.py
 python3 tests/functional/hydromechanics/check_kirsch.py dynearthsol2d OUT --spacings .2 .1 .05 .025
 ```
 

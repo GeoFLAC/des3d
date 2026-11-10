@@ -94,7 +94,7 @@ This checks two-way coupled pumping deformation against the thickness-averaged m
 To reproduce the whole study behind this figure, from the DES source folder:
 
 ```bash
-python3 benchmarks/hydromechanics/slab_refinement.py dynearthsol3d OUT --resolutions 20 10 5
+python3 benchmarks/poromechanics/slab_refinement.py dynearthsol3d OUT --resolutions 20 10 5
 ```
 
 The study’s full numbers: [record.json](/downloads/poromechanics/aquifer/record.json).
