@@ -10,7 +10,7 @@ description: Run the three shipped rate-and-state examples and see how a−b and
 A frictional fault either creeps steadily or locks and fails in repeated
 earthquakes. Rate-and-state friction decides which through two quantities:
 the sign of $a-b$ and the characteristic slip distance $D_c$. This tutorial
-runs the three examples shipped in `examples/rate_and_state_friction/`,
+runs the three examples shipped in `examples/earthquakes/rate_and_state_friction/`,
 which differ only in those parameters, for 1000 years each:
 
 | Case | $a$ | $b$ | $a-b$ | $D_c$ | Outcome |
@@ -31,7 +31,7 @@ equations and for global velocity scaling.
 | Dimension | 2D |
 | Build | `make ndims=2` |
 | Run time | about 10 minutes per case on 3 threads |
-| Inputs | `examples/rate_and_state_friction/` in the DynEarthSol repository |
+| Inputs | `examples/earthquakes/rate_and_state_friction/` in the DynEarthSol repository |
 | Checked with | DynEarthSol `68cc2a0` |
 
 :::
@@ -65,8 +65,8 @@ friction. In these examples all band materials share the same $a$ and $b$.
 Build `dynearthsol2d` in the DES root. Then:
 
 ```bash
-cd examples/rate_and_state_friction
-python3 run_rsf_examples.py --exe ../../dynearthsol2d
+cd examples/earthquakes/rate_and_state_friction
+python3 run_rsf_examples.py --exe ../../../dynearthsol2d
 python3 plot_rsf_time_series.py -o rsf_time_series.png
 ```
 
@@ -77,7 +77,7 @@ directly:
 
 ```bash
 mkdir -p ep_rsf_eq
-OMP_NUM_THREADS=3 ../../dynearthsol2d ep_rsf_eq.cfg
+OMP_NUM_THREADS=3 ../../../dynearthsol2d ep_rsf_eq.cfg
 ```
 
 The settings that matter for the cycle are:

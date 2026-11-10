@@ -35,7 +35,7 @@ defaults, `mmg_hmax_factor = 2.0`/`mmg_hmin_factor = 0.2`, convert to
 :::
 
 ## Screenshots
-- `examples/core-complex-mmg.cfg`
+- `examples/tectonics/core-complex-mmg.cfg`
 - `param.mesh.resolution`: 1 km
 ![examples of adaptive meshing for different hmax and hmin values](../../tutorial/img/mmg-results.png)
 
@@ -99,7 +99,7 @@ In plain terms, by default:
 | `mmg_metric_refine_recover` | no | `no` (default): once refined, a node keeps its finest size target even as plastic strain there drops. `yes`: the target tracks the current plastic strain instead, so a refined zone can coarsen again. |
 | `mmg_aniso_wall_ratio` | 0 (off) | At a `remeshing_option = 13` restored inflow wall, `>= 1` coarsens elements normal to the wall while keeping them fine along it (an aspect ratio), so an incoming column is carried by fewer, wider elements. |
 
-Start from `examples/core-complex-mmg.cfg`, which lists every MMG key with a
+Start from `examples/tectonics/core-complex-mmg.cfg`, which lists every MMG key with a
 one-line hint. `mmg_metric_refine_coeff` and `mmg_remesh_active_plstrain` are the
 two most worth tuning first; in 3D, also `mmg_hausd_factor`.
 

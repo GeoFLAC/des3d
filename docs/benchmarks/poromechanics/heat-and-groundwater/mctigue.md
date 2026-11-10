@@ -96,7 +96,7 @@ This checks the thermal pressurization source, the thermal stress and their two-
 To reproduce the whole study behind this figure, from the DES source folder:
 
 ```bash
-python3 benchmarks/hydromechanics/mctigue_reference.py
+python3 benchmarks/poromechanics/mctigue_reference.py
 python3 tests/functional/hydromechanics/check_mctigue.py dynearthsol2d OUT/mesh --spacings 0.05 0.025 0.0125 0.00625
 python3 tests/functional/hydromechanics/check_mctigue.py dynearthsol2d OUT/steps400 --spacings 0.00625 --steps 400
 python3 tests/functional/hydromechanics/check_mctigue.py dynearthsol3d OUT/3d --ndims 3 --spacings 0.025 0.0125

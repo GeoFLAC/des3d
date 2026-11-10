@@ -103,7 +103,7 @@ To reproduce the whole study behind this figure, from the DES source folder:
 
 ```bash
 python3 tests/functional/hydromechanics/check_salencon.py dynearthsol2d OUT --spacings .2 .1 .05 --dilation 30 --mixed --refined --load-steps 16
-python3 benchmarks/hydromechanics/qualify_salencon.py OUT FIGURES
+python3 benchmarks/poromechanics/qualify_salencon.py OUT FIGURES
 ```
 
 The study’s full numbers: [record.json](/downloads/poromechanics/salencon/record.json).

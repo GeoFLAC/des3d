@@ -93,7 +93,7 @@ This checks a layered aquifer system: an aquitard of a second material leaking f
 To reproduce the whole study behind this figure, from the DES source folder:
 
 ```bash
-python3 benchmarks/hydromechanics/hantush_reference.py
+python3 benchmarks/poromechanics/hantush_reference.py
 python3 tests/functional/hydromechanics/check_hantush.py dynearthsol3d OUT --spacings 2.5 1.25 0.625
 ```
 

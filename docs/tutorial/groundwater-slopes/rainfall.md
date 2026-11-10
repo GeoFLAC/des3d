@@ -98,8 +98,8 @@ Current-source coupling and fluid-content checks
 To reproduce the whole study behind this figure, from the DES source folder:
 
 ```bash
-python3 benchmarks/hydromechanics/rainfall_slope.py dynearthsol2d OUT --spacings 0.5 0.25
-python3 benchmarks/hydromechanics/slope_application.py dynearthsol2d OUT-driven --spacings 0.5 0.25 0.125 --cohesion 1000 --friction 30 --elastic-gravity
+python3 benchmarks/poromechanics/rainfall_slope.py dynearthsol2d OUT --spacings 0.5 0.25
+python3 benchmarks/poromechanics/slope_application.py dynearthsol2d OUT-driven --spacings 0.5 0.25 0.125 --cohesion 1000 --friction 30 --elastic-gravity
 ```
 
 The study’s full numbers: [record.json](/downloads/poromechanics/rainfall/record.json).

@@ -97,7 +97,7 @@ This checks Richards flow and the Bishop coupling together during drainage: desa
 To reproduce the whole study behind this figure, from the DES source folder:
 
 ```bash
-python3 benchmarks/hydromechanics/drainage_reference.py
+python3 benchmarks/poromechanics/drainage_reference.py
 python3 tests/functional/hydromechanics/check_unsaturated_drainage.py dynearthsol2d OUT --spacings 0.05 0.025 0.0125
 python3 tests/functional/hydromechanics/check_unsaturated_drainage.py dynearthsol2d OUT-explicit --spacings 0.05 --explicit
 python3 tests/functional/hydromechanics/check_unsaturated_drainage.py dynearthsol2d OUT-steps960 --spacings 0.0125 --steps 960

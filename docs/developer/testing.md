@@ -17,11 +17,11 @@ Compiling is not verification. Before a change is reported as done:
    ```
 
 2. **Compare results with the parent revision** whenever the change could
-   alter them. In `benchmarks-cores/`, store a reference with the executable
+   alter them. In `tests/regression/`, store a reference with the executable
    built from the parent commit, then rebuild with the change and compare:
 
    ```console
-   cd benchmarks-cores
+   cd tests/regression
    make set NDIMS=2 CASE=<case>.cfg      # with the parent's dynearthsol2d
    # rebuild the root executables with your change, then
    make cmp NDIMS=2 CASE=<case>.cfg

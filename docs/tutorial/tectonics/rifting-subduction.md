@@ -27,7 +27,7 @@ case takes minutes on a laptop; the second about half an hour.
 | Dimension | 2D |
 | Build | `make ndims=2 usemmg=1` |
 | Run time | 12 minutes (rifting, to 100 kyr) and 22 minutes (subduction, to 5 Myr) on 6 threads |
-| Inputs | `examples/core-complex.cfg`, `examples/subduction.cfg` and the tutorial package |
+| Inputs | `examples/tectonics/core-complex.cfg`, `examples/tectonics/subduction.cfg` and the tutorial package |
 | Checked with | Part 1: DynEarthSol `68cc2a0` (relief, dip and element count as stated); Part 2: DynEarthSol `68cc2a0` (slab-tip depths, mesh growth and step count as stated; serpentinite and eclogite counts within 10 %; deepest trench point about 1 km deeper than stated, within the run-to-run scatter described under Exercise 3) |
 
 :::
@@ -188,7 +188,7 @@ faults get finer elements and the quiet far field stays coarse. See
 ## Part 1: Rifting a brittle crust (core complex)
 
 The bundled example
-[`examples/core-complex.cfg`](https://github.com/GeoFLAC/DynEarthSol/blob/master/examples/core-complex.cfg)
+[`examples/tectonics/core-complex.cfg`](https://github.com/GeoFLAC/DynEarthSol/blob/master/examples/tectonics/core-complex.cfg)
 stretches a single 10 km brittle layer with a pre-cut dipping fault. With
 strain softening the fault keeps slipping, its footwall rises and rotates,
 and the fault surface flattens into a dome. This is the rolling-hinge
@@ -328,8 +328,8 @@ The parameters you will change most often:
 ### Step 3: Run
 
 ```bash
-cd DynEarthSol/examples
-OMP_NUM_THREADS=6 ../dynearthsol2d core-complex.cfg
+cd DynEarthSol/examples/tectonics
+OMP_NUM_THREADS=6 ../../dynearthsol2d core-complex.cfg
 ```
 
 As shipped the file stops at 50 kyr, which is enough to see the fault break
@@ -511,7 +511,7 @@ Change one parameter at a time, and keep a log of what you changed.
 ### Going further: a lithospheric rift
 
 `core-complex.cfg` has no mantle, no temperature and no viscosity.
-[`examples/rifting-2d.cfg`](https://github.com/GeoFLAC/DynEarthSol/blob/master/examples/rifting-2d.cfg)
+[`examples/tectonics/rifting-2d.cfg`](https://github.com/GeoFLAC/DynEarthSol/blob/master/examples/tectonics/rifting-2d.cfg)
 adds all three: a 500 × 150 km crust-over-mantle lithosphere read from a
 `.poly` file (the one used in [Making a complex mesh](../../user-guide/model-setup/poly-meshes.md)),
 `elasto-visco-plastic` rheology, a 100 Myr half-space geotherm and a Gaussian
@@ -522,7 +522,7 @@ step.
 ## Part 2: Subduction
 
 :::note Part 2 needs a recent master
-The example below, `examples/subduction.cfg`, and the phase-change engine it
+The example below, `examples/tectonics/subduction.cfg`, and the phase-change engine it
 uses (`phase_change_option = 3` on a virtual-topology marker grid) reached
 DynEarthSol `master` on 30 October 2026 with
 [pull request #110](https://github.com/GeoFLAC/DynEarthSol/pull/110). A clone
@@ -533,7 +533,7 @@ number above zero.
 :::
 
 The example
-[`examples/subduction.cfg`](https://github.com/GeoFLAC/DynEarthSol/blob/master/examples/subduction.cfg)
+[`examples/tectonics/subduction.cfg`](https://github.com/GeoFLAC/DynEarthSol/blob/master/examples/tectonics/subduction.cfg)
 with its mesh file `poly-subduction.poly` pushes an oceanic plate under a
 fixed overriding plate. A short slab is already in the mantle at the start,
 so the plate interface exists from the first step. Two metamorphic reactions
@@ -752,12 +752,12 @@ The parameters you will change most often:
 
 ### Step 3: Run
 
-Run from `examples/` so the `.poly` path resolves. The MMG build from the
+Run from `examples/tectonics/` so the `.poly` path resolves. The MMG build from the
 prerequisites is required here, since the restored side walls need it:
 
 ```bash
-cd DynEarthSol/examples
-OMP_NUM_THREADS=6 ../dynearthsol2d subduction.cfg
+cd DynEarthSol/examples/tectonics
+OMP_NUM_THREADS=6 ../../dynearthsol2d subduction.cfg
 ```
 
 The full run takes about 22 minutes on 6 threads, with the mesh growing from
