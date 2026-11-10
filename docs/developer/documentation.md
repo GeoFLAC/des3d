@@ -16,9 +16,10 @@ https://geoflac.github.io/des3d/ when changes are merged to `main`.
 | Section | Folder | Contents |
 | --- | --- | --- |
 | Getting started | `docs/getting-started/` | overview, installation, quickstart, running, visualizing, troubleshooting |
+| Theory | `docs/theory/` | formulation and numerical methods |
 | User guide | `docs/user-guide/` | one feature per page: model setup, numerical controls, running and output |
-| Tutorials | `docs/tutorial/` | reproducible worked examples, each opening with an *At a glance* box |
-| Theory | `docs/theory/` | formulation, numerical methods, verification |
+| Tutorials | `docs/tutorial/` | reproducible worked examples that build a model for a geoscience problem, each opening with an *At a glance* box |
+| Benchmarks | `docs/benchmarks/` | DES compared with analytical, theoretical or independent solutions, grouped by field and listed in the overview |
 | Reference | `docs/reference/` | configuration file and the generated parameter list |
 | Developer guide | `docs/developer/` | this section |
 
