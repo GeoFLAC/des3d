@@ -7,7 +7,7 @@ description: The balance laws DES solves, the unknowns and sign conventions, and
 
 # Governing equations
 
-DynEarthSol follows the deforming material with a Lagrangian mesh: nodes
+With its default moving mesh, DynEarthSol follows the deforming material: nodes
 move with the velocity, so every quantity below is carried by the material
 and time derivatives follow it. This page collects the equations and the
 conventions; each section links to the page that treats it in detail.
@@ -31,15 +31,20 @@ each element.
 ## Momentum
 
 $$
-\rho\,\frac{d\mathbf{u}}{dt} = \nabla\cdot\boldsymbol\sigma + \rho\,\mathbf{g}.
+\rho_I\,\frac{d\mathbf{u}}{dt} = \nabla\cdot\boldsymbol\sigma + \rho_b\,\mathbf{g}.
 $$
 
 DES integrates this equation explicitly. For slow tectonic deformation the
 inertia is scaled up ([mass scaling](./solution-scheme/massscaling.md)) and
-damped ([dynamic relaxation](./solution-scheme/dynamicrelaxation.md)) so
-that each step stays close to equilibrium, or each physical step is solved
+damped ([dynamic relaxation](./solution-scheme/dynamicrelaxation.md)) to
+approach a quasistatic response, or each physical step is solved
 to equilibrium by [pseudo-transient iteration](./solution-scheme/pt.md).
+Scaled explicit/GVS runs still require force-balance and physical-step
+checks for their loading path.
 See [Solution scheme](./solution-scheme/index.md).
+
+$\rho_I$ constructs the inertial mass, while $\rho_b$ supplies physical
+weight. Mass scaling changes the former, not the gravitational load.
 
 ## Constitutive law
 
@@ -53,11 +58,14 @@ integration and [Rate-and-state friction](./rate-state-friction.md).
 
 ## Density
 
-The density of an element varies with temperature only,
+Without hydraulics, the solid density of an element varies with temperature,
 $\rho = \rho_0[1 - \alpha(T - 273\ \text{K})]$, averaged over the materials
 of its markers; it does not change with pressure or volumetric strain. It
-enters the momentum balance through gravity, while volume change is
-resisted by the bulk modulus in the constitutive law.
+enters gravity, while volume change is resisted by the bulk modulus in the
+constitutive law. Hydraulics adds mixture weight, with saturation-dependent
+fluid content; the optional finite-density mode has inventory-based weight.
+These physical weights are distinct from the fictitious inertial mass used
+by quasistatic explicit/GVS mechanics. See [Poromechanics](./poromechanics.md).
 
 ## Energy
 
@@ -71,9 +79,10 @@ with radiogenic, shear and injected heat. See [Heat transport](./thermalevolutio
 
 With `control.has_hydraulic_diffusion = yes`, the stress in the momentum
 balance is the total stress of a fluid-saturated or partly saturated solid,
-$\boldsymbol\sigma = \boldsymbol\sigma' - \alpha_B\,p\,\mathbf{I}$ for
-effective stress $\boldsymbol\sigma'$ and Biot coefficient $\alpha_B$, and
-the pore pressure obeys a fluid mass balance with Darcy flow. See
+$\boldsymbol\sigma = \boldsymbol\sigma' - \alpha_B\,\chi p\,\mathbf{I}$ for
+effective stress $\boldsymbol\sigma'$ and Biot coefficient $\alpha_B$.
+$\chi=1$ for saturated material and $\chi=S_e$ for the Bishop retention law.
+The pore pressure obeys a fluid mass balance with Darcy flow. See
 [Poromechanics](./poromechanics.md).
 
 ## Material and surface changes

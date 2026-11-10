@@ -44,17 +44,18 @@ $$
 
 The temperature is updated explicitly, $T_a \leftarrow T_a + \Delta t\,\dot T_a$.
 The explicit update is stable only below a diffusion time step of order
-$\rho c_p h^2/k$. When the mechanical time step is longer, DES divides it into
-as many equal thermal sub-steps as stability requires and applies the
-sources over each sub-step; the mechanical step is not shortened.
+$\rho c_p h^2/k$. When the physical time step is longer, DES uses stable
+thermal substeps and applies sources over their actual intervals.
+Transport substeps do not make an oversized explicit mechanical step stable.
 
 ## Boundary conditions
 
 Each side of the box is either insulated or held at a fixed temperature,
 set by `bc.tbc_x0` … `bc.tbc_z1` (0 insulated, 1 fixed) with the value
 `bc.tbc_val_*`. By default only the top is fixed, at
-`bc.surface_temperature`. A fixed value applies from the start, so a value
-that differs from the initial temperature is part of the initial state; see
+`bc.surface_temperature`. Explicit thermal boundary settings apply from
+initialization; with only the legacy defaults, the initial profile is kept
+until the first transport update applies the top value. See
 [Temperature](../user-guide/model-setup/temperature.md) for the initial
 profiles. There is no prescribed boundary heat flux; heat can be added
 through the sources below.
@@ -68,10 +69,14 @@ through the sources below.
 the element, is remapped on remeshing and heats the model throughout the
 run. The field is written as `radiogenic source`.
 
-**Shear heating.** With `control.has_shear_heating = yes`, all the viscous
-and plastic work accepted in a step becomes heat in the next thermal update,
-with unit efficiency. The initial pseudo-transient equilibration does not
-generate heat.
+**Shear heating.** With `control.has_shear_heating = yes`, the constitutive
+model's accepted nonelastic work becomes pending heat with unit efficiency.
+Rejected PT trials and the initial instantaneous equilibration do not
+deposit it. The pending quantity is extensive energy: changing the next
+physical timestep changes its rate of deposition, not the energy already
+accepted. Checkpoints and remapping preserve it. Reversible elastic,
+thermal and pore-pressure increments are excluded; see the
+[plastic-heating reference](../benchmarks/poromechanics/heat-and-groundwater/plastic-heat.md).
 
 **Injected heat.** `[heat_injection]` adds heat at points on a schedule, and
 `[injection]` fluid injected at a prescribed temperature carries its
@@ -84,12 +89,19 @@ flow also carries heat, and the heat capacity becomes that of the
 rock–water mixture,
 $C = (1-\phi)\rho_s c_s + \phi\rho_f c_f$. The advective term is added to
 the same explicit update as a Galerkin operator with added graph diffusion,
-which keeps the update free of new extremes; with no flow it reduces to
-ordinary conduction. The thermal sub-steps then also respect the advective
-limit. Buoyancy from
+which limits the advective contribution. With no flow it reduces to
+ordinary Galerkin conduction; on an arbitrary obtuse mesh it does not
+guarantee a maximum principle for the combined operator. Thermal substeps
+respect the advective limit. Buoyancy from
 fluid thermal expansion (`mat.fluid_alpha`) couples the flow to temperature.
 The formulation and its checks are in [Poromechanics](./poromechanics.md)
 and the [heat and groundwater benchmarks](../benchmarks/poromechanics/index.md).
+
+The capacity above belongs to the default hydraulic model. With evolving
+fluid storage it is not a complete retained-enthalpy ledger. The optional
+[finite-density model](./poromechanics.md#finite-density-water-and-sensible-heat)
+tracks actual water mass, retained sensible energy and inlet/outlet heat;
+full pressure work remains outside it.
 
 ## Coupling back to mechanics
 
@@ -108,10 +120,12 @@ benchmark](../benchmarks/heat/half-space-cooling.md) shows the effect.
 **Viscosity.** Creep viscosity depends exponentially on temperature; see
 [Rheology](./rheology.md).
 
-**Thermal stress.** With pore-fluid flow enabled, a temperature change also
-changes the stress through the drained thermal expansion $K\alpha\,\Delta T$
-and, through the fluid, the pore pressure (thermal pressurization). Without
-pore-fluid flow, thermal expansion acts only through the density.
+**Thermal stress.** With `control.has_thermal_pressurization = yes`, heating
+adds $-K\alpha\,\Delta T$ to the normal stresses and, through fluid/solid
+expansion, changes pore pressure. Hydraulic and thermal diffusion must both
+be enabled; enabling pore-fluid flow alone does not enable this stress
+term. With thermal pressurization disabled, solid thermal expansion still
+affects density.
 
 ## Parameters
 
