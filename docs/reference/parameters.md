@@ -10,7 +10,7 @@ toc_max_heading_level: 2
 
 # Configuration parameters
 
-All parameters accepted by DynEarthSol at source revision `1877763`, as printed by
+All parameters accepted by DynEarthSol at source revision `5f32830`, as printed by
 `dynearthsol2d -h` and `dynearthsol3d -h`. A parameter is written in its section
 of the input file; see [Configuration file](./configuration.md). Defaults that
 differ between 2D and 3D are shown for both.
