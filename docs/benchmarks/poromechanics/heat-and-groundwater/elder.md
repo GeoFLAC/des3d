@@ -14,9 +14,9 @@ the grid. This page therefore compares DES with an independent solution
 of the same equations on several grids and shows both as they come out;
 nothing is tuned to make them agree.
 
-**The reference converges between its two finest grids. Against it, the
+**The two finest reference grids follow the same plume branch. Against it, the
 finest DES mesh reaches the same plume pattern at $\tau$ = 0.05 and 0.1, with
-the heat content of the layer within 1 %. Early, while the first plumes
+the heat content of the layer differing by about 1 %. Early, while the first plumes
 form, DES grows more of them and its heat content is up to 14 % higher.**
 
 :::info At a glance
@@ -32,6 +32,10 @@ form, DES grows more of them and its heat content is up to 14 % higher.**
 :::
 
 ## Problem setup
+
+![Symmetric half box, partial basal heater, cold top and impermeable walls](../img/elder/setup.svg)
+
+[PDF schematic](../img/elder/setup.pdf) · [PNG schematic](../img/elder/setup.png)
 
 **Box.** The symmetric half of Elder's box: 2 m wide and 1 m high, with the
 symmetry axis at $x = 0$. The base is held 10 K above the top over
@@ -66,7 +70,37 @@ Runge–Kutta steps.
 It checks its own heat budget without buoyancy and that plumes form with
 it.
 
+For dimensionless upward $z$, temperature
+$\theta=(T-T_0)/\Delta T$ and stream function $\psi$, the reference solves
+
+$$
+\nabla^2\psi=-\mathrm{Ra}\,\partial_x\theta,
+\qquad (u,w)=(\partial_z\psi,-\partial_x\psi),
+$$
+
+$$
+\partial_\tau\theta+u\,\partial_x\theta+w\,\partial_z\theta
+=\nabla^2\theta.
+$$
+
+Impermeable walls have $\psi=0$. The heater has $\theta=1$, the top
+$\theta=0$, and the remaining thermal boundaries have zero normal
+temperature gradient. This is an independent numerical reference, not an
+analytical solution.
+
 ## Results
+
+The selected comparison uses DES $h=1/64$ m and the 256 × 512 reference:
+
+| $\tau$ | Heat content, finest DES mesh | Reference |
+| --- | ---: | ---: |
+| 0.005 | 0.093 | 0.089 |
+| 0.02 | 0.299 | 0.262 |
+| 0.05 | 0.501 | 0.506 |
+| 0.1 | 0.597 | 0.590 |
+
+<details>
+<summary>Supporting mesh and reference-grid comparisons</summary>
 
 ![Temperature on every reference grid and DES mesh at four times; the white lines are the 0.2 and 0.6 isotherms and the red bar marks the heater](../img/elder/fields.png)
 
@@ -78,6 +112,8 @@ it.
 | 0.02 | 0.386 | 0.314 | 0.299 | 0.262 |
 | 0.05 | 0.628 | 0.523 | 0.501 | 0.506 |
 | 0.1 | 0.758 | 0.617 | 0.597 | 0.590 |
+
+</details>
 
 - **Convergence.** DES approaches the reference as the mesh is refined;
   the coarsest mesh carries too much heat at every time.
@@ -101,7 +137,7 @@ it.
 
 ## Limits
 
-- **Other branches.** The reference converges on one branch within
+- **Other branches.** The two finest reference grids agree on one branch within
   $\tau \le 0.1$, but at this Rayleigh number other flow patterns exist,
   and coarser grids of both codes fall onto them; later times were not
   compared.
