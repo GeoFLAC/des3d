@@ -43,18 +43,21 @@ config does not automatically find a checkpoint.
 PT restores saved velocity, next-step dt and velocity scale, and does not
 repeat completed initial equilibration. Its optional running scale requires
 the stored history; old checkpoints without it cannot silently start a new
-history. Hydraulic checkpoints also require the pending signed pressure
-increment for the next mechanical step. Dry checkpoints do not require that
-hydraulic record. See [PT restart and limits](../numerical-controls/solver.md#failure-restart-and-limits).
+history. Hydraulic checkpoints also require the raw signed pressure
+increment and the saved ordering that determines whether it has already
+been consumed. Dry checkpoints do not require that hydraulic record. See
+[PT restart and limits](../numerical-controls/solver.md#failure-restart-and-limits).
 
 :::danger Checkpoint/output format revision 4
 The checkpoint and frame file format was bumped from revision 3 to 4.
 A revision (or dimensionality) mismatch between the file and the running
 binary is now a **hard error** with a diagnostic naming the expected and
 actual values, previously it was accepted silently and could be misread.
-This means **checkpoint and frame files written before this change cannot
-be restarted or read by a newer DES3D binary.** Finish or discard runs on
-the old binary before upgrading.
+A checkpoint with the earlier revision cannot be restarted by the newer
+solver. Preserve the original executable, configuration and data to continue
+it. This restart restriction does not imply that every older saved field
+is unreadable by Python: `Dynearthsol.py` reads frame metadata and available
+fields separately, subject to the schema that reader supports.
 :::
 
 :::danger Conservative MMG remeshing adds new checkpoint records
@@ -62,10 +65,18 @@ Checkpoints now also carry `nremesh`, `plstrain_remesh`, and, in MMG builds,
 `surface dh` and `refined_elem_size_n` (plus, with `remeshing_option = 13`,
 `side_prof_*`). A checkpoint written before this change does not have these
 records, and restarting from it is a restart-mismatch error (`21`/`22`).
-Finish or discard runs on the old binary before upgrading. See
+Continue such checkpoints with their matching executable and preserve the
+original data; the new state is not inferred automatically. See
 [Conservative remeshing](../numerical-controls/mmg.md#conservative-remeshing-freeze--required-policy)
 for what changed in MMG remeshing itself.
 :::
+
+The optional finite-density hydraulic model also saves the physical
+inventories, numerical split buffer, EOS temperature origin and pending
+thermal/pressure increments. Accepted shear heat is saved as energy, so a
+changed timestep must not reinterpret an old power as a new energy. These
+model-specific guards apply in addition to the file-format revision. See
+[Poromechanics](../../theory/poromechanics.md#finite-density-water-and-sensible-heat).
 
 Frame files (HDF5 and plain binary) now also embed the full `.info` row
 (steps, time, dt, walltime, node/element/segment counts). If a run's
