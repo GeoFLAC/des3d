@@ -30,8 +30,7 @@ The rest of this page covers building from source.
    `icpc` and PGI `pgc++` compilers are no longer supported: `make
    CXX=icpc` (or `CXX=pgc++`) now stops at `check-deps` instead of
    building.
-2. Make and Git. The CLI11 config parser is vendored in the source tree;
-   Boost is no longer required by current builds.
+2. Make and Git. The CLI11 config parser is vendored in the source tree.
 3. Python 3 with NumPy and SciPy for the Python tools. Add `h5py` to read
    VTKHDF output and Matplotlib for the PT tutorial figures.
 4. On macOS, an OpenMP runtime such as Homebrew's `libomp`.
@@ -59,11 +58,6 @@ git submodule update --init --recursive
 command above explicitly after cloning is recommended.
 
 ## Configuration
-
-`BOOST_ROOT_DIR` is no longer read by the Makefile: DES3D now parses config
-files with the vendored CLI11 parser, so Boost is not a build dependency.
-Passing `BOOST_ROOT_DIR=...` on the command line is accepted but ignored,
-with a build-time warning.
 
 ### Build options
 
