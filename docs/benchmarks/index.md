@@ -27,7 +27,7 @@ listed below.
 | [Cooling of a half-space](./heat/half-space-cooling.md) | Error-function profile in 2D and 3D | `benchmarks/heat/half-space-cooling/diffusion.cfg` |
 | [Rate-and-state friction under a velocity step](./faults-friction/rsf-velocity-step.md) | Closed-form RSF response to a step in slip rate | `benchmarks/poromechanics/` |
 | [Fault-zone heating at fixed normal traction](./faults-friction/fault-heat.md) | Thermal weakening by shear heating: shear resistance, temperature and pore pressure against a differential reference | `benchmarks/poromechanics/` |
-| [Poromechanics](./poromechanics/index.md), 32 benchmarks | Consolidation, groundwater and unsaturated flow, openings, injection and heat transport against analytical and independent solutions | `benchmarks/poromechanics/`, `tests/functional/hydromechanics/` |
+| [Poromechanics](./poromechanics/index.md), 33 benchmarks | Consolidation, groundwater and unsaturated flow, openings, injection and heat transport against analytical and independent solutions | `benchmarks/poromechanics/`, `tests/functional/hydromechanics/` |
 
 ## Other comparisons with reference solutions
 
