@@ -79,6 +79,14 @@ If your conda lives somewhere other than `$HOME/miniforge3`, remember to
 update `CONDA_ENV_PATH` when [building DynEarthSol with GoSPL
 support](#build-dynearthsol-with-gospl-support) below.
 
+:::tip If conda stalls on "retrying with next repodata source"
+That means it's using the slow classic dependency solver. Add
+`--solver=libmamba` to the `conda create` command above (conda 23.10 or
+later), or set it once with `conda config --set solver libmamba`. With
+mamba 2, `mamba activate` needs a one-time
+`mamba shell init --shell bash` (or `zsh`) and a new shell before it works.
+:::
+
 ### Install gospl_extensions
 
 GoSPL is written in Python and DynEarthSol in C++. `gospl_extensions` is the
@@ -91,33 +99,26 @@ bridge between them. It provides:
 - **interpolation** between the DES mesh and the GoSPL mesh, which are built
   independently and at different resolutions.
 
-```
+```bash
 git clone https://github.com/GeoFLAC/gospl_extensions.git
 cd gospl_extensions/cpp_interface
 conda activate gospl
-make install-local
+command -v python3        # must print $CONDA_PREFIX/bin/python3
+make install-local                                                     # Linux
+make install-local PYTHON_LIBS="$CONDA_PREFIX/lib/libpython3.11.dylib" # macOS
 ```
+The build takes its Python headers from the first `python3` on `PATH`. If
+that's some other Python (Homebrew's, say), it builds against the wrong
+headers with no warning — the `command -v` check above catches that before
+it happens; put `$CONDA_PREFIX/bin` first on `PATH` if it doesn't point into
+the `gospl` environment.
+
 :::tip Check your build
 You will see this message if successful:
 ```
 Installing locally for DynEarthSol integration...
 ✅ Installed locally to gospl_extensions/lib and gospl_extensions/include
 ```
-:::
-
-:::caution macOS: point `install-local` at the conda env explicitly
-This Makefile detects its Python flags with `python3-config --ldflags
---embed`, which on macOS doesn't reliably resolve to the active conda
-environment's own Python library. If the build fails here, or succeeds but
-the resulting library can't find `libpythonX.Y.dylib` at link time, override
-`PYTHON_LIBS` on the command line instead, pointing explicitly at
-`$CONDA_PREFIX` (set by `conda activate gospl`):
-```bash
-make install-local \
-  PYTHON_LIBS="-L${CONDA_PREFIX}/lib $(python3-config --ldflags --embed) -Wl,-rpath,${CONDA_PREFIX}/lib"
-```
-Note the comma in `-Wl,-rpath,...` — Apple's linker only accepts `-rpath` in
-that form, not the `-Wl,-rpath=...` (equals-sign) form that works on Linux.
 :::
 
 ### Build DynEarthSol with GoSPL support
@@ -134,7 +135,9 @@ build command stays copy-pasteable either way:
    ```
 2. `CONDA_ENV_PATH` defaults to `$(HOME)/miniforge3/envs/gospl`, where the
    Miniforge install above puts it. If your `gospl` environment is
-   elsewhere, `export` it the same way:
+   elsewhere, `export` it the same way — or, simplest, with the environment
+   active, point it at itself: `export CONDA_ENV_PATH=$CONDA_PREFIX` works
+   wherever that environment actually lives, Miniforge or otherwise:
    ```bash
    export CONDA_ENV_PATH=/path/to/envs/gospl
    ```
@@ -155,7 +158,7 @@ build command stays copy-pasteable either way:
    empty or missing directory here means a wrong path now, not a build
    error later.
 4. Build with any conda environment active or none; it doesn't matter unless
-   that environment has its own Boost or compilers ahead of the system ones.
+   that environment has its own compilers ahead of the system ones.
    `make config` prints what was actually picked up:
    ```bash
    make clean
@@ -168,27 +171,17 @@ build command stays copy-pasteable either way:
    [Adaptive mesh refinement with MMG](./usingmmg) and
    [Known limitations](#known-limitations) below.
 
-   :::caution macOS: pre-configure MMG without VTK
-   The MMG submodule is only auto-configured on its *first* build (`make`
-   skips the `cmake` step once `mmg/build/Makefile` already exists), and its
-   default CMake configuration can pick up a Homebrew VTK install that fails
-   to link on macOS. Avoid this by configuring `mmg/build` yourself, with
-   VTK explicitly off, before the `make -j4 ...` command above:
-   ```bash
-   cmake -S mmg -B mmg/build -DUSE_VTK=OFF
-   ```
-   :::
-
-5. **macOS only:** the Darwin build fixes up the Boost, MMG and Exodus
-   libraries' runtime paths automatically after linking, but not GoSPL's or
-   Python's — export `DYLD_LIBRARY_PATH` in the same shell before running
-   anything built with `usegospl=1` (building, verifying, or any of the
-   exercises below):
-   ```bash
-   export DYLD_LIBRARY_PATH="${GOSPL_EXT_DIR:-$HOME/opt/gospl_extensions}/lib:${CONDA_ENV_PATH:-$HOME/miniforge3/envs/gospl}/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}"
-   ```
-   Without this, the binary links successfully but fails at startup with a
-   dyld "Library not loaded" error.
+:::tip macOS
+No extra steps needed: the paths to `libgospl_extensions.so` and `libpython`
+are written into the executable at build time, so nothing like
+`DYLD_LIBRARY_PATH` is required to run it afterward. The one thing to get
+right is OpenMP: with `usegospl=1`, the build must link the `gospl`
+environment's own `libomp`, not Homebrew's — `CONDA_ENV_PATH` (step 2 above)
+is what selects it. GoSPL's Python loads the environment's copy into the
+same process, and if the executable brought in a second, different `libomp`,
+the run aborts immediately with `OMP: Error #15: ... libomp.dylib already
+initialized`.
+:::
 
 :::tip This builds whatever commit is checked out, not a specific release
 A plain clone's `master` branch is typically ahead of the latest tagged release (e.g.
@@ -635,9 +628,10 @@ the two cases side by side.
 
 | Message | Cause and fix |
 |---------|---------------|
-| `cannot find -lpython3.11` | Wrong conda path. Make sure the `gospl` environment exists (e.g. `~/miniforge3/envs/gospl`) with Python 3.11, or update `CONDA_ENV_PATH` in the Makefile |
+| `cannot find -lpython3.11`, or (macOS) `no such file` for `libpython3.11.dylib` | Wrong conda path. Make sure the `gospl` environment exists (e.g. `~/miniforge3/envs/gospl`) with Python 3.11, or update `CONDA_ENV_PATH` in the Makefile |
 | `cannot find -lgospl_extensions` | Extensions built elsewhere. Update `GOSPL_EXT_DIR` in the Makefile |
 | `gospl-driver.hpp: No such file` | `gospl_driver` is not in the DynEarthSol source directory |
+| `ld: library 'python3.11' not found`, building `gospl_extensions` on macOS | Pass `PYTHON_LIBS="$CONDA_PREFIX/lib/libpython3.11.dylib"` to `make install-local`, as in [Install gospl_extensions](#install-gospl_extensions) |
 
 ### Runtime errors
 
@@ -646,6 +640,8 @@ the two cases side by side.
 | `GoSPL not initialized`, or an `ImportError` for `gospl` | The GoSPL Python package was not found. Activate the environment: `conda activate gospl` |
 | `No module named 'gospl_python_interface'` | Add the `gospl_extensions/cpp_interface` directory to `PYTHONPATH`, or use the `dynearthsol-gospl` wrapper |
 | `The input file is not found`, or `Cannot find gospl_config.yml` | Run from the directory that holds the YAML, or use an absolute path |
+| macOS: `Library not loaded: libgospl_extensions.so` | DES was built from an older checkout, or `gospl_extensions` moved since. Rebuild DES (`make clean`, then the build above, updating `GOSPL_EXT_DIR` if it moved) |
+| macOS: `OMP: Error #15: ... libomp.dylib already initialized` | DES was built against a different `libomp` than the one the `gospl` environment loads at runtime. Rebuild with `CONDA_ENV_PATH` pointing at that environment, as in [Build DynEarthSol with GoSPL support](#build-dynearthsol-with-gospl-support) |
 
 Most of these come from a path assumption. Nearly all are fixed by editing a
 directory variable in the Makefile or by changing directory before running. To
