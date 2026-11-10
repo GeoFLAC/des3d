@@ -32,6 +32,7 @@ COLORS = {'wedge-phi1': '#2F6FB0', 'wedge-phi5': '#C2410C'}
 TOP = 32            # bcflag of the top surface (BOUNDZ1)
 VE = 2.0            # vertical exaggeration of the cross sections
 ZMIN, ZMAX = -4.0, 3.2
+SHOW = [5, 10, 15, 20]        # frames at 50, 100, 150, 200 kyr
 plt.rcParams.update({'font.size': 9})
 
 
@@ -44,7 +45,6 @@ def frame(des, fr):
     sr = des.read_field(fr, 'strain-rate')                               # xx, zz, xz
     d['sr'] = np.sqrt(0.25 * (sr[:, 0] - sr[:, 1])**2 + sr[:, 2]**2)     # second invariant
     d['mat'] = des.read_field(fr, 'material')
-    d['vel'] = des.read_field(fr, 'velocity')
     flag = des.read_field(fr, 'bcflag')
     top = np.nonzero(flag & TOP)[0]
     top = top[np.argsort(d['xy'][top, 0])]
@@ -117,7 +117,8 @@ def compare(out, specs):
                 bbox=dict(boxstyle='round', fc='white', ec='0.7', alpha=0.9))
         ax.set_ylabel('z (km)')
         ax.set_xlim(max(0, m['wall'] - 1), 40)
-        series.append((label, [metrics(frame(des, fr)) for fr in des.frames[1:] if fr <= last], pal[i % len(pal)]))
+        series.append((label, [metrics(d if fr == last else frame(des, fr))
+                               for fr in des.frames[1:] if fr <= last], pal[i % len(pal)]))
     top.colorbar(im, ax=axes, location='bottom', shrink=0.8, aspect=30, extend='max', pad=0.08).set_label('plastic strain')
     for ax, (key, title) in zip(bot.subplots(2, 1, sharex=True), (('width', 'wedge width, wall to thrust front (km)'),
                                                      ('hmax', 'maximum elevation (km)'))):
@@ -132,17 +133,22 @@ def compare(out, specs):
 
 def sections(out, frames, specs):
     nr, nc = len(specs), len(frames)
-    zmin = min(Dynearthsol(sp.split(':', 1)[0]).read_field(0, 'coordinate')[:, 1].min()
-               for sp in specs) / 1e3
-    zmax = max(Dynearthsol(sp.split(':', 1)[0]).read_field(fr, 'coordinate')[:, 1].max()
-               for sp in specs for fr in frames) / 1e3 + 0.4
+    models = {}
+    for spec in specs:
+        name = spec.split(':', 1)[0]
+        if name not in models:
+            des = Dynearthsol(name)
+            models[name] = (des, {fr: frame(des, fr) for fr in set(frames)})
+    zmin = min((data[0]['xy'] if 0 in data else des.read_field(0, 'coordinate') / 1e3)[:, 1].min()
+               for des, data in models.values())
+    zmax = max(d['xy'][:, 1].max() for _, data in models.values() for d in data.values()) + 0.4
     fig, axes = plt.subplots(nr, nc, figsize=(6 * nc, 1.9 * nr + 0.8), squeeze=False,
                              sharex=True, sharey=True)
     for i, spec in enumerate(specs):
         name, label = spec.split(':', 1) if ':' in spec else (spec, spec)
-        des = Dynearthsol(name)
+        _, data = models[name]
         for j, fr in enumerate(frames):
-            d = frame(des, fr)
+            d = data[fr]
             ax = axes[i, j]
             im = section(ax, d, d['pls'], cmap='magma', vmin=0, vmax=2)
             interface(ax, d)
@@ -171,7 +177,13 @@ outdir = sys.argv[2] if len(sys.argv) > 2 else '.'
 runs = {}
 for name, _ in MODELS:
     des = Dynearthsol(os.path.join(rundir, name))
-    runs[name] = (des, [metrics(frame(des, fr)) for fr in des.frames])
+    history, snapshots = [], {}
+    for fr in des.frames:
+        d = frame(des, fr)
+        history.append(metrics(d))
+        if fr in SHOW:
+            snapshots[fr] = d
+    runs[name] = (des, history, snapshots)
 
 for name, label in MODELS:
     print('\n%s (%s)' % (name, label))
@@ -179,15 +191,12 @@ for name, label in MODELS:
     for m in runs[name][1]:
         print('  %6.0f  %8.2f  %9.2f  %9.2f  %10.2f' % (m['t'], m['wall'], m['front'], m['width'], m['hmax']))
 
-SHOW = [5, 10, 15, 20]        # frames at 50, 100, 150, 200 kyr
-
 # --- plastic strain ----------------------------------------------------------
 fig, axes = plt.subplots(len(SHOW), 2, figsize=(12, 7.8), sharex=True, sharey=True)
 fig.subplots_adjust(hspace=0.45)
 for j, (name, label) in enumerate(MODELS):
-    des = runs[name][0]
     for i, fr in enumerate(SHOW):
-        d = frame(des, fr)
+        d = runs[name][2][fr]
         ax = axes[i, j]
         im = section(ax, d, d['pls'], cmap='magma', vmin=0, vmax=2)
         interface(ax, d)
@@ -211,9 +220,8 @@ plt.close(fig)
 fig, axes = plt.subplots(len(SHOW), 2, figsize=(12, 7.8), sharex=True, sharey=True)
 fig.subplots_adjust(hspace=0.45)
 for j, (name, label) in enumerate(MODELS):
-    des = runs[name][0]
     for i, fr in enumerate(SHOW):
-        d = frame(des, fr)
+        d = runs[name][2][fr]
         ax = axes[i, j]
         im = section(ax, d, np.log10(np.maximum(d['sr'], 1e-20)), cmap='viridis', vmin=-15.5, vmax=-12.5)
         if j == 0:
@@ -232,9 +240,8 @@ plt.close(fig)
 fig, axes = plt.subplots(1, 3, figsize=(12, 3.4))
 ax = axes[0]
 for name, label in MODELS:
-    des = runs[name][0]
     for fr, ls in ((10, '--'), (20, '-')):
-        d = frame(des, fr)
+        d = runs[name][2][fr]
         ax.plot(d['surf'][:, 0], d['surf'][:, 1], ls, color=COLORS[name],
                 label='%s, %.0f kyr' % (label.replace('basal friction ', 'φb = '), d['t']))
 ax.set_xlim(0, 40)

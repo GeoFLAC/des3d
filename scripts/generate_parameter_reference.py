@@ -31,7 +31,8 @@ SECTIONS = {
 
 def options(exe):
     """{name: (type, default or None, required, help)} in the order of `exe -h`."""
-    text = subprocess.run([str(exe), '-h'], capture_output=True, text=True).stdout
+    text = subprocess.run([str(exe), '-h'], capture_output=True, text=True,
+                          check=True, timeout=60).stdout
     out, name = {}, None
     for line in text.splitlines():
         if line and not line.startswith(' '):
@@ -45,6 +46,8 @@ def options(exe):
             out[name] = [m['type'], default, extra == 'required', []]
         elif name and line.strip():
             out[name][3].append(line.strip())
+    if not out:
+        raise ValueError(f'{exe}: help contains no configuration options')
     return {k: (t, d, r, ' '.join(h)) for k, (t, d, r, h) in out.items()}
 
 

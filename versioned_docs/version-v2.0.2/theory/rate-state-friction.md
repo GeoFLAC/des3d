@@ -197,40 +197,49 @@ physical density and $M$ the modulus chosen by
 `control.mass_scaling_reference_speed` (`shear`: $G$, the default;
 `bulk`: $K$). The nodal masses are rebuilt from $\rho_f$ every step.
 
-While $c\,v_{\max}$ is below the cap, the scaled waves always travel $c$
-times faster than the fastest material point. Stress therefore spreads
-through the model ahead of the motion, and the model is as close to
-quasi-static during accelerating slip as during loading. When $c\,v_{\max}$
-reaches the cap, the wave speed is the physical shear or bulk wave speed.
-With the `bulk` ceiling the density is then the physical density. With the
-default `shear` ceiling it is $\rho K/G$, still larger than $\rho$.
+Below the ceiling, the prescribed scaled speed is $c\,v_{\max}$. This
+helps separate elastic relaxation from deformation, but does not establish
+mechanical equilibrium during acceleration or an instantaneous load.
+Check force residuals, deformation and physical-step convergence for the
+loading path. The ceiling is a speed used to construct fictitious mass,
+not a guarantee of the complete physical wave spectrum. At the bulk ceiling
+the dry inertial density reaches $\rho$; at the default shear ceiling it
+remains $\rho K/G$.
 
 ### Time step
 
-The elastic step follows the same speed:
+For automatic timesteps (`control.fixed_dt = 0`), the elastic contribution is
 
 $$
-\Delta t = \frac{0.5\,l_{\min}}{c\,v_{\max}},
-\qquad
-\Delta t \ge \frac{0.2\,l_{\min}}{\sqrt{M/\rho}},
+\Delta t_{el}=\max\!\left(\frac{0.5\,l_{\min}}{c\,v_{\max}},\ \Delta t_{floor}\right),
 $$
 
-where $l_{\min}$ is the smallest element size. The fastest point therefore
-moves at most $0.5\,l_{\min}/c$ per step, a fixed fraction of an element,
-whatever its speed. The lower bound is the stable step at the capped wave speed.
-Other limits (Maxwell relaxation, heat and fluid diffusion, the state limit
-below) still apply, and `control.dt_fraction` scales the result.
+$$
+\Delta t_{floor}=\min_e\frac{h_e}{5\sqrt{M_e/\rho_e}},
+$$
 
-For example, with $l_{\min}=100$ m, $c=10^5$, $G=30$ GPa and
-$\rho=2700$ kg/m³ (shear speed 3.3 km/s):
+where $h_e$ is the element's smallest altitude and $l_{\min}=\min_e h_e$.
+Other limits, including motion, Maxwell relaxation, heat/fluid transport
+and the RSF state limit, can reduce the final timestep;
+`control.dt_fraction` multiplies that minimum. The numerical controls must be checked against the loading time scale.
 
-| Stage | $v_{\max}$ | $c_f$ | $\Delta t$ |
+Only while the first term controls does $v_{\max}\Delta t_{el}$ equal
+$0.5\,l_{\min}/c$. Once the floor controls, that displacement estimate no
+longer holds. Neither the floor nor a velocity ceiling guarantees an
+accurate or stable coupled solution for arbitrary loading.
+
+For a homogeneous dry example with $l_{\min}=100$ m, $c=10^5$,
+$G=30$ GPa and $\rho=2700$ kg/m³ (shear speed 3.3 km/s), ignoring the
+other timestep limits and taking `dt_fraction = 1`:
+
+| Stage | $v_{\max}$ | Capped speed used for mass | $\Delta t_{el}$ |
 | --- | --- | --- | --- |
 | Interseismic loading | $10^{-9}$ m/s | $10^{-4}$ m/s | $5\times10^{5}$ s (6 days) |
-| Rupture | 1 m/s | 3.3 km/s (cap) | $6\times10^{-3}$ s |
+| Fast slip | 1 m/s | 3.3 km/s | $6\times10^{-3}$ s |
 
-The step changes by eight orders of magnitude within one cycle and returns
-to long steps after the event, without user intervention.
+The automatic step can therefore span many orders of magnitude. GVS still
+uses its selected fictitious mass and damping; reaching its ceiling is not
+an automatic switch to undamped physical coseismic inertia.
 
 ### Damping
 
@@ -251,8 +260,8 @@ sparse interseismic frames and dense coseismic frames.
 ### Limiting the state change per step
 
 The explicit state update is accurate only if the slip in one step is small
-compared with $D_c$. GVS limits the slip per step to $0.5\,l_{\min}/c$,
-which is set by the element size, not by $D_c$. For the aging law, the
+compared with $D_c$. While the inverse-speed term controls, the GVS displacement estimate
+is $0.5\,l_{\min}/c$, set by the element size rather than $D_c$. For the aging law, the
 update is stable only if $\Delta t\,V/D_c<2$. When $0.5\,l_{\min}/c$ is
 not small compared with $D_c$, set `control.rsf_dtheta_max` $=f$. It adds
 two bounds over all elements:
