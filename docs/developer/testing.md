@@ -36,7 +36,7 @@ Compiling is not verification. Before a change is reported as done:
 3. **Run the tests that cover the area you changed**, for example the
    functional tests under `tests/functional/`, the component checks under
    `tests/residual-assembly-test/`, or a benchmark under `benchmarks/`. See
-   [Verification and benchmarks](../theory/verification.md) for the list.
+   [Benchmarks](../benchmarks/index.md) for the list.
 
 Pull requests run the same build matrix and functional tests in continuous
 integration, but CI cannot tell whether a change should have altered results;
