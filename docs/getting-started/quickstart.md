@@ -86,12 +86,12 @@ xy = des.read_field(frame, 'coordinate') / 1e3          # km
 conn = des.read_field(frame, 'connectivity')
 plstrain = des.read_field(frame, 'plastic strain')
 
-fig, ax = plt.subplots(figsize=(9, 2.6), constrained_layout=True)
+fig, ax = plt.subplots(figsize=(9, 1.9), constrained_layout=True)
 pc = ax.tripcolor(Triangulation(xy[:, 0], xy[:, 1], conn),
                   facecolors=plstrain, vmin=0, vmax=2)
 ax.set_aspect('equal'); ax.set_xlabel('x (km)'); ax.set_ylabel('z (km)')
-fig.colorbar(pc, ax=ax, label='plastic strain')
-fig.savefig('plastic_strain.png', dpi=150)
+fig.colorbar(pc, cax=ax.inset_axes([1.01, 0, .012, 1]), label='plastic strain')
+fig.savefig('plastic_strain.png', dpi=150, bbox_inches='tight')
 ```
 
 ## 4. What you should see
