@@ -1,8 +1,8 @@
 ---
-sidebar_position: 6
-title: "Application: seasonal pumping and land subsidence"
+sidebar_position: 5
+title: "Seasonal pumping and land subsidence"
 ---
-# Application: seasonal pumping and land subsidence
+# Seasonal pumping and land subsidence
 
 A well field pumps a soft confined aquifer for six months, rests for six months and repeats. The ground subsides around the wells, partly rebounds in each rest season and keeps a growing subsidence farther out.
 
@@ -21,7 +21,7 @@ A well field pumps a soft confined aquifer for six months, rests for six months 
 
 ## Problem setup
 
-![Setup](../img/regional/setup.png)
+![Setup](./img/regional/setup.png)
 
 **Basin and pumping.** A confined aquifer of soft basin sediment, $B=50$ m thick, is modelled as a quarter of a 6 km square slab with a well field on its corner edge. It pumps $Q=0.02\ \mathrm{m^3/s}$ for six months, rests for six months, and repeats once.
 
@@ -63,7 +63,7 @@ dynearthsol3d input.cfg
 
 DES writes `basin.info` (one line per saved frame: frame, step, time in seconds), `basin.save.NNNNNN` (the fields of each saved frame) and `basin.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
 
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../../benchmarks/poromechanics/running.md) before using the Python reader or converter.
 
 | Field | What to look at |
 | --- | --- |
@@ -85,7 +85,7 @@ View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" basin`.
 
 ## Result: DES and the analytical solution
 
-![Result](../img/regional/result.png)
+![Result](./img/regional/result.png)
 
 (a) Subsidence against distance from the well field at the ends of the four seasons: lines are the closed-basin averaged-aquifer reference, symbols DES elements along the x axis; the shaded band is the compared range. (b) Subsidence in time at three observation wells, reference lines and DES symbols; dotted lines mark the season changes. (c) Largest pressure and subsidence errors after the first frame against mesh spacing: open markers with the longer time step, solid markers with four times as many steps.
 
@@ -157,4 +157,4 @@ Linear elastic, thin-slab averaged model: horizontal displacement uniform throug
 
 ## Reproduction
 
-[Commands, solver hashes and portable inputs](../running.md).
+[Commands, solver hashes and portable inputs](../../benchmarks/poromechanics/running.md).

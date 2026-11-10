@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 title: "Fault-zone heating at fixed normal traction"
 ---
 # Fault-zone heating at fixed normal traction
@@ -21,7 +21,7 @@ A prestressed, sealed fault patch slips at 1 m/s under 50 MPa normal compression
 
 ## Problem setup
 
-![Setup](../img/fault-heat/setup.png)
+![Setup](./img/fault-heat/setup.png)
 
 **Geometry and motion.** 10 mm square, four nodes and two triangles; plane strain and fixed reference mesh. The base is fixed; both sides impose a linear horizontal velocity from zero at the base to 1 m/s at the top. The top normal platen is free under 50 MPa compression.
 
@@ -61,7 +61,7 @@ dynearthsol2d input.cfg
 
 DES writes `cell.info` (one line per saved frame: frame, step, time in seconds), `cell.save.NNNNNN` (the fields of each saved frame) and `cell.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
 
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../poromechanics/running.md) before using the Python reader or converter.
 
 | Field | What to look at |
 | --- | --- |
@@ -86,7 +86,7 @@ View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" cell`.
 
 ## Result: DES and the analytical solution
 
-![Result](../img/fault-heat/result.png)
+![Result](./img/fault-heat/result.png)
 
 (a) Shear resistance under fixed total normal traction; the dashed line is the zero-water-expansion reference. (b) Temperature rise from plastic work. (c) Sealed pore pressure. Black curves solve the independent continuous MC/Jaumann equations; markers are ordinary explicit DES with physical mass and zero damping.
 
@@ -171,4 +171,4 @@ A uniform two-triangle local patch with one normal mechanical mode, constant fri
 
 ## Reproduction
 
-[Commands, solver hashes and portable inputs](../running.md).
+[Commands, solver hashes and portable inputs](../poromechanics/running.md).

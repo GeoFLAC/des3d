@@ -74,23 +74,23 @@ title: "Reference solutions"
 
 <a id="regional"></a>
 
-[Application: seasonal pumping and land subsidence](../poroelastic-consolidation/regional.md).
+[Application: seasonal pumping and land subsidence](../../../tutorial/groundwater-slopes/regional.md).
 
 <a id="embankment"></a>
 
-[Factor of safety of an embankment by strength reduction](../material-strength/embankment.md).
+[Factor of safety of an embankment by strength reduction](../../../tutorial/groundwater-slopes/embankment.md).
 
 <a id="drawdown"></a>
 
-[Application: rapid drawdown of a reservoir against an embankment](../material-strength/drawdown.md).
+[Application: rapid drawdown of a reservoir against an embankment](../../../tutorial/groundwater-slopes/drawdown.md).
 
 <a id="slope"></a>
 
-[Application: pore pressure triggers a translational slide](../material-strength/slope.md).
+[Application: pore pressure triggers a translational slide](../../../tutorial/groundwater-slopes/slope.md).
 
 <a id="rainfall"></a>
 
-[Application: rainfall triggers a shallow slide](../material-strength/rainfall.md).
+[Application: rainfall triggers a shallow slide](../../../tutorial/groundwater-slopes/rainfall.md).
 
 <a id="rudnicki"></a>
 
@@ -106,7 +106,7 @@ title: "Reference solutions"
 
 <a id="rsf"></a>
 
-[Rate-and-state friction under a velocity step](../material-strength/rsf.md).
+[Rate-and-state friction under a velocity step](../../faults-friction/rsf-velocity-step.md).
 
 <a id="plastic-heat"></a>
 
@@ -114,7 +114,7 @@ title: "Reference solutions"
 
 <a id="fault-heat"></a>
 
-[Fault-zone heating at fixed normal traction](../heat-and-groundwater/fault-heat.md).
+[Fault-zone heating at fixed normal traction](../../faults-friction/fault-heat.md).
 
 <a id="plastic-content"></a>
 

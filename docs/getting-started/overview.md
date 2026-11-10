@@ -24,7 +24,7 @@ with OpenACC.
 | Convergent wedges | Basal décollement friction, `.poly` geometry | [Convergent wedges](../tutorial/tectonics/accretionary-wedge.md) |
 | Earthquake cycles and slow slip | Rate-and-state friction, global velocity scaling | [Rate-and-state friction](../theory/rate-state-friction.md), [Creep or earthquakes](../tutorial/tectonics/rsf/earthquake-cycles.md) |
 | Static and slowly loaded equilibrium | Pseudo-transient (PT) mechanics | [Choosing a mechanical solver](../user-guide/numerical-controls/solver.md), [Elastic loading](../tutorial/fundamentals/elastic.md) |
-| Groundwater, consolidation and slopes | Biot poromechanics, partly saturated flow, groundwater heat transport | [Poromechanics](../theory/poromechanics.md), [poromechanics examples](../tutorial/poromechanics/index.md) |
+| Groundwater, consolidation and slopes | Biot poromechanics, partly saturated flow, groundwater heat transport | [Poromechanics](../theory/poromechanics.md), [poromechanics benchmarks](../benchmarks/poromechanics/index.md), [groundwater and slopes tutorials](../tutorial/groundwater-slopes/embankment.md) |
 | Landscape and tectonics together | Coupling with GoSPL | [Coupling with GoSPL](../tutorial/advanced/couplinggospl.md) |
 | Thermal evolution | Heat conduction in the deforming (Lagrangian) mesh | [Thermal evolution](../theory/thermalevolution.md) |
 | Strongly distorting domains | Adaptive remeshing with Triangle, TetGen or MMG | [Remeshing](../theory/remeshing.md), [MMG](../user-guide/numerical-controls/mmg.md) |

@@ -1,8 +1,8 @@
 ---
-sidebar_position: 3
-title: "Application: pore pressure triggers a translational slide"
+sidebar_position: 2
+title: "Pore pressure triggers a translational slide"
 ---
-# Application: pore pressure triggers a translational slide
+# Pore pressure triggers a translational slide
 
 A 2 m soil layer on 20° bedrock is loaded by its own weight and then by pore pressure rising from the bedrock. Plastic flow starts at the base and spreads along it, and the basal slip accelerates as the pressure rises.
 
@@ -21,7 +21,7 @@ A 2 m soil layer on 20° bedrock is loaded by its own weight and then by pore pr
 
 ## Problem setup
 
-![Setup](../img/slope/setup.png)
+![Setup](./img/slope/setup.png)
 
 **Slope.** A soil layer of vertical thickness $D=2$ m on bedrock inclined at $\beta=20^\circ$, 40 m long, plane strain. The base is fixed and supplies water; the surface is free and drained; the vertical ends are rollers. The 4 m at each end are strong (cohesion 10 MPa) so the corners stay elastic.
 
@@ -67,7 +67,7 @@ dynearthsol2d input.cfg
 
 DES writes `slope.info` (one line per saved frame: frame, step, time in seconds), `slope.save.NNNNNN` (the fields of each saved frame) and `slope.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
 
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../../benchmarks/poromechanics/running.md) before using the Python reader or converter.
 
 | Field | What to look at |
 | --- | --- |
@@ -89,7 +89,7 @@ View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" -g slope`.
 
 ## Result: DES and the analytical solution
 
-![Result](../img/slope/result.png)
+![Result](./img/slope/result.png)
 
 (a) Plastic strain, on a logarithmic scale, in the middle of the slope at the last time step for which PT finds equilibrium on the finest mesh; plastic flow is concentrated along the bedrock. (b) Mean plastic strain of the basal 0.6 m against the bedrock pore pressure for each mesh (solid) and for the run with twice as many steps (dashed); crosses mark the last PT equilibrium, vertical lines the pointwise-yield, Davis non-associated and classical factor-of-safety estimates. (c) Bedrock pressure at the onset of basal yield, at two fixed basal plastic strains and at the last PT equilibrium, against mesh spacing; filled symbols are the run with twice as many steps, horizontal lines the three estimates.
 
@@ -146,4 +146,4 @@ No exact solution: an application compared with engineering estimates. The slip 
 
 ## Reproduction
 
-[Commands, solver hashes and portable inputs](../running.md).
+[Commands, solver hashes and portable inputs](../../benchmarks/poromechanics/running.md).
