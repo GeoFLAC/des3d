@@ -1,0 +1,9 @@
+{
+  "label": "Mechanics and rheology",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "slug": "/category/benchmarks-mechanics",
+    "description": "Elastoplastic and viscoelastic responses compared with closed-form solutions"
+  }
+}

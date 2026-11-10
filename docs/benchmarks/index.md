@@ -22,6 +22,9 @@ listed below.
 | --- | --- | --- |
 | [Shear bands with and without rate-and-state friction](./geodynamics/localization.md) | Band dips against the Arthur angle | `benchmarks/DESv2.0/rsf/localization/` |
 | [Checking the friction law in simple shear](./faults-friction/simple-shear.md) | Closed-form stresses for static friction and steady-state and aging-law RSF | `benchmarks/simple_shear_rsf/` |
+| [Elastoplastic oedometer test](./mechanics/oedometer.md) | Closed-form Mohr–Coulomb stress path under uniaxial strain | `benchmarks/oedometer-2d.cfg` |
+| [Maxwell stress build-up in pure shear](./mechanics/maxwell.md) | Maxwell response at a constant strain rate | `benchmarks/maxwell.cfg` |
+| [Cooling of a half-space](./heat/half-space-cooling.md) | Error-function profile in 2D and 3D | `benchmarks/diffusion.cfg` |
 
 ## Other comparisons with reference solutions
 
@@ -74,19 +77,3 @@ ExodusII and GoSPL builds) and runs the functional tests:
 - a subset of the RSF simple-shear benchmark;
 - rejection of malformed input files;
 - a 3D run in a debug build to catch memory errors.
-
-## Older benchmark inputs
-
-`benchmarks/` also holds inputs from earlier versions. They are useful
-starting points, but have no automated check, and some plotting scripts were
-written for earlier Python versions and the earlier output reader.
-
-| Input | Problem |
-| --- | --- |
-| `1d-consolidation-*.cfg`, `1d_consolidation-plot.ipynb` | One-dimensional consolidation in 2D and 3D, loaded by traction or by water |
-| `2d-consolidation.cfg`, `2d_consolidation-plot.ipynb` | Two-dimensional consolidation |
-| `diffusion.cfg`, `diffusion-plot.py` | Cooling of a half-space, compared with the error-function solution |
-| `oedometer-2d.cfg`, `oedometer-2d-plot.py` | Elastoplastic oedometer test against its analytical path |
-| `maxwell.cfg`, `maxwell.diff` | Maxwell relaxation; the patch adds the needed output |
-| `acm-error-est.cfg`, `acm-error-est.diff` | Remapping error during remeshing; the patch varies the interpolation |
-| `core-complex_mesh_opt.cfg`, `core-complex_new_mesh.cfg` | The core-complex model with two remeshing strategies |
