@@ -145,7 +145,7 @@ build command stays copy-pasteable either way:
    empty or missing directory here means a wrong path now, not a build
    error later.
 4. Build with any conda environment active or none; it doesn't matter unless
-   that environment has its own Boost or compilers ahead of the system ones.
+   that environment has its own compilers ahead of the system ones.
    `make config` prints what was actually picked up:
    ```bash
    make clean
