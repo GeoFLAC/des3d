@@ -11,8 +11,8 @@ in terms of the **number** of materials and the **order** by which the materials
 
 This technical requirement is illustrated by a multi-material 2D rifting example.
 A pair of input parameter files are provided:
-1. `DynEarthSol/examples/rifting-2d.cfg`: input file for `DynEarthSol`.
-2. `DynEarthSol/examples/rifting-2d.poly`: input file for the mesh generator, `triangle`.
+1. `DynEarthSol/examples/tectonics/rifting-2d.cfg`: input file for `DynEarthSol`.
+2. `DynEarthSol/examples/tectonics/rifting-2d.poly`: input file for the mesh generator, `triangle`.
 
 ## In .cfg file
 

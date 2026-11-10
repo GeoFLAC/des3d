@@ -22,7 +22,7 @@ load](../../tutorial/fundamentals/maxwell.md).
 | Dimension | 2D |
 | Build | `make ndims=2` |
 | Run time | about 7 minutes, 8 threads (2.2 million steps) |
-| Inputs | `benchmarks/maxwell.cfg` in the DynEarthSol repository, with the boundary conditions below |
+| Inputs | `benchmarks/mechanics/maxwell/maxwell.cfg` in the DynEarthSol repository |
 | Checked with | DynEarthSol `68cc2a0` |
 
 :::
@@ -37,18 +37,10 @@ load](../../tutorial/fundamentals/maxwell.md).
 | Mechanics | explicit, `inertial_scaling = 1e6`, `characteristic_speed = 1e-14` |
 | Duration | $3\times10^{12}$ s, three Maxwell times, a frame every $10^4$ steps |
 
-The input in the repository uses boundary type 100, which needs the patch
-`benchmarks/maxwell.diff` written for an older version of DES. The run here
-uses standard boundary conditions instead. In `[bc]` of `maxwell.cfg`, set
-
-```ini
-vbc_x1 = 1
-vbc_val_x1 = -1e-14
-vbc_z0 = 1
-vbc_val_z0 = -1e-14
-```
-
-and in `[sim]` add `max_time_in_yr = 95000`.
+The input uses standard velocity conditions (`vbc_x1 = 1`,
+`vbc_val_x1 = -1e-14`, `vbc_z0 = 1`, `vbc_val_z0 = -1e-14`) and stops at
+`max_time_in_yr = 95000`. Earlier versions of this input used a boundary
+type that needed a source patch.
 
 With the side lengths $L_x = 1 - vt$ and $L_z = 1 + vt$, the strain rates
 are $-v/L_x$ and $+v/L_z$, and the stress difference
@@ -64,8 +56,8 @@ $4\eta v = 400$ MPa in magnitude.
 ## Input and how to run
 
 ```bash
-cd benchmarks
-../dynearthsol2d maxwell.cfg     # after the changes above
+cd benchmarks/mechanics/maxwell
+../../../dynearthsol2d maxwell.cfg
 ```
 
 ## What to look for

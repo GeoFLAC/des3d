@@ -95,7 +95,7 @@ This checks the coupled poroelastic response around an opening: diffusion from a
 To reproduce the whole study behind this figure, from the DES source folder:
 
 ```bash
-python3 benchmarks/hydromechanics/borehole_reference.py
+python3 benchmarks/poromechanics/borehole_reference.py
 python3 tests/functional/hydromechanics/check_borehole.py dynearthsol2d OUT/mesh --spacings 0.2 0.1 0.05
 python3 tests/functional/hydromechanics/check_borehole.py dynearthsol2d OUT/steps --spacings 0.1 --steps 576
 ```

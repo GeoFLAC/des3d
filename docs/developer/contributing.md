@@ -40,7 +40,7 @@ Templates under `.github/` fill in when you open an issue or a pull request.
 - **Enhancements:** the problem, a concrete proposal, alternatives rejected,
   and what closes the issue.
 - **Pull requests:** one topic each, commits that each build and pass
-  `benchmarks-cores`, and a title that stands alone in `git log`. Report
+  `tests/regression`, and a title that stands alone in `git log`. Report
   whether the change altered results (see [Testing a change](./testing.md)).
   Open as a draft until CI passes, then ask at least one other developer to
   review.

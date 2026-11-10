@@ -80,7 +80,7 @@ cd pt-tutorial
 You can also inspect [option 0](/tutorial/pt/elastic-0.cfg),
 [option 1](/tutorial/pt/elastic-1.cfg) and the
 [analysis script](/tutorial/pt/analyze_pt.py) individually. The elastic
-configs reproduce the upstream `examples/pt-elastic-load.cfg` with distinct
+configs reproduce the upstream `examples/fundamentals/pt-elastic-load.cfg` with distinct
 output names and the selected `PT_option`.
 
 ## Geometry and loading

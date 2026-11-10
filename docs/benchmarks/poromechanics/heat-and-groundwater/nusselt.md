@@ -92,7 +92,7 @@ This checks finite-amplitude Darcy convection: buoyancy, heat advection by the D
 To reproduce the whole study behind this figure, from the DES source folder:
 
 ```bash
-python3 benchmarks/hydromechanics/convection_steady.py
+python3 benchmarks/poromechanics/convection_steady.py
 python3 tests/functional/hydromechanics/check_convection_nusselt.py dynearthsol2d OUT --spacings 0.05 0.025 0.0125
 ```
 

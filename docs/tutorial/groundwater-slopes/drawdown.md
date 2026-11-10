@@ -104,7 +104,7 @@ This joins the verified pieces in the problem dam engineers check first: the und
 To reproduce the whole study behind this figure, from the DES source folder:
 
 ```bash
-python3 benchmarks/hydromechanics/drawdown_slope.py dynearthsol2d OUT --spacings 1
+python3 benchmarks/poromechanics/drawdown_slope.py dynearthsol2d OUT --spacings 1
 ```
 
 The study’s full numbers: [record.json](/downloads/poromechanics/drawdown/record.json).

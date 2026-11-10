@@ -96,9 +96,9 @@ Switching from explicit/GVS to physical inertia
 To reproduce the whole study behind this figure, from the DES source folder:
 
 ```bash
-python3 benchmarks/hydromechanics/undrained_wave.py dynearthsol3d OUT --spacing .0125 --steps 1024 2048 4096 8192 --samples 64 --restart-check
-python3 benchmarks/hydromechanics/undrained_wave.py dynearthsol3d OUT-h005 --spacing .05 --steps 4096 --samples 32
-python3 benchmarks/hydromechanics/undrained_wave.py dynearthsol3d OUT-h0025 --spacing .025 --steps 4096 --samples 32
+python3 benchmarks/poromechanics/undrained_wave.py dynearthsol3d OUT --spacing .0125 --steps 1024 2048 4096 8192 --samples 64 --restart-check
+python3 benchmarks/poromechanics/undrained_wave.py dynearthsol3d OUT-h005 --spacing .05 --steps 4096 --samples 32
+python3 benchmarks/poromechanics/undrained_wave.py dynearthsol3d OUT-h0025 --spacing .025 --steps 4096 --samples 32
 ```
 
 The study’s full numbers: [record.json](/downloads/poromechanics/wave/record.json).

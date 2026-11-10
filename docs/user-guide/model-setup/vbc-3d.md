@@ -40,5 +40,5 @@ bc.vbc_val_x1   =  0.01
 bc.vbc_val_x1_l = -0.005
 ```
 
-See `examples/oblique-rift-3d.cfg` for a complete transtensional rifting
+See `examples/tectonics/oblique-rift-3d.cfg` for a complete transtensional rifting
 example using case 6.

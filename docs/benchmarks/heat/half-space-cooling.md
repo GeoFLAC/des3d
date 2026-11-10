@@ -25,7 +25,7 @@ it cool to 100 million years.
 | Dimension | 2D and 3D, same input |
 | Build | `make ndims=2` and `make ndims=3` |
 | Run time | 6 s (2D) and 41 s (3D) on 8 threads |
-| Inputs | `benchmarks/diffusion.cfg` in the DynEarthSol repository |
+| Inputs | `benchmarks/heat/half-space-cooling/diffusion.cfg` in the DynEarthSol repository |
 | Checked with | DynEarthSol `68cc2a0` |
 
 :::
@@ -46,13 +46,13 @@ the insulated base at 250 km, so the half-space solution applies.
 ## Input and how to run
 
 ```bash
-cd benchmarks
-../dynearthsol2d diffusion.cfg
-../dynearthsol3d diffusion.cfg
+cd benchmarks/heat/half-space-cooling
+../../../dynearthsol2d diffusion.cfg
+../../../dynearthsol3d diffusion.cfg
 ```
 
 Each run writes `diffusion.save.*`. Frame $n$ is the plate at age $1 + n$ Myr.
-`benchmarks/diffusion-plot.py` plots frames 0, 9 and 59 against the
+`benchmarks/heat/half-space-cooling/diffusion-plot.py` plots frames 0, 9 and 59 against the
 error function; it was written for Python 2 and the earlier output reader.
 
 ## What to look for
