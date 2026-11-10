@@ -6,7 +6,7 @@ title: "Rapid drawdown of a reservoir against an embankment"
 
 A reservoir stands at the crest of the embankment and the slope is saturated. When the reservoir is drawn down quickly the water no longer supports the face, while the pore pressure inside falls only as the slope drains: the classic critical case for the upstream slope of a dam.
 
-**250 s after drawdown DES brackets the factor of safety at 0.85–0.9 against 0.857 from Bishop on the same pore pressure; at 20000 s, 0.9–0.95 against 0.918. Largest gap between the bracket midpoint and Bishop: 2.5%. The slope that stands dry (FS 1.369) fails on rapid drawdown, and draining restores only part of its strength in this time.**
+**On the selected 0.5 m mesh, 250 s after drawdown DES brackets the factor of safety at 0.8–0.85 against 0.857 from Bishop on the same pore pressure; at 20000 s, 0.9–0.95 against 0.918. The largest midpoint gap is 4.2%. Three of six brackets contain Bishop; the other three are slightly conservative. The original all-times containment criterion is not met.**
 
 :::info At a glance
 
@@ -15,7 +15,7 @@ A reservoir stands at the crest of the embankment and the slope is saturated. Wh
 | Dimension | 2D |
 | Build | `make ndims=2` from the poromechanics source |
 | Inputs | [drawdown.zip](/downloads/poromechanics/drawdown.zip) |
-| Checked with | DynEarthSol `97f9794` (poromechanics branch) |
+| Checked with | DynEarthSol `4ec082f` (poromechanics branch) |
 
 :::
 
@@ -23,7 +23,7 @@ A reservoir stands at the crest of the embankment and the slope is saturated. Wh
 
 ![Setup](./img/drawdown/setup.png)
 
-**Slope.** The embankment of the strength-reduction page ($H=10$ m, 2:1, $c=10$ kPa, $\phi=20^\circ$, $\psi=0$), saturated: porosity 0.3, saturated unit weight $20\ \mathrm{kN/m^3}$, $k=10^{-13}\ \mathrm{m^2}$, Gardner retention ($\alpha=2.4\times10^{-4}$ Pa$^{-1}$), Bishop $\chi=S_e$.
+**Slope.** A 0.5 m mesh of the embankment of the strength-reduction page ($H=10$ m, 2:1, $c=10$ kPa, $\phi=20^\circ$, $\psi=0$), saturated: porosity 0.3, saturated unit weight $20\ \mathrm{kN/m^3}$, $k=10^{-13}\ \mathrm{m^2}$, Gardner retention ($\alpha=2.4\times10^{-4}$ Pa$^{-1}$), Bishop $\chi=S_e$.
 
 **Reservoir.** Water stands at the crest. DES loads the face and the toe platform with its pressure, and the slope fills through the crest and the base until its pore pressure is hydrostatic.
 
@@ -33,28 +33,59 @@ A reservoir stands at the crest of the embankment and the slope is saturated. Wh
 
 ## Input and how to run
 
-Every file this example needs is in [drawdown.zip](/downloads/poromechanics/drawdown.zip). Run from that folder:
+[drawdown.zip](/downloads/poromechanics/drawdown.zip) contains the selected
+0.5 m input, mesh and hydrostatic reservoir frame. Keep the supplied
+`reservoir.save.000100`, `reservoir.chkpt.000100` and `reservoir.info`
+together. Use the recorded 2D source revision for this checkpoint.
+Run from the extracted `drawdown` folder:
 
 ```bash
-# Optional: meshes slope.poly at 1 m (crest marked separately from the face) and writes the unstressed, gravity-free state as seed frame 0.
-dynearthsol2d seed.cfg
-# Optional: restarts from seed frame 0 with gravity and the reservoir at the crest: the face and toe platform carry the water load, and the slope fills through the crest (p = 0) and the base (hydrostatic pressure) for 25000 s, writing reservoir frames 0–100 with checkpoints. The shipped reservoir.chkpt.000100, reservoir.save.000100 and reservoir.info are this result, so both optional stages can be skipped.
-dynearthsol2d reservoir.cfg
-# The drawdown (same as drawdown.cfg): restarts from reservoir frame 100, removes the water load, drains the face and toe platform at p = 0 and seals the crest and base, then runs 20000 s of drainage. Writes drawdown frames 101–180, one every 250 s, each with a checkpoint for the trials.
+export OMP_NUM_THREADS=1
 dynearthsol2d input.cfg
-# A strength-reduction trial at one time after drawdown, here F = 0.85 at 250 s. In the copy set: sim.modelname to a new name (srf250-0.850); restarting_from_modelname = drawdown and restarting_from_frame = 101 (250 s; frames 104, 112, 124, 148 and 180 are 1000, 3000, 6000, 12000 and 20000 s); max_time_in_yr to that frame's time in drawdown.info (third column, s) plus 2000 s, divided by 31556926 (DES’s year, 365.2422 days); output_time_interval_in_yr = 3.168876453507857e-07 (10 s); checkpoint_frame_interval = 100000; rheology_type = elasto-plastic; hydraulic_perm = [1e-25] and fluid_bulk_modulus = [1000.0], which hold the pore pressure during the trial; cohesion0 and cohesion1 = 10000/F Pa; friction_angle0 and friction_angle1 = atan(tan 20°/F) in degrees.
-cp input.cfg trial.cfg
-# Runs the trial for 2000 s of mass-scaled time. Judge it from the velocity history: if the peak nodal speed over the last frames is below that about three quarters through the run, the slope is coming to rest and F is below the factor of safety; otherwise it is sliding. Repeat with other F to bracket the factor of safety at that time.
-dynearthsol2d trial.cfg
 ```
+
+The reservoir has filled for about 25000 s. This restart removes the water
+load and runs 20000 s of drainage, saving a checkpoint every 250 s.
+The bundle's [manifest](/downloads/poromechanics/drawdown/manifest.json)
+records the input, starting-frame and solver hashes. The complete study
+command below regenerates the reservoir and strength trials from source.
+
+For one strength-reduction trial at 250 s after drawdown, copy the input:
+
+```bash
+cp input.cfg trial.cfg
+```
+
+Edit the following settings in `trial.cfg` for a trial factor $F$:
+
+| Setting | Trial value |
+| --- | --- |
+| `sim.modelname` | a fresh name, e.g. `srf250-0.850` for $F=0.85$ |
+| `sim.restarting_from_modelname` | `drawdown` |
+| `sim.restarting_from_frame` | `101` (250 s after drawdown) |
+| `sim.max_time_in_yr` | that frame's saved time plus 2000 s, divided by 31556926 |
+| `sim.output_time_interval_in_yr` | `3.168876453507857e-7` (10 s) |
+| `sim.checkpoint_frame_interval` | `100000` |
+| `mat.rheology_type` | `elasto-plastic` |
+| `mat.hydraulic_perm` | `[1e-25]` |
+| `mat.fluid_bulk_modulus` | `[1000]` |
+| `mat.cohesion0`, `mat.cohesion1` | `[10000/F]` Pa, evaluated numerically |
+| `mat.friction_angle0`, `mat.friction_angle1` | `[atan(tan(20°)/F)]` in degrees, evaluated numerically |
+
+The trial settings keep pressure nearly fixed, as assumed by limit
+equilibrium. Then run `dynearthsol2d trial.cfg`. The recorded rest criterion
+compares the mean peak nodal speed in the last five frames with five frames
+at three quarters of the trial; a ratio below one means deceleration.
+Repeat factors to bracket rest and sliding. Frames 104, 112, 124, 148 and
+180 give the other five comparison times.
 
 ### Settings that define this example
 
 | Setting | Value | What it does here |
 | --- | --- | --- |
-| `sim.restarting_from_modelname` | `reservoir` | starts from the filled reservoir state written by reservoir.cfg |
+| `sim.restarting_from_modelname` | `reservoir` | starts from the supplied filled-reservoir state |
 | `sim.restarting_from_frame` | `100` | uses reservoir frame 100, the slope with hydrostatic pore pressure under the full reservoir |
-| `sim.max_time_in_yr` | `0.001425994510149279 yr = 45000 s` | end time counted from the start of the reservoir stage: 25000 s of filling plus 20000 s of drainage |
+| `sim.max_time_in_yr` | `0.001425994411974377` yr (about 45000 s) | end time counted from the start of the reservoir stage: 25000 s of filling plus 20000 s of drainage |
 | `sim.checkpoint_frame_interval` | `1` | writes a restart checkpoint with every frame, so a strength-reduction trial can start at any saved time |
 | `control.has_hydraulic_diffusion` | `true` | turns on Darcy flow, so the slope drains through the face after drawdown |
 | `bc.has_water_loading` | `no` | removes the reservoir's pressure on the face and toe platform (it is on in reservoir.cfg) |
@@ -67,7 +98,7 @@ dynearthsol2d trial.cfg
 | `mat.rho0` | `[2483.9085481287316]` | grain density chosen so the saturated unit weight is 20 kN/m³ |
 | `mat.rheology_type` | `elastic` | elastic during drainage; each trial switches to Mohr–Coulomb elasto-plasticity |
 
-[input.cfg](/downloads/poromechanics/drawdown/input.cfg) holds all 58 settings that differ from DES’s defaults; `dynearthsol2d -h` lists every option with its default.
+[input.cfg](/downloads/poromechanics/drawdown/input.cfg) holds the selected example’s settings; `dynearthsol2d -h` lists every option with its default.
 
 ## Output
 
@@ -93,9 +124,25 @@ value = model.read_field(frame, 'pore pressure')
 
 View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" -g drawdown`.
 
-## Result: DES and the analytical solution
+## Result: DES and the limit-equilibrium reference
 
-![Result](./img/drawdown/result.png)
+![Selected 0.5 m result: pore pressure, safety-factor history and failure mechanism](./img/drawdown/result.png)
+
+[PDF figure](./img/drawdown/result.pdf)
+
+| Time after drawdown (s) | DES strength-reduction bracket | Bishop | Within bracket |
+| ---: | ---: | ---: | :---: |
+| 250 | 0.80–0.85 | 0.857 | no |
+| 1000 | 0.85–0.90 | 0.877 | yes |
+| 3000 | 0.85–0.90 | 0.890 | yes |
+| 6000 | 0.85–0.90 | 0.902 | no |
+| 12000 | 0.85–0.90 | 0.913 | no |
+| 20000 | 0.90–0.95 | 0.918 | yes |
+
+The misses exceed the upper bracket by 0.00202–0.01341. All 72 trials and
+six Bishop searches reproduced their recorded metrics in the remote
+raw-field replay; that checks reproducibility, not exact agreement with
+limit equilibrium.
 
 (a) Pore pressure at the first comparison time after drawdown, with the zero-pressure contour and Bishop's critical circle on the same pore pressure. (b) Factor of safety against time after drawdown: Bishop's method on the DES pore pressure (line and circles) and the DES strength-reduction bracket, from the last F at rest to the first F sliding (bars). (c) Displacement in the first sliding trial at the first comparison time, with Bishop's circle.
 
@@ -104,12 +151,12 @@ This joins the verified pieces in the problem dam engineers check first: the und
 To reproduce the whole study behind this figure, from the DES source folder:
 
 ```bash
-python3 benchmarks/poromechanics/drawdown_slope.py dynearthsol2d OUT --spacings 1
+python3 benchmarks/poromechanics/drawdown_slope.py dynearthsol2d OUT --spacings 0.5
 ```
 
 The study’s full numbers: [record.json](/downloads/poromechanics/drawdown/record.json).
 
-## Analytical reference
+## Bishop reference
 
 $$
 FS=\frac{\sum\left[c\,b+(W-\chi p\,b)\tan\phi\right]/m_\alpha}{\sum W\sin\alpha}
@@ -133,13 +180,13 @@ $p$ and $S$ are DES’s pore pressure and saturation at that time, $\chi=S_e$ (B
 
 Before drawdown the reservoir’s pressure on the face balances the pore pressure inside: only buoyant weight drives sliding. Removing the water removes that support at once, and the undrained response lowers the pore pressure by about the removed load; the remaining pressure then drains through the face. The factor of safety is lowest just after drawdown and recovers as the slope drains.
 
-A strength-reduction trial holds the pore pressure: no flow, and a compressible pore fluid so that deformation does not change it. With a stiff fluid the trial would be undrained and excess pore pressure of order 10 kPa would lower the factor of safety below limit equilibrium.
+A strength-reduction trial nearly holds the pore pressure: negligible flow and a compressible pore fluid limit its change during deformation. With a stiff fluid the trial would be undrained and excess pore pressure of order 10 kPa would lower the factor of safety below limit equilibrium.
 
 Morgenstern (1963), Géotechnique 13(2), 121–131 (stability charts for rapid drawdown); Bishop (1955), Géotechnique 5(1), 7–17.
 
 ## Validity and limits
 
-No exact solution: Bishop’s method needs the pore pressure as an input, here taken from DES, so the comparison checks the mechanics given the hydraulics. 2D, small strain; drawdown is instantaneous; the earliest comparison is a few hundred seconds after drawdown, once the mass-scaled mechanics has settled.
+No exact solution: Bishop’s method needs the pore pressure as an input, here taken from DES, so the comparison checks the mechanics given the hydraulics. The 0.05 trial-factor spacing and small conservative discrepancies remain part of this result. 2D, small strain; drawdown is instantaneous; the earliest comparison is a few hundred seconds after drawdown, once the mass-scaled mechanics has settled.
 
 ## Reproduction
 
