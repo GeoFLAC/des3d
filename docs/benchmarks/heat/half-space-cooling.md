@@ -57,7 +57,7 @@ error function; it was written for Python 2 and the earlier output reader.
 
 ## What to look for
 
-![Temperature against depth at 1, 10 and 60 Myr in 2D and 3D: DES nodes (circles) and the error function (lines)](../img/half-space-cooling.png)
+![Temperature against depth at 1, 10 and 60 Myr in 2D and 3D: the error function (lines) and DES nodes, one per 5 km of depth (circles)](../img/half-space-cooling.png)
 
 | Plate age | Largest difference, 2D | Largest difference, 3D | With `mat.alpha = [0]`, 2D | With `mat.alpha = [0]`, 3D |
 | --- | ---: | ---: | ---: | ---: |
