@@ -10,8 +10,9 @@ skeleton. Pore pressure changes the effective stress and therefore the
 strength, and deformation changes the pore pressure. Optional extensions
 cover partly saturated ground, groundwater heat transport, thermal
 pressurization, evolving porosity and permeability, and an immobile matrix
-reservoir. Like the mechanics, every part of the update is explicit: there
-is no global linear or nonlinear solve.
+reservoir. Fluid and heat transport use explicit substeps. The mechanical
+solver can use ordinary explicit stepping, GVS or PT relaxation; local
+pressure/content conversions do not introduce a global implicit flow solve.
 
 Hydraulics is enabled with `control.has_hydraulic_diffusion = yes`.
 
@@ -47,7 +48,8 @@ balances the external loads.
 
 ### Fluid content
 
-The change in fluid volume per unit bulk volume is
+The default `control.hydraulic_content_model = 0` uses the linear excess
+fluid volume per unit bulk volume
 ([Rice and Cleary, 1976](https://doi.org/10.1029/RG014i002p00227))
 
 $$
@@ -86,15 +88,23 @@ where $Q$ is a volumetric source from wells or point sources.
 
 ### Weight of the saturated rock
 
-The bulk density used for gravity and inertia is the mixture
+For the default hydraulic model, gravity uses the mixture density
 
 $$
 \rho = (1-\phi)\,\rho_s + \phi\, S\,\rho_f ,
 $$
 
-with solid density $\rho_s$ (`mat.rho0`) and saturation $S$ ($S=1$ when
-saturated). The same density loads a wet Winkler foundation. Without
-hydraulics, DES3D uses the solid density alone.
+with the temperature-dependent solid density $\rho_s$ and saturation $S$
+($S=1$ when saturated). The same density loads a wet Winkler foundation.
+The reference solid density is `mat.rho0`. Without hydraulics, gravity uses
+the solid density alone.
+
+This gravity density must be distinguished from inertial mass. With
+`control.is_quasi_static = yes`, ordinary explicit mechanics and GVS use
+fictitious masses set by [mass scaling](./solution-scheme/massscaling.md).
+The default hydraulic model's unscaled mass and wave estimates use the
+saturated mixture ($S=1$), even when gravity uses a lower saturation. The
+finite-density model below has a separate inventory-based weight.
 
 ## Coupling in time
 
@@ -102,17 +112,18 @@ Each physical step advances mechanics once and pressure over the same
 interval. Which quantity drives the pressure depends on the mechanical
 solver.
 
-**Strain-driven form (explicit mechanics, including global velocity
-scaling).** Pressure advances first, from the strain rate projected from
-the current velocity:
+**Strain-driven form (default content model).** With ordinary explicit
+mechanics or GVS and pressure feedback enabled, pressure advances first
+from the strain rate projected from the current velocity:
 
 $$
 \frac1M\,\dot p = -\alpha\,\dot\varepsilon_v - \nabla\cdot\mathbf q + Q .
 $$
 
-The stress and nodal forces then use the new pressure. This is the undrained
-response of the Biot equations, so with physical inertia it carries the
-fast and slow compressional waves.
+The stress and nodal forces then use the new pressure. Unscaled physical
+inertia also uses this ordering. The sealed elastic limit gives the
+undrained longitudinal wave; relative-fluid inertia is not integrated as a
+separate momentum equation.
 
 **Fixed-stress form (PT mechanics).** Mechanics first reaches equilibrium for
 the step. Pressure then follows from the accepted change in mean total
@@ -134,17 +145,24 @@ order in $\Delta t$.
 
 `control.has_poroelastic_pressure_feedback = no` removes the mechanical
 source term (the $\dot\varepsilon_v$ or $\Delta\sigma_m$ term). Pressure
-still diffuses and still acts on the effective stress. The storage stays as
-above. This gives a flow-only model on a deforming or fixed skeleton.
+still diffuses and still acts on the effective stress. In quasistatic
+explicit/GVS runs with feedback disabled, storage is $S_\sigma$, as in the
+reduced fixed-stress flow model; unscaled physical inertia uses $1/M$.
+Removing feedback therefore does not mean keeping the same diffusivity as
+every coupled explicit case. It does not disable the pressure's effect on
+skeleton strength.
 
 ### Hydraulic substeps
 
 Pressure diffusion often needs smaller steps than mechanics. Within each
 physical step DES3D advances pressure in explicit substeps. Their size is
-set by the assembled lumped storage and conductance, so the update is
-stable for any physical step, including `control.fixed_dt`. Mechanics,
+set by the assembled lumped storage and conductance. A long physical step,
+including `control.fixed_dt`, can therefore contain many stable transport
+substeps. This does not make an oversized mechanical step stable or remove
+the coupling lag. Mechanics,
 porosity and other histories advance once per physical step. Scheduled
-boundary values and sources are integrated exactly over each substep.
+flux and source amounts use their exact schedule integrals; prescribed
+pressures are imposed at substep endpoints.
 
 ## Boundary and initial conditions
 
@@ -212,10 +230,11 @@ Here $a$ is `mat.retention_alpha` (1/Pa) and $n$ is `mat.retention_n`
 [Mualem, 1976](https://doi.org/10.1029/WR012i003p00513)). For Brooks–Corey,
 $1/a$ is the air-entry pressure and $n$ the pore-size index.
 
-The fluid content becomes $\phi S(p) + p/M$ plus the mechanical term. DES3D
-updates the nodal content explicitly and inverts it for pressure node by
-node. The content is a monotone function of pressure, so each inversion has
-one root. Effective stress uses Bishop's form with $\chi = S_e$
+The pressure-dependent nodal content is $\phi S(p)+s p$, where $s$ is
+$1/M$ in the strain-driven form or $S_\sigma$ in the fixed-stress form.
+Mechanical source increments are assembled separately. DES3D updates this
+content explicitly and inverts it for pressure node by node. Its positive
+capacity gives one local root. Effective stress uses Bishop's form with $\chi = S_e$
 ([Lu et al., 2010](https://doi.org/10.1029/2009WR008646)):
 
 $$
@@ -223,8 +242,14 @@ $$
 $$
 
 Suction therefore adds apparent cohesion to a partly saturated slope.
-Retention cannot yet be combined with evolving porosity, thermal
-pressurization or matrix exchange.
+`dppressure` remains the raw $p_{old}-p_{new}$. Each element evaluates its
+own Bishop increment $S_e(p_{old})p_{old}-S_e(p_{new})p_{new}$ with its own
+retention law, averaging the nodal products over the element. This differs
+from multiplying an averaged saturation by an averaged pressure. Matching
+fixed-stress terms use the same element law. Elements
+saturated at both states keep the saturated arithmetic.
+Retention cannot yet be combined with evolving porosity or permeability, thermal
+pressurization, fluid heat advection or matrix exchange.
 
 ## Evolving porosity and permeability
 
@@ -233,13 +258,15 @@ element history, the pore strain $\varepsilon_\phi$. Each step adds
 
 $$
 \Delta\varepsilon_\phi = \Delta\varepsilon_v + \frac{\Delta p}{K_s}
-- \alpha_s\,\Delta T,
+- \alpha_s\,\Delta T-\Delta h,
 \qquad
 \phi = \alpha - (\alpha - \phi_0)\,e^{-\varepsilon_\phi},
 $$
 
 where $\alpha_s$ is the solid thermal expansivity (`mat.alpha`, used only
-with thermal pressurization) and $\phi_0$ the material porosity. A step that
+with thermal pressurization), $\phi_0$ the material porosity and $\Delta h$
+recovery of previously accepted plastic pore dilation (zero unless pore
+healing is enabled). A step that
 would leave $0<\phi\le\alpha$ stops the run with a diagnostic.
 
 `mat.permeability_model` lets permeability follow porosity:
@@ -276,7 +303,9 @@ C\,\dot T + \rho_f c_f\,\mathbf q\cdot\nabla T = \nabla\cdot(\lambda\nabla T) + 
 C = (1-\phi)\rho_s c_s + \phi\,\rho_f c_f,
 $$
 
-with fluid heat capacity $c_f$ (`mat.fluid_heat_capacity`). The fluid
+with fluid heat capacity $c_f$ (`mat.fluid_heat_capacity`). This is the
+default heat-capacity model; evolving storage requires the separate
+finite-density inventory below for retained sensible-energy accounting. The fluid
 density in Darcy gravity varies with temperature (Boussinesq),
 $\rho_f[1-\alpha_f(T-T_0)]$, with $\alpha_f$ = `mat.fluid_alpha` and $T_0$
 the surface temperature. This drives free convection. Heat diffusion also
@@ -307,10 +336,61 @@ After a remesh, nodal pressure is interpolated onto the new mesh like other
 nodal fields. For saturated material with fixed properties, DES3D then
 adjusts the pressure on free nodes by a common offset, so the total linear
 Biot content $\int\zeta\,dV$ is the same before and after the remesh.
-Prescribed-pressure nodes keep their values. The content changes only
-where the domain itself gains or loses volume. This is a global constraint;
-it does not conserve content element by element. Partly saturated material
-and evolving porosity are interpolated without this adjustment.
+Prescribed-pressure nodes keep their values; domain changes and boundary
+reservoir reactions are accounted for separately. This is a global
+constraint, not conservation element by element. Partly saturated material
+and evolving porosity in the default model are interpolated without this
+adjustment. The optional inventory model has its own remap, below.
+
+## Finite-density water and sensible heat
+
+`control.hydraulic_content_model = 1` selects a saturated inventory model.
+It requires pressure feedback, `mat.porosity_model = 1`, an elastic bulk
+response and `control.is_quasi_static = yes`; ordinary explicit mechanics,
+GVS and PT are available, but unscaled physical inertia is excluded.
+Retention, matrix exchange, surface processes and material phase conversion
+are outside this mode. All solid materials must share one fluid law.
+
+Constant compressibility and expansivity give
+
+$$
+\rho_f(p,T)=\rho_{f0}\exp[p/K_f-\alpha_f(T-T_0)],
+\qquad M_f=V\rho_f\phi.
+$$
+
+$T_0$ is the saved EOS temperature origin and the reference pressure is
+zero. This is a constitutive EOS, not a tabulated water-property model.
+The porosity law above is integrated over the accepted path. A moving
+mesh supplies $V$; a fixed mesh uses the virtual volume
+$V_0\exp(\mathrm{tr}\,\boldsymbol\varepsilon)$. That convention does not
+establish finite-strain mechanical accuracy.
+
+The forward transport step uses the starting substep's Darcy mass and
+sensible-heat fluxes. Converting the updated local inventories to pressure
+and temperature requires a local root, without a global implicit transport
+solve. A fixed-stress numerical mass buffer $R$ is recorded separately:
+the split closes the $M_f+R$ budget, while physical mass alone retains a
+coupling defect that must decrease with physical-step refinement. $R$ is
+neither fluid density nor heat capacity.
+
+For heat transport this mode requires both thermal pressurization and fluid
+thermal advection. Retained sensible energy is
+
+$$
+E=(C_s+c_fM_f)T,
+$$
+
+where $C_s$ is the retained solid heat-capacity inventory. Injection uses
+inlet temperature and density; outflow uses the local state. Remapping
+transfers physical water, the numerical buffer, solid mass, $C_s$, sensible
+energy and accepted pending shear energy, with domain and reservoir
+exchanges recorded separately. The constraint is global, not exact local
+inventory matching. Checkpoints preserve these inventories and their time
+levels when the next timestep changes.
+
+Full pressure work and thermoelastic caloric energy are outside this
+sensible-heat model. A closed ledger alone does not qualify a general
+thermal plume or complete earthquake-cycle energy balance.
 
 ## Output
 
@@ -321,12 +401,22 @@ change in stored fluid, the mechanical and thermal source, well extraction,
 net boundary inflow and their residual. The residual measures how well the
 discrete update balances its own fluid volume.
 
+With content model 1, `fluid mass` and `hydraulic split buffer` separate
+physical mass from the numerical reservoir. The six entries of
+`fluid mass balance` are physical stored-mass change, buffer change, extraction,
+boundary inflow, reservoir reset and residual. With heat transport,
+`sensible energy balance` separates retained-energy change, supplied heat,
+well enthalpy, carried boundary heat, thermal reaction and residual. These
+mass and energy diagnostics are distinct from the default five-entry
+`fluid balance`.
+
 ## Parameters
 
 | Parameter | Default | Meaning |
 | --- | --- | --- |
 | `control.has_hydraulic_diffusion` | `no` | Enable pore-pressure transport |
 | `control.has_poroelastic_pressure_feedback` | `yes` | Let deformation drive pore pressure |
+| `control.hydraulic_content_model` | `0` | `0` linear Biot/retention, `1` saturated finite-density inventory |
 | `mat.porosity` | `[0.0]` | Porosity $\phi_0$ |
 | `mat.hydraulic_perm` | `[1e-14]` | Intrinsic permeability $k_0$ (m²) |
 | `mat.permeability_tensor` | `[1,1,1,0,0,0]` | Dimensionless anisotropy tensor |
@@ -345,6 +435,7 @@ discrete update balances its own fluid volume.
 | `mat.porosity_model` | `0` | `0` fixed, `1` evolving with deformation |
 | `mat.permeability_model` | `0` | `0` fixed, `1` Kozeny–Carman, `2` power law |
 | `mat.permeability_exponent` | `[3]` | Power-law exponent $n$ |
+| `mat.pore_healing_time` | `[0]` | Recovery timescale of accepted plastic pore dilation; zero disables recovery |
 | `mat.matrix_storage`, `mat.matrix_exchange` | `[0]`, `[0]` | Immobile reservoir storage (1/Pa) and exchange coefficient (1/(Pa s)) |
 | `control.has_fluid_thermal_advection` | `no` | Heat transport by Darcy flow |
 | `control.has_thermal_pressurization` | `no` | Thermal stress and thermal fluid content |
