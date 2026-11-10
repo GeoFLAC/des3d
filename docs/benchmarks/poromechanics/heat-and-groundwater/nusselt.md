@@ -21,7 +21,7 @@ Above onset the heated porous cell settles into a steady convection roll that ca
 
 ## Problem setup
 
-![Setup](../img/nusselt/setup.png)
+![Setup](../img/convection/setup.png)
 
 **Cell.** The Horton–Rogers–Lapwood square cell of the onset page, $0\le x,z\le H$: impermeable walls, base at $T_0+\Delta T$, top at $T_0$, insulated sides, Boussinesq Darcy flow with heat conduction and advection.
 
