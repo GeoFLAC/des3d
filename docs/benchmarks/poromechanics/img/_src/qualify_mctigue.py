@@ -65,8 +65,6 @@ def build(study, output, record_source, times, space):
     data = output/'data'/KEY; data.mkdir(parents=True, exist_ok=True)
     shutil.copy2(folder/'mctigue.cfg', data/'input.cfg'); shutil.copy2(folder/'start.cfg', data/'start.cfg')
     shutil.copy2(times/'summary.json', data/'summary.json'); shutil.copy2(study/'summary.json', data/'summary-mesh.json')
-    shutil.copy2(study/'runner.py', data/'check_mctigue.py')
-    shutil.copy2((DES_ROOT/'benchmarks/poromechanics/mctigue_reference.py'), data/'mctigue_reference.py')
 
     base = cm.Dynearthsol(str(folder/'start')); model = cm.Dynearthsol(str(folder/'mctigue'))
     rows = [r for r in cm.scan_frames(str(folder/'mctigue')) if r['time'] > 0]

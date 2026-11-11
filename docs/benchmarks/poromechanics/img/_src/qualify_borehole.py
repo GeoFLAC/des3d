@@ -53,8 +53,6 @@ def build(study, output, record_source, steps):
     folder = study/f"h{finest['spacing_m']:g}"
     shutil.copy2(folder/'hole.cfg', data/'input.cfg'); shutil.copy2(folder/'annulus.poly', data/'annulus.poly')
     shutil.copy2(study/'summary.json', data/'summary.json'); shutil.copy2(steps/'summary.json', data/'summary-steps.json')
-    shutil.copy2(study/'runner.py', data/'check_borehole.py')
-    shutil.copy2((DES_ROOT/'benchmarks/poromechanics/borehole_reference.py'), data/'borehole_reference.py')
 
     ref, pw = cb.REF, cb.PW
     model = cb.Dynearthsol(str(folder/'hole')); rows = cb.scan_frames(str(folder/'hole'))

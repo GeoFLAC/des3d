@@ -57,8 +57,6 @@ def build(study, output, record_source):
 
     data = output/'data'/KEY; data.mkdir(parents=True, exist_ok=True)
     shutil.copy2(folder/'theis.cfg', data/'input.cfg'); shutil.copy2(study/'summary.json', data/'summary.json')
-    shutil.copy2(study/'runner.py', data/'check_theis.py')
-    shutil.copy2((DES_ROOT/'benchmarks/poromechanics/theis_reference.py'), data/'theis_reference.py')
     np.savetxt(data/'balance.csv', budget, delimiter=',',
                header='time_s,stored_change_m3,expected_change_m3', comments='')
 

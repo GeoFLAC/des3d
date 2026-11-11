@@ -53,7 +53,6 @@ def build(study, output, record_source, pressure_driven):
     shutil.copy2(folder/'slope.cfg', data/'input.cfg')
     for name in ('seed.cfg', 'slope.poly'): shutil.copy2(folder/name, data/name)
     shutil.copy2(study/'summary.json', data/'summary.json'); shutil.copy2(pressure_driven/'summary.json', data/'summary-pressure-driven.json')
-    shutil.copy2(study/'runner.py', data/'rainfall_slope.py')
 
     driven_cases = {c['spacing_m']: c for c in driven['cases'] if c['frames']}
     hour = 3600.0

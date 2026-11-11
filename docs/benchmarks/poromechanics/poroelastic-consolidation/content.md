@@ -61,9 +61,7 @@ dynearthsol2d input.cfg
 
 ## Output
 
-DES writes `column.info` (one line per saved frame: frame, step, time in seconds), `column.save.NNNNNN` (the fields of each saved frame) and `column.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -71,17 +69,6 @@ Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../runn
 | `strain` | element strain; its volumetric part times the Biot coefficient gives the deformation part of the stored water in panel (b) |
 | `fluid balance` | five numbers per frame for the last step: storage change, mechanical source, wells, boundary exchange and residual; the summed boundary exchange gives the drained water in panel (b) |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('column')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'pore pressure')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" column`.
 
 ## Result: DES and the analytical solution
 
@@ -209,7 +196,3 @@ Separation of variables and mesh-independent quadrature for the stated mixed-bou
 ## Validity and limits
 
 Fixed geometry, saturated flow and constant material properties. This example does not check storage that changes with deformation, large-strain mass, mass conservation through remeshing, or heat. A closed budget does not by itself mean an accurate equilibrium; the two are checked separately.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

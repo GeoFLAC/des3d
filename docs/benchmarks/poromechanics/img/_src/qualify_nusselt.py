@@ -15,7 +15,6 @@ import numpy as np
 
 import prepare_figures as pf
 import diagram_style as ds
-from convection_steady import solve
 sys.path.insert(0, str(pf.ROOT/'tests/functional/hydromechanics'))
 import check_convection_nusselt as cn
 
@@ -36,8 +35,7 @@ def build(study, output, record_source):
     data = output/'data'/KEY; data.mkdir(parents=True, exist_ok=True)
     top = max(ras)
     shutil.copy2(study/f"ra{top:g}-h{finest[top]['spacing_m']:g}"/'box.cfg', data/'input.cfg')
-    shutil.copy2(study/'summary.json', data/'summary.json'); shutil.copy2(study/'runner.py', data/'check_convection_nusselt.py')
-    shutil.copy2((DES_ROOT/'benchmarks/poromechanics/convection_steady.py'), data/'convection_steady.py')
+    shutil.copy2(study/'summary.json', data/'summary.json')
 
     with pf.plt.rc_context(ds.FIGURE_RC):
         fig, axes = ds.result_figure(3)
@@ -49,7 +47,16 @@ def build(study, output, record_source):
         levels = np.linspace(.1, .9, 9)
         tri = pf.matplotlib.tri.Triangulation(coord[:, 0], coord[:, 1] + 1, conn)
         ax.tricontour(tri, theta, levels=levels, colors=ds.HOT, linewidths=1.0)
-        _, _, ref, _ = solve(top, 128)
+        reference_path = study/f'reference-ra{top:g}.npz'
+        if not reference_path.is_file():
+            raise FileNotFoundError(f'{reference_path}: supply the archived reference; plotting does not solve it')
+        record_source(reference_path)
+        if 'reference_sha256' in summary:
+            assert cn.digest(reference_path) == summary['reference_sha256'][f'{top:g}']
+        with np.load(reference_path, allow_pickle=False) as saved:
+            assert float(saved['ra']) == top and int(saved['grid']) == 128
+            ref = saved['temperature'].copy()
+        assert ref.shape == (129, 129)
         g = np.linspace(0, 1, ref.shape[0])
         # The reference cell turns either way; match the DES sense of rotation by the x-mirror if needed.
         if np.corrcoef(theta, ref[np.clip(np.round((coord[:, 1]+1)*128).astype(int), 0, 128),

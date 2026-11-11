@@ -10,7 +10,7 @@ toc_max_heading_level: 2
 
 # Configuration parameters
 
-All parameters accepted by DynEarthSol at source revision `3774df00ba1708a4f70a836d2073f845653aac64`, as printed by
+All parameters accepted by DynEarthSol at source revision `1c7ef34`, as printed by
 `dynearthsol2d -h` and `dynearthsol3d -h`. A parameter is written in its section
 of the input file; see [Configuration file](./configuration.md). Defaults that
 differ between 2D and 3D are shown for both.
@@ -261,12 +261,6 @@ Velocity, traction, thermal and hydraulic boundary conditions, and surface proce
 | `tbc_val_z0` | real | nan | Fixed boundary temperature in K; defaults to surface\_temperature (mantle\_temperature at z0). It is applied at initialization, so a value that differs from the initial temperature is part of the initial state, not a thermal load; to heat a boundary at t &gt; 0, restart with the new value. |
 | `tbc_z1` | integer | 1 | Thermal boundary: 0 insulated, 1 fixed temperature. |
 | `tbc_val_z1` | real | nan | Fixed boundary temperature in K; defaults to surface\_temperature (mantle\_temperature at z0). It is applied at initialization, so a value that differs from the initial temperature is part of the initial state, not a thermal load; to heat a boundary at t &gt; 0, restart with the new value. |
-| `hbc_val_x0` | real | nan | Research-input compatibility: finite value with hbc=1 maps to prescribed pressure (hbc=2). |
-| `hbc_val_x1` | real | nan | Research-input compatibility: finite value with hbc=1 maps to prescribed pressure (hbc=2). |
-| `hbc_val_y0` | real | nan | Research-input compatibility: finite value with hbc=1 maps to prescribed pressure (hbc=2). |
-| `hbc_val_y1` | real | nan | Research-input compatibility: finite value with hbc=1 maps to prescribed pressure (hbc=2). |
-| `hbc_val_z0` | real | nan | Research-input compatibility: finite value with hbc=1 maps to prescribed pressure (hbc=2). |
-| `hbc_val_z1` | real | nan | Research-input compatibility: finite value with hbc=1 maps to prescribed pressure (hbc=2). |
 | `surface_temperature` | real | 273 | Surface temperature (in Kelvin) |
 | `mantle_temperature` | real | 1600 | Mantle temperature (in Kelvin) |
 | `has_winkler_foundation` | yes/no | yes | Using Winkler foundation for the bottom boundary? |

@@ -60,7 +60,6 @@ def build(study, output, record_source, steps):
     shutil.copy2(folder/'slope.cfg', data/'input.cfg')
     for name in ('seed.cfg', 'slope.poly'): shutil.copy2(folder/name, data/name)
     shutil.copy2(study/'summary.json', data/'summary.json'); shutil.copy2(steps/'summary.json', data/'summary-steps.json')
-    shutil.copy2(study/'runner.py', data/'slope_application.py')
 
     estimates = ((sa.U_POINT, 'pointwise yield', ds.MUTED, ':'), (sa.U_DAVIS, 'Davis, non-associated', ds.INK, '--'),
                  (sa.U_STAR, 'infinite slope, FS = 1', ds.HOT, '-.'))

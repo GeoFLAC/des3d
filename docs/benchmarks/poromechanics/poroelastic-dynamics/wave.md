@@ -61,9 +61,7 @@ dynearthsol3d input.cfg
 
 ## Output
 
-DES writes `wave.info` (one line per saved frame: frame, step, time in seconds), `wave.save.NNNNNN` (the fields of each saved frame) and `wave.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -71,17 +69,6 @@ Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../runn
 | `pore pressure` | at the base node, normalized by the pressure amplitude, in (b); maximum error over all nodes in the result |
 | `strain` | volumetric strain, combined with the pressure to check that the local fluid content stays zero |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('wave')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'velocity')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" -g wave`.
 
 ## Result: DES and the analytical solution
 
@@ -91,7 +78,6 @@ View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" -g wave`.
 
 This checks fluid storage and elastic wave coupling together; local fluid content is conserved to round-off. It does not test a GVS earthquake cycle.
 
-Switching from explicit/GVS to physical inertia
 
 To reproduce the whole study behind this figure, from the DES source folder:
 
@@ -139,10 +125,49 @@ $$
 
 Direct eigenmode solution of the stated sealed one-dimensional Biot wave problem; evaluated in undrained_wave.py.
 
+## Switching from explicit/GVS to physical inertia
+
+A separate restart control switches a nonzero coupled state after 32
+accepted steps. The unit column has a fixed base, side-normal rollers,
+sealed water boundaries and a constant −1 kPa top traction. Internal Darcy
+flow remains active. Ordinary explicit and both GVS ceilings are checked
+at scalings $10^4$, $10^5$ and $10^6$, in 2D/3D native and HDF5 output.
+Both phases use strain-driven pressure ordering; this does not convert a
+nonzero PT pending-pressure history.
+
+The physical phase sets `is_quasi_static=false`,
+`use_global_velocity_scaling=false` and the neutral
+`mass_scaling_reference_speed=shear`. The independent mixture density
+is 2237.5 kg/m³. Minimum-simplex-altitude and undrained-wave calculations
+predict first physical intervals of 42.8985 µs (2D) and 35.0265 µs (3D).
+Every free velocity component checks the mass actually used:
+
+$$
+v_{i,n+1}-v_{i,n}=\frac{\Delta t}{\rho_bV_i}F_{i,n+1}.
+$$
+
+Across the recorded 36 cases, the largest relative identity error is
+$4.23\times10^{-16}$. Stress, strain, pressure and velocity are preserved
+at the switch; the reselected mass and timestep change deliberately.
+The closed Biot-content residual is at most $2.27\times10^{-16}$ of its
+stored/deformation scale. A further physical restart preserves the
+continuation fields exactly.
+
+At unchanged velocity, physical kinetic energy is continuous. Report the
+change in artificial kinetic energy separately:
+
+$$
+\Delta K_{\rm num}=\frac12\sum_i
+(m_{i,\rm physical}-m_{i,\rm artificial})|v_i|^2.
+$$
+
+The switch neither rescales velocity nor deposits that numerical energy
+change as heat. Full mechanical/thermal work, event-trigger hysteresis,
+RSF coseismic paths and complete earthquake-cycle transitions are outside
+this control. Reproduce it from the DES checkout with
+`python3 tests/functional/check_inertia_switch.py ./dynearthsol2d OUT`;
+repeat with the 3D executable and a separate output folder.
+
 ## Validity and limits
 
-Linear small-strain, homogeneous, completely sealed, zero-permeability elasticity. The input file sets inertial_scaling, but with is_quasi_static = false DES uses the physical (unscaled) mass, so the value has no effect. This wave is a dynamic coupling check and does not establish earthquake-cycle or GVS equilibrium accuracy.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).
+The standing-wave comparison uses linear small-strain, homogeneous, completely sealed, zero-permeability elasticity. The input file sets inertial_scaling, but with is_quasi_static = false DES uses the physical (unscaled) mass, so the value has no effect. This wave is a dynamic coupling check and does not establish earthquake-cycle or GVS equilibrium accuracy.

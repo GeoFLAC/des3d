@@ -61,25 +61,12 @@ dynearthsol3d input.cfg
 
 ## Output
 
-DES writes `cryer.info` (one line per saved frame: frame, step, time in seconds), `cryer.save.NNNNNN` (the fields of each saved frame) and `cryer.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
 | `pore pressure` | nodal pressure; the node nearest the centre gives panel (a), all nodes binned by radius give the profiles in panel (b), and the largest nodal error gives panel (c) |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('cryer')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'pore pressure')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" cryer`.
 
 ## Result: DES and the analytical solution
 
@@ -146,7 +133,3 @@ Cryer (1963); Detournay and Cheng (1993). Derived and evaluated in cryer_referen
 ## Validity and limits
 
 Small strain, linear isotropic poroelasticity with constant properties; the curved surface is a faceted approximation of the sphere. DES couples pressure and mechanics sequentially, so the earliest frames carry the one-step lag of that split. No gravity.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

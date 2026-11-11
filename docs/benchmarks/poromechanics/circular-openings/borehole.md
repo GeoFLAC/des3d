@@ -63,26 +63,13 @@ dynearthsol2d input.cfg
 
 ## Output
 
-DES writes `hole.info` (one line per saved frame: frame, step, time in seconds), `hole.save.NNNNNN` (the fields of each saved frame) and `hole.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
 | `pore pressure` | nodal pressure, binned by radius and compared with the reference in panel (a) |
 | `stress` | element total stress, rotated to radial and hoop components in panel (b) |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('hole')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'pore pressure')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" hole`.
 
 ## Result: DES and the analytical solution
 
@@ -143,7 +130,3 @@ Detournay and Cheng (1988), International Journal of Rock Mechanics and Mining S
 ## Validity and limits
 
 Axisymmetric loading only (no deviatoric in-situ stress), linear poroelasticity, small strain. The finite annulus is part of the reference; the infinite-medium Detournay–Cheng solution is its $R\to\infty$ limit.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

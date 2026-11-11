@@ -46,7 +46,7 @@ def render(output, key, plot):
     folder = output/'figures'/key
     folder.mkdir(parents=True, exist_ok=True)
     plot(folder)
-    for ext in ('svg', 'png', 'pdf'):
+    for ext in ('png',):
         (folder/f'result.{ext}').rename(folder.parent/f'{key}.{ext}')
     folder.rmdir()
 

@@ -149,8 +149,6 @@ def des(ax, x, y, color=HOT, label='DES', size=3.5, **kw):
 def panel(ax, letter, title, **labels):
     """Title '(a) ...' when a figure has several panels; plain title otherwise."""
     ax.set(title=f'({letter}) {title}' if letter else title, **labels)
-    if ax.get_legend_handles_labels()[0]:
-        ax.legend()
 
 
 def band(ax, a, b, text='compared band', x=None, y=.97, rotation=0, ha='left', va='top'):

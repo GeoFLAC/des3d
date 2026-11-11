@@ -63,9 +63,7 @@ dynearthsol2d input.cfg
 
 ## Output
 
-DES writes `mctigue.info` (one line per saved frame: frame, step, time in seconds), `mctigue.save.NNNNNN` (the fields of each saved frame) and `mctigue.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -73,17 +71,6 @@ Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../runn
 | `temperature` | nodal temperature along the column, panel (b); also integrated for the heat ledger |
 | `strain` | element vertical strain by layer; integrated over depth it gives the surface heave |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('mctigue')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'pore pressure')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" -g mctigue`.
 
 ## Result: DES and the analytical solution
 
@@ -157,7 +144,3 @@ McTigue (1986), Thermoelastic response of fluid-saturated porous rock, J. Geophy
 ## Validity and limits
 
 Linear thermo-poroelasticity with constant properties, small strain and conduction only (no Darcy heat advection, no temperature-dependent fluid properties). A finite column stands for the half-space while both diffusion lengths stay well inside it. DES couples pressure and mechanics sequentially, so the earliest frames carry the one-step lag.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

@@ -47,8 +47,6 @@ def build(study, output, record_source, show_failure=False):
         with (data/path.name).open('w') as stream: cfg.write(stream)
     for name in ('annulus.poly', 'load-path.json'): shutil.copy2(folder/name, data/name)
     shutil.copy2(study/'qualification.json', data/'qualification.json')
-    for path in (Path(cs.__file__), Path(cs.ck.__file__), (DES_ROOT/'benchmarks/poromechanics/salencon_reference.py')):
-        shutil.copy2(path, data/path.name)
     shutil.copy2(folder/'salencon.cfg', data/'input.cfg')   # the recorded original; the review build makes its paths local
     model = cs.ck.Dynearthsol(str(folder/'salencon'))
     x = model.read_field(model.frames[0], 'coordinate'); conn = model.read_field(model.frames[0], 'connectivity')
@@ -116,7 +114,7 @@ if __name__ == '__main__':
     result = build(args.study.resolve(), args.output.resolve(), lambda p:None, args.show_failure)
     target = args.output/'fig/salencon'; target.mkdir(parents=True, exist_ok=True)
     schematic('salencon', target)
-    for extension in ('png', 'svg', 'pdf'):
+    for extension in ('png',):
         (args.output/'figures'/f'salencon.{extension}').replace(target/f'result.{extension}')
     if not any((args.output/'figures').iterdir()): (args.output/'figures').rmdir()
     print(json.dumps({k:v for k,v in result.items() if k != 'evidence'}, indent=2))

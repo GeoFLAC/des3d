@@ -61,9 +61,7 @@ dynearthsol3d input.cfg
 
 ## Output
 
-DES writes `basin.info` (one line per saved frame: frame, step, time in seconds), `basin.save.NNNNNN` (the fields of each saved frame) and `basin.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../../benchmarks/poromechanics/running.md) before using the Python reader or converter.
+See [Running the examples](../../benchmarks/poromechanics/running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -71,17 +69,6 @@ Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../../b
 | `strain` | the zz component times the 50 m thickness is the subsidence (positive down); panels (a), (b) and the subsidence errors |
 | `coordinate` | node positions, used for the distance of nodes and element centres from the well field |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('basin')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'pore pressure')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" basin`.
 
 ## Result: DES and the analytical solution
 
@@ -154,7 +141,3 @@ Bear and Corapcioglu (1981a, b), generalised to Biot coefficients and a finite b
 ## Validity and limits
 
 Linear elastic, thin-slab averaged model: horizontal displacement uniform through the thickness, up to $O((B/r)^2)$. No gravity, no overlying aquitard and no inelastic compaction of clays, which dominate most real subsidence. The square basin is approximated by a circle of equal area in the reference.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../../benchmarks/poromechanics/running.md).

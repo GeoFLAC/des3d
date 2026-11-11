@@ -61,26 +61,13 @@ dynearthsol3d input.cfg
 
 ## Output
 
-DES writes `column.info` (one line per saved frame: frame, step, time in seconds), `column.save.NNNNNN` (the fields of each saved frame) and `column.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
 | `temperature` | nodal temperature, normalized as (T − T_0)/(T_in − T_0) and plotted along the column |
 | `pore pressure` | checked to stay on the steady linear profile at every saved time |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('column')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'temperature')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" column`.
 
 ## Result: DES and the analytical solution
 
@@ -145,7 +132,3 @@ Ogata and Banks (1961), USGS Professional Paper 411-A; the transport solution is
 ## Validity and limits
 
 The analytical solution is semi-infinite: $\theta(0,t)=1$, $\theta(x,0)=0$ for $x>0$ and $\theta(\infty,t)=0$. The numerical domain ends at $x=1$ m with zero conductive flux, so the comparison uses early times before the front reaches that boundary. Constant-capacity, divergence-free flow is tested; general evolving-storage enthalpy conservation is not established. The intentionally tiny fluid modulus makes the hydraulic storage large without changing the steady flux.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

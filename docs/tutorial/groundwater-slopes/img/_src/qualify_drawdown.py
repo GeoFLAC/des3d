@@ -65,8 +65,7 @@ def build(study, output, record_source):
     data = output/'data'/KEY; data.mkdir(parents=True, exist_ok=True)
     shutil.copy2(folder/'slope.poly', data/'slope.poly')
     shutil.copy2(folder/'drawdown.cfg', data/'input.cfg')
-    shutil.copy2(study/'summary.json', data/'summary.json'); shutil.copy2(study/'runner.py', data/'drawdown_slope.py')
-    shutil.copy2(Path(br.__file__), data/'bishop_reference.py')
+    shutil.copy2(study/'summary.json', data/'summary.json')
 
     x = model.read_field(first['frame'], 'coordinate'); conn = model.read_field(first['frame'], 'connectivity')
     tri = pf.matplotlib.tri.Triangulation(x[:, 0], x[:, 1], conn)
@@ -116,7 +115,7 @@ def build(study, output, record_source):
         ds.panel(ax, 'c', f"Mechanism at F = {high:g}, {first['time']:.0f} s" if high else 'Mechanism', xlabel='$x$ (m)',
                  ylabel='$z$ (m)')
         if show: ax.legend(fontsize=10, loc='lower left')
-        pf.save_figure(fig, output/'figures', KEY)
+        pf.save_figure(fig, output/'figures', KEY, formats=('png', 'pdf'))
 
     mids = [(lo + hi)/2 if lo is not None and hi is not None else None for lo, hi in brackets]
     dry = json.loads((output/'data/embankment/summary.json').read_text())['fs_bishop']

@@ -52,8 +52,7 @@ def build(study, output, record_source, space, times=()):
     data = output/'data'/KEY; data.mkdir(parents=True, exist_ok=True)
     for name in ('cryer.cfg', 'octant.poly'):
         shutil.copy2(folder/name, data/('input.cfg' if name.endswith('cfg') else name))
-    shutil.copy2(study/'summary.json', data/'summary.json'); shutil.copy2(study/'runner.py', data/'check_cryer.py')
-    shutil.copy2((DES_ROOT/'benchmarks/poromechanics/cryer_reference.py'), data/'cryer_reference.py')
+    shutil.copy2(study/'summary.json', data/'summary.json')
 
     model = cc.Dynearthsol(str(folder/'cryer')); rows = cc.scan_frames(str(folder/'cryer'))
     coord = model.read_field(0, 'coordinate'); r = np.linalg.norm(coord, axis=1)

@@ -61,9 +61,7 @@ dynearthsol2d input.cfg
 
 ## Output
 
-DES writes `column.info` (one line per saved frame: frame, step, time in seconds), `column.save.NNNNNN` (the fields of each saved frame) and `column.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -72,17 +70,6 @@ Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../runn
 | `plastic strain` | shows that the column has yielded before the balance is checked |
 | `fluid balance` | per-step water ledger; its boundary entry stays zero in this sealed column |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('column')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'pore pressure')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" column`.
 
 ## Result: DES and the analytical solution
 
@@ -174,7 +161,3 @@ Integral Biot conservation with prescribed boundary motion; independent scalar p
 ## Validity and limits
 
 Fixed porosity and geometry. The pending PT term is a numerical coupling lag, not physical water. Porosity change from plastic strain (including enhancement and healing), remeshing, the energy balance of open systems and shear heating are not covered.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

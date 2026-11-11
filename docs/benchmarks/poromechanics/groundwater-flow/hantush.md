@@ -61,26 +61,13 @@ dynearthsol3d input.cfg
 
 ## Output
 
-DES writes `hantush.info` (one line per saved frame: frame, step, time in seconds), `hantush.save.NNNNNN` (the fields of each saved frame) and `hantush.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
 | `pore pressure` | drawdown s_p = p(frame 0) − p at the aquifer nodes 10–30 m from the well, compared with Hantush–Jacob |
 | `coordinate` | gives the radius from the well and selects the nodes on the aquifer base |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('hantush')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'pore pressure')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" hantush`.
 
 ## Result: DES and the analytical solution
 
@@ -144,7 +131,3 @@ Hantush and Jacob (1955), Non-steady radial flow in an infinite leaky aquifer, T
 ## Validity and limits
 
 Hantush and Jacob neglect aquitard storage, horizontal aquitard flow and vertical resistance in the aquifer. Their dimensionless measures here are $S^\prime_B b^\prime/S_p\le0.12\%$, $(b^\prime/\lambda)^2/10\le0.28\%$ and $B^2/(20\lambda^2)=0.14\%$, the first two falling with $h$. $S^\prime_B$ is aquitard storage per volume and $S_p=BS_B$ aquifer storage per area. Line well, no wellbore storage; the axis $r<10$ m is excluded.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

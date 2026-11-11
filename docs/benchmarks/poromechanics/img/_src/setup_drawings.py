@@ -1212,7 +1212,7 @@ def elder(folder):
         ds.gravity(ax, 6.15, 3.2, length=.4)
         ds.axes(ax, (5.55, .33), length=.4, names=('x', 'z'))
         ds.check_labels(fig, ax)
-        pf.save_figure(fig, folder, 'setup')
+        pf.save_figure(fig, folder, 'setup', formats=('png', 'svg', 'pdf'))
 
 
 DRAW['convection_3d'] = convection_cube
@@ -1243,4 +1243,4 @@ if __name__ == '__main__':
         folder = a.review/'fig'/key.replace('_', '-')
         folder.mkdir(parents=True, exist_ok=True)
         DRAW[key](folder)
-        print('drew', key, '->', folder/'setup.svg')
+        print('drew', key, '->', folder/'setup.png')

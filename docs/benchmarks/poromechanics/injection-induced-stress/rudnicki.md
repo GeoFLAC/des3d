@@ -61,26 +61,13 @@ dynearthsol3d input.cfg
 
 ## Output
 
-DES writes `rudnicki.info` (one line per saved frame: frame, step, time in seconds), `rudnicki.save.NNNNNN` (the fields of each saved frame) and `rudnicki.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
 | `pore pressure` | nodal pressure against distance from the source, averaged in radial bins, in (a); RMS error over 2.5 ≤ r ≤ 8 m in (c) |
 | `strain` | element strain tensor, rotated to radial and hoop components about the source, in (b); RMS errors in (c) |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('rudnicki')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'pore pressure')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" rudnicki`.
 
 ## Result: DES and the analytical solution
 
@@ -142,7 +129,3 @@ Rudnicki (1986), Fluid mass sources and point forces in linear elastic diffusive
 ## Validity and limits
 
 Linear isotropic poroelasticity with constant properties and small strain; an unbounded solid approximated by a 60 m box, whose fixed far faces perturb the strain by about $(r/L)^3$, with $L=60$ m (under 0.3% at $r=8$ m). The singular region $r<2.5$ m is excluded. No fault or friction is modelled: the stresses are those a fault would feel.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

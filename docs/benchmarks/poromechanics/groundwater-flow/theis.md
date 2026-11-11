@@ -61,9 +61,7 @@ dynearthsol3d input.cfg
 
 ## Output
 
-DES writes `theis.info` (one line per saved frame: frame, step, time in seconds), `theis.save.NNNNNN` (the fields of each saved frame) and `theis.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -71,17 +69,6 @@ Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../runn
 | `coordinate` | gives the radius r = √(x²+y²) of each node from the well axis |
 | `connectivity` | with the coordinates, gives element volumes for the closed-box water budget against the pumped volume |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('theis')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'pore pressure')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" theis`.
 
 ## Result: DES and the analytical solution
 
@@ -148,7 +135,3 @@ Theis (1935), evaluated with the exponential integral in theis_reference.py; the
 ## Validity and limits
 
 Confined, homogeneous, isotropic aquifer with constant properties; a line well without wellbore storage; the singular axis $r<10$ m is excluded. Pressure only: the stiff skeleton removes poroelastic coupling, which the averaged-aquifer page addresses.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

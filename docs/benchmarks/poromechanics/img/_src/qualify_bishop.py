@@ -43,8 +43,6 @@ def build(study, output, record_source, space):
     law = laws[0]
     shutil.copy2(study/f"{law}-h{finest[law]['spacing_m']:g}"/'bishop.cfg', data/'input.cfg')
     shutil.copy2(study/'summary.json', data/'summary.json'); shutil.copy2(space/'summary.json', data/'summary-3d.json')
-    shutil.copy2(study/'runner.py', data/'check_bishop_column.py')
-    shutil.copy2((DES_ROOT/'benchmarks/poromechanics/unsaturated_reference.py'), data/'unsaturated_reference.py')
 
     with pf.plt.rc_context(ds.FIGURE_RC):
         fig, axes = ds.result_figure(3)

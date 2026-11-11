@@ -34,7 +34,7 @@ def figure(aq, rows, output):
     axes[1].legend()
     fig.suptitle('Thin 3D DES slab vs the averaged-aquifer reference', x=0.06, ha='left',
                  fontsize=11, fontweight='semibold', y=1.02)
-    for suffix in ('png', 'svg', 'pdf'):
+    for suffix in ('png',):
         fig.savefig(output / f'pumping_slab.{suffix}', dpi=180, bbox_inches='tight')
     plt.close(fig)
 

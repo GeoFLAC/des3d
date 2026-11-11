@@ -18,45 +18,45 @@ from theis_reference import drawdown, scheduled_drawdown
 
 COLORS = ['#0072B2', '#D55E00', '#009E73', '#CC79A7']
 
-def save_figure(fig, output, name):
-    # Keep keys below all panels and colour bars at the same height.
-    keys = []
+def save_figure(fig, output, name, formats=('png',)):
+    # Labels and explicit keys belong to the caller; fill only missing keys.
     for ax in fig.axes:
         ax.set_title('\n'.join(textwrap.wrap(html.unescape(ax.get_title()), 38)), pad=10)
-        legend = ax.get_legend()
-        if legend is not None:
-            keys.append((ax, legend.legend_handles, [t.get_text() for t in legend.texts]))
-            legend.remove()
+        handles, labels = ax.get_legend_handles_labels()
+        if handles and ax.get_legend() is None:
+            ax.legend(handles, labels)
     # Keep dense fields compact in SVG/PDF while preserving vector labels.
     for ax in fig.axes:
         for artist in ax.collections:
             values = artist.get_array()
             if values is not None and values.size > 1000:
                 artist.set_rasterized(True)
+    keys = [ax.get_legend() for ax in fig.axes if ax.get_legend() is not None]
+    for legend in keys:
+        legend.set_in_layout(False)
+        for label in legend.texts:
+            if '$' not in label.get_text():
+                label.set_text('\n'.join(textwrap.wrap(label.get_text(), 32,
+                                                       break_long_words=False, break_on_hyphens=False)))
+    # Reposition each existing key once, below the labels. Stack keys in
+    # multi-row figures rather than creating a second figure legend.
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
     bottom = min(ax.get_tightbbox(renderer).y0 for ax in fig.axes)/fig.bbox.height-.04
-    outside = []
-    columns = {}
-    for ax, handles, labels in keys:
-        centre = ax.get_position().x0+ax.get_position().width/2
+    next_bottom = {}
+    for ax in fig.axes:
+        legend = ax.get_legend()
+        if legend is None:
+            continue
+        centre = ax.get_position().x0 + ax.get_position().width/2
         column = round(centre, 1)
-        if column not in columns:
-            columns[column] = (centre, [], [])
-        _, merged_handles, merged_labels = columns[column]
-        for handle, label in zip(handles, labels):
-            if label not in merged_labels:
-                merged_handles.append(handle); merged_labels.append(label)
-    for centre, handles, labels in columns.values():
-        labels = ['\n'.join(textwrap.wrap(t, 32, break_long_words=False, break_on_hyphens=False))
-                  if '$' not in t else t for t in labels]
-        legend = fig.legend(handles, labels, loc='upper center', fontsize=11,
-                            bbox_to_anchor=(centre, bottom),
-                            bbox_transform=fig.transFigure, frameon=False, ncol=1)
-        outside.append(legend)
-    for suffix in ('png', 'svg', 'pdf'):
-        fig.savefig(output / f'{name}.{suffix}', dpi=180, bbox_inches='tight',
-                    bbox_extra_artists=outside or None)
+        anchor = next_bottom.get(column, bottom)
+        legend.set_loc('upper center')
+        legend.set_bbox_to_anchor((centre, anchor), transform=fig.transFigure)
+        fig.canvas.draw()
+        next_bottom[column] = legend.get_window_extent(renderer).y0/fig.bbox.height-.02
+    for suffix in formats:
+        fig.savefig(output / f'{name}.{suffix}', dpi=180, bbox_inches='tight', bbox_extra_artists=keys)
     plt.close(fig)
 
 

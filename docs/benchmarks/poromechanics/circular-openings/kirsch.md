@@ -61,26 +61,13 @@ dynearthsol2d input.cfg
 
 ## Output
 
-DES writes `kirsch.info` (one line per saved frame: frame, step, time in seconds), `kirsch.save.NNNNNN` (the fields of each saved frame) and `kirsch.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
 | `stress` | element stress, rotated to radial and hoop components and compared over 1.1a ≤ r ≤ 5a in panel (a) |
 | `strain` | element strain, rotated to radial and hoop components in panel (b) |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('kirsch')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'stress')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" kirsch`.
 
 ## Result: DES and the analytical solution
 
@@ -162,7 +149,3 @@ Finite-annulus solution derived from radial equilibrium; evaluated and checked i
 ## Validity and limits
 
 Isotropic, small-strain, dry elasticity. The finite outer wall changes the opening hoop stress by 0.251% relative to infinite-domain Kirsch. Anisotropic loading, plasticity, excavation history and poroelastic injection remain separate tests.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

@@ -58,6 +58,27 @@ See [Poromechanics](../theory/poromechanics.md#coupling-in-time) for capacity
 selection and [PT](../theory/solution-scheme/pt.md) for trial/commit ownership.
 Transport substeps do not repeat plastic, porosity or RSF histories.
 
+## Increment and energy ownership
+
+`dppressure` stores $p_{\rm old}-p_{\rm new}$, integrated over the physical
+interval. Each element applies its own Biot coefficient and retention law.
+Its Bishop increment uses $S_e(p_{\rm old})p_{\rm old}-S_e(p_{\rm new})p_{\rm new}$;
+saturated elements retain the saturated arithmetic. Hydraulic scratch
+increments and the next rheology call can belong to different time levels,
+so sharing an element calculation does not permit reusing a scratch value
+without checking its ownership. Checkpoints record whether the pressure
+increment was consumed; a pressure correction must not repeat the plastic
+return or consume that increment twice.
+
+PT trials restore the same constitutive baseline until acceptance. Only the
+accepted caller transfers nonelastic work to pending heat. This reservoir
+is extensive energy: changing the next timestep changes its conversion to
+a rate, rather than the stored energy. Checkpoints and remapping retain it
+separately from temperature. Physical water supplies fluid heat capacity;
+the numerical fixed-stress buffer supplies neither density nor sensible
+heat. See [thermal evolution](../theory/thermalevolution.md) and
+[poromechanics](../theory/poromechanics.md) for the declared energy models.
+
 ## Conventions
 
 The development notes in the repository's

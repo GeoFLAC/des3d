@@ -47,7 +47,6 @@ def build(study, output, record_source, times, final):
     shutil.copy2(folder/'basin.cfg', data/'input.cfg'); shutil.copy2(study/'summary.json', data/'summary.json')
     shutil.copy2(final/'summary.json', data/'summary-final.json'); shutil.copy2(times/'summary.json', data/'summary-steps.json')
     if (final/'NOTE.txt').exists(): shutil.copy2(final/'NOTE.txt', data/'NOTE-final.txt'); record_source(final/'NOTE.txt')
-    shutil.copy2(study/'runner.py', data/'regional_subsidence.py')
 
     model = rs.Dynearthsol(str(folder/'basin')); rows = rs.scan_frames(str(folder/'basin'))
     coord = model.read_field(0, 'coordinate'); conn = model.read_field(0, 'connectivity')

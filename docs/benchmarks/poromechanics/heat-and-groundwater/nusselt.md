@@ -60,26 +60,13 @@ dynearthsol2d input.cfg
 
 ## Output
 
-DES writes `box.info` (one line per saved frame: frame, step, time in seconds), `box.save.NNNNNN` (the fields of each saved frame) and `box.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
 | `temperature` | nodal temperature; isotherms in panel (a) and the heat transport in the Nusselt number |
 | `pore pressure` | with the temperature, rebuilds the Darcy flux used in the volume form of Nu |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('box')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'temperature')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" box`.
 
 ## Result: DES and the reference
 
@@ -135,7 +122,3 @@ Horton and Rogers (1945); Lapwood (1948); steady values as in Caltagirone (1975)
 ## Validity and limits
 
 Steady state only: the transient depends on storage, which is chosen for speed. Single-roll solution, as seeded; Boussinesq, constant properties, no mechanical coupling.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

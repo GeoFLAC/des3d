@@ -67,9 +67,7 @@ dynearthsol2d salencon.cfg
 
 ## Output
 
-DES writes `salencon.info` (one line per saved frame: frame, step, time in seconds), `salencon.save.NNNNNN` (the fields of each saved frame) and `salencon.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -79,17 +77,6 @@ Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../runn
 | `strain` | total strain from the initially compressed state, compared as radial and hoop strain |
 | `plastic strain` | marks the yielded ring; its outer edge is the plastic radius |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('salencon')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'stress')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" -g salencon`.
 
 ## Result: DES and the analytical solution
 
@@ -154,10 +141,65 @@ Salençon (1969), Contraction quasi-statique d’une cavité à symétrie sphér
 
 [Original reference](https://docs.itascacg.com/itasca940/3dec/docproject/source/examples/CylindricalHoleInAnIMCM.html).
 
+### Component check: return to a shear edge
+
+The tunnel comparison also needs a correct material-point return. This
+check uses tension-positive stress, unlike the compression-positive tunnel
+reference above. In the order $(xx,zz,yy)$, define
+
+$$
+\mathbf C=\lambda\mathbf1\mathbf1^T+2G\mathbf I,
+\qquad \mathbf A=\begin{pmatrix}N&0&-1\\0&N&-1\end{pmatrix}.
+$$
+
+The rows of $\mathbf B$ replace the friction factor $N$ by the dilation
+factor $M$. If the trial reaches both adjacent shear faces, the independent
+reference solves the two active constraints together:
+
+$$
+(\mathbf A\mathbf C\mathbf B^T)\boldsymbol\eta
+ =\mathbf A\boldsymbol\sigma^{\rm tr}-q\mathbf1,
+$$
+
+$$
+\boldsymbol\sigma=\boldsymbol\sigma^{\rm tr}
+ -\mathbf C\mathbf B^T\boldsymbol\eta.
+$$
+
+The multipliers must be nonnegative and the returned principals ordered.
+The tensile cap must also hold. DES keeps the existing single-face return
+when its principals remain ordered; otherwise its shared shear routine
+checks both adjacent edges and restores the repeated eigenvalue.
+
+For the same rock, an associated trial with sorted principals
+$(169,185,200)$ kPa exceeds the tensile cap $T=173.205$ kPa, yet its
+admissible shear return is $(165.347657,170.585939,170.585939)$ kPa.
+Both shear multipliers are positive and the tensile constraint is inactive.
+Therefore the trial maximum alone cannot select tensile clipping. Both
+2D plane strain and 3D test the uncut shear return before accepting a
+tensile/composite branch. Rotated material-point tests and 1/16/64-increment
+paths check the stress and plastic history independently of stress smoothing.
+These controls qualify constant strength; they do not establish general
+apex, mixed tensile/shear or evolving-strength accuracy.
+
+### Why small force residuals do not establish convergence
+
+With no mixed-stress smoothing, the coarse tunnel develops alternating
+pressure between elements with an edge and a vertex on the wall. The
+out-of-plane stress remains the intermediate principal until the apex,
+so the shear-edge correction does not explain this spatial mode.
+Mixed stress suppresses the alternating pressure, but projects stress
+after the plastic return. The projected state can leave local yield and
+return again at the next step. This is a plausible explanation of the
+load-hold drift, rather than a demonstrated defect in the local return.
+
+At fixed mesh, the 16/32/64-stage sequences do not demonstrate convergence
+in the load increment. At the matching 32 stages, refining 0.05 to 0.025 m
+reduces hoop error from 3.09% to 1.24% and displacement error from 0.372%
+to 0.113%, while radial-strain error remains 4.44% of $P/G$.
+The selected 16-stage result must be read with this limit. No correction
+of both spatial effects has been qualified.
+
 ## Validity and limits
 
 Dry, isotropic loading, small strain, perfectly plastic. The radial strain misses a 3% target (3.88% of $P/G$ on the finest mesh), almost all of it within half a radius of the wall. With mixed stress (needed here) the stored stress readjusts slightly at every step, so the result depends on the number of unloading steps: on the 0.05 m mesh, 16, 32 and 64 steps give hoop errors of 1.57%, 3.09% and 6.71%. Use the 16 steps shipped here, and do not hold the final load for many extra steps. Without mixed stress the coarse mesh diverges near the wall. Zero dilation is not covered.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

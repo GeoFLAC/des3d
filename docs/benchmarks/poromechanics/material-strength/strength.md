@@ -61,26 +61,13 @@ dynearthsol3d input.cfg
 
 ## Output
 
-DES writes `cell.info` (one line per saved frame: frame, step, time in seconds), `cell.save.NNNNNN` (the fields of each saved frame) and `cell.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
 | `strain` | element strain; its xx component, averaged over the cell, is the imposed normal strain e on the horizontal axis |
 | `stress` | element total stress; half of (σxx − σzz), averaged over the cell, is the principal shear load t on the vertical axis |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('cell')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'strain')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" cell`.
 
 ## Result: DES and the analytical solution
 
@@ -150,7 +137,3 @@ Closed-form Mohr-Coulomb response derived for the stated imposed path; stress an
 ## Validity and limits
 
 A uniform-strain, fixed-pressure, zero-dilation material check on the compressive shear branch. Evolving rate-and-state friction is checked on the rate-and-state page. Tensile failure, mixed-material suction, flow, dilation and slope or injection applications are not tested here.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

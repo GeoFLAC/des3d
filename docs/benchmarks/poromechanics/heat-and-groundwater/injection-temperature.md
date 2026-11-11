@@ -65,25 +65,12 @@ mkdir -p doublet && cp input-doublet.cfg doublet/ && (cd doublet && dynearthsol2
 
 ## Output
 
-DES writes `hot.info` (one line per saved frame: frame, step, time in seconds), `hot.save.NNNNNN` (the fields of each saved frame) and `hot.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
 | `temperature` | nodal temperature: along the symmetry edge against the Avdonin solution in panel (a), and summed with the heat capacity into the stored heat in panel (b) |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('hot')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'temperature')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" hot`.
 
 ## Result: DES and the analytical solution
 
@@ -137,7 +124,3 @@ Avdonin’s radial thermal-injection problem (1964). The similarity solution is 
 ## Validity and limits
 
 Fixed heat capacity: heat carried by fluid that goes into storage is not tracked, so a sealed cell storing all its injection is outside the scope. No pressure work, dissipation or thermal expansion. Thermal advection uses the Darcy flux at the start of each step, which loses part of the first step of heat when a source starts from rest and that step needs several thermal substeps.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).
