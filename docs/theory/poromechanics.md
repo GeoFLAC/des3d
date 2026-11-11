@@ -152,6 +152,35 @@ Removing feedback therefore does not mean keeping the same diffusivity as
 every coupled explicit case. It does not disable the pressure's effect on
 skeleton strength.
 
+### Pressure sampled by a plastic return
+
+The fixed-stress mechanical return samples $p_n$, while a completed saved
+frame pairs its stress with $p_{n+1}$. For a saturated Mohr–Coulomb material,
+let $N=(1+\sin\phi)/(1-\sin\phi)$ and $q_c=2c\sqrt N$. The admissible
+slack at the sampled pressure and the saved-frame diagnostic obey
+
+$$
+f_n=\sigma_{\min}+\alpha p_n-N(\sigma_{\max}+\alpha p_n)+q_c,
+$$
+
+$$
+f_{\rm saved}=f_n-(N-1)\alpha(p_{n+1}-p_n).
+$$
+
+A negative saved-frame slack during a pressure rise can therefore measure
+coupling lag. In the recorded pressure-driven slope, doubling 404 to 808
+steps reduces the minimum in-plane saved-pressure slack from −205.617 to
+−102.843 Pa; using the sampled pressure gives −0.000744 and −0.000226 Pa.
+This timing check does not replace the three-principal material return
+checks. Hydraulic subcycling does not remove the mechanical lag.
+
+After plastic yielding, the pressure source uses accepted total volumetric
+strain, rather than converting stress through elastic moduli. The
+[sealed plastic cell](../benchmarks/poromechanics/material-strength/plastic-content.md)
+checks the matching fixed-stress recurrence. With retention, the
+[Bishop cell](../benchmarks/poromechanics/unsaturated-flow/bishop-cell.md)
+checks its own rate equation and matching stabilization.
+
 ### Hydraulic substeps
 
 Pressure diffusion often needs smaller steps than mechanics. Within each
@@ -279,6 +308,55 @@ would leave $0<\phi\le\alpha$ stops the run with a diagnostic.
 
 ([Costa, 2006](https://doi.org/10.1029/2005GL025134);
 [Yang et al., 2021](https://doi.org/10.1029/2021JB021787)).
+
+### Recovery of accepted plastic opening
+
+Recovery uses signed plastic volume, including the out-of-plane stress in
+plane strain. Reversible pressure and thermal increments are excluded from
+the elastic stress change:
+
+$$
+\Delta\varepsilon_v^p=\Delta\varepsilon_v
+-\frac{\operatorname{tr}_3\Delta\boldsymbol\sigma_{\rm elastic}}{3K}.
+$$
+
+For remaining recoverable opening $\eta\ge0$, each accepted interval uses
+
+$$
+\Delta h=\eta_n(1-e^{-\Delta t/\tau}),\qquad
+\eta_{n+1}=\max(0,\eta_n-\Delta h+\Delta\varepsilon_v^p).
+$$
+
+Closure precedes the new plastic increment; compaction reduces opening and
+is not itself healed. Elastic dilation does not enter $\eta$. With
+`mat.pore_healing_time` $=\tau_0>0$,
+
+$$
+\tau(T)=\tau_0(T/T_0)
+\exp\!\left[\frac{E_a}{R}(T^{-1}-T_0^{-1})\right],
+$$
+
+where `mat.pore_healing_temperature` is $T_0$ in K,
+`mat.pore_healing_energy` is $E_a$ in J/mol and $R=8.3144$ J/(mol K).
+Mixed elements average recovery rates by marker count. Frozen pressure,
+strain and temperature give expelled pore volume
+$\delta\phi_c=(\alpha-\phi_n)(e^{\Delta h}-1)$; its negative increment
+enters the hydraulic source. Changing permeability alone would omit it.
+
+During a drained hold starting at the accepted state $(\eta_*,\phi_*)$,
+
+$$
+\eta(s)=\eta_*e^{-s/\tau},\qquad
+\phi(s)=\alpha-(\alpha-\phi_*)e^{\eta_*[1-e^{-s/\tau}]}.
+$$
+
+Together with the chosen permeability law, this is the independent hold
+reference in `check_recovery.py`. The recorded 2D/3D controls use finite
+grain stiffness, signed dilation/compaction, elastic holds, restart,
+changed timestep and remeshing. PT trials freeze recovery; acceptance
+commits it once. Checkpoints require its history when enabling recovery.
+The qualification covers this property law and tangent Biot coupling;
+finite-density recovery energy and retentive remapping are outside it.
 
 ## Matrix storage
 

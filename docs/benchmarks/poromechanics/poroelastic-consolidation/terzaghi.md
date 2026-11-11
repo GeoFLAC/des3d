@@ -61,26 +61,13 @@ dynearthsol2d input.cfg
 
 ## Output
 
-DES writes `terzaghi.info` (one line per saved frame: frame, step, time in seconds), `terzaghi.save.NNNNNN` (the fields of each saved frame) and `terzaghi.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
 | `pore pressure` | nodal pressure; profiles against depth below the drained top are compared with the series in panel (a) |
 | `strain` | element strain; the vertical component integrated over the column gives the top settlement in panel (b) |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('terzaghi')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'pore pressure')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" terzaghi`.
 
 ## Result: DES and the analytical solution
 
@@ -141,10 +128,40 @@ $$
 
 The series and settlement follow directly from the stated one-dimensional Biot initial/boundary problem; evaluated in terzaghi_reference.py.
 
+## Coupled GVS and PT in 3D
+
+A separate 1 m × 1 m × 10 m confined column receives a sudden 100 kPa
+traction, with $K=20$ MPa, $G=10$ MPa, zero gravity, a fixed mesh, sealed
+sides/base and a drained top. Pressure and settlement use the same
+analytical series at each saved frame's actual time. PT1 uses a 1 s
+physical interval; shear-ceiling GVS uses scaling $10^5$, an initial
+velocity scale of $10^{-5}$ m/s, `fixed_dt=0` and `dt_fraction=0.5`.
+
+| Method | $h$ (m) | Late pressure / load error | Late settlement / drained settlement | Final free-node force / total load |
+| --- | --- | --- | --- | --- |
+| PT1 | 1 | 0.4915% | 0.1679% | $9.62\times10^{-9}$ |
+| PT1 | 0.5 | 0.1706% | 0.1011% | $5.39\times10^{-9}$ |
+| GVS shear | 1 | 0.8916% | 0.1551% | $5.00\times10^{-7}$ |
+| GVS shear | 0.5 | 0.2196% | 0.03967% | $2.51\times10^{-7}$ |
+
+Late means 200–400 s; the drainage time is 2,933.74 s. Over the entire
+saved 40–400 s window, fine-grid pressure errors are 0.8685% (GVS) and
+0.8417% (PT1). Halving the mesh also changes the automatic GVS step, so
+this is combined mesh/step evidence. The coarse eleven-case matrix covers
+PT0/PT1, ordinary explicit and both GVS ceilings at scalings $10^4$–$10^6$.
+All finish, but ordinary explicit at $10^4$ retains 2.086% late pressure
+error and force/load 0.01245. This does not qualify cold starts, a full
+3D drainage history, Mandel/Cryer with GVS, or earthquake cycles.
+
+From a complete DES checkout, reproduce the fine comparison with:
+
+```bash
+python3 benchmarks/poromechanics/mechanical_methods.py OUT \
+  --dimension 3 --executable ./dynearthsol3d --spacing .5 --duration 400 \
+  --dt-fraction .5 --pt-dt 1 --initial-speeds 1e-5 --scalings 1e5 \
+  --methods pt1 gvs-shear --timeout 600 --max-steps 10000000
+```
+
 ## Validity and limits
 
 Small-strain, homogeneous, saturated, laterally confined elasticity; constant properties, no gravity or heating. Frame 0 is written before the load is applied and is not compared. This example uses the PT solver; a sudden load with GVS is not tested here.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

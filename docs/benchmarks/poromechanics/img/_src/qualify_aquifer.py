@@ -46,8 +46,6 @@ def build(study, output, record_source):
 
     data = output/'data'/KEY; data.mkdir(parents=True, exist_ok=True)
     shutil.copy2(case/'input.cfg', data/'input.cfg'); shutil.copy2(study/'summary.json', data/'summary.json')
-    for name in ('slab_refinement.py', 'pumping_slab.py', 'averaged_aquifer_reference.py'):
-        shutil.copy2(DES_ROOT/'benchmarks/poromechanics'/name, data/name)
 
     with pf.plt.rc_context(ds.FIGURE_RC):
         fig, axes = ds.result_figure(3)

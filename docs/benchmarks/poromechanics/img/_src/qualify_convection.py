@@ -142,8 +142,6 @@ def build(study, output, record_source, coarse=None):
     rows = [(c['ra_over_critical'], *sample) for c in seeded for sample in c['series']]
     np.savetxt(data/'history.csv', rows, delimiter=',',
         header='Ra_over_Rac,time_s,mode_K,max_departure_K', comments='')
-    shutil.copy2(study/'runner.py', data/'check_convection.py')
-    shutil.copy2((DES_ROOT/'benchmarks/poromechanics/convection_reference.py'), data/'convection_reference.py')
     return record
 
 
@@ -173,8 +171,6 @@ def build_3d(study, output, record_source):
         record_source(study/c['folder']/'box.cfg')
     shutil.copy2(folder/'box.cfg', data/'input.cfg')
     shutil.copy2(study/'qualification.json', data/'summary.json')
-    shutil.copy2(study/'runner.py', data/'check_convection_3d.py')
-    shutil.copy2(study/'reference.py', data/'convection_reference.py')
     model = cc.Dynearthsol(str(folder/'box'))
     x = model.read_field(0, 'coordinate')
     theta = model.read_field(40, 'temperature') - (cc.T_TOP-cc.DT*x[:, 2])

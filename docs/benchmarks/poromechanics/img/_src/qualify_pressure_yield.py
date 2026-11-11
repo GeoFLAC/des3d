@@ -72,8 +72,6 @@ def build(study, output, record_source, steps, extra=(), slabs=()):
     shutil.copy2(best_folder/'layer.cfg', data/'input.cfg')
     shutil.copy2(study/'summary.json', data/'summary.json'); shutil.copy2(steps/'summary.json', data/'summary-steps.json')
     for s, r in more: shutil.copy2(r/'summary.json', data/f"summary-{r.name}.json")
-    shutil.copy2(study/'runner.py', data/'check_pressure_yield.py')
-    shutil.copy2((DES_ROOT/'benchmarks/poromechanics/pressure_yield_reference.py'), data/'pressure_yield_reference.py')
 
     ref, dp_max = cp.REF, summary['dp_max']
     front_best, paths = _history(best_folder)

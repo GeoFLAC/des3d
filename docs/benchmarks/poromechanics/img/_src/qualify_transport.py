@@ -96,8 +96,6 @@ def build(data, output=None, record_source=None):
         packed = output/'data/theis_wells'; packed.mkdir(parents=True, exist_ok=True)
         shutil.copy2(data/'multiwell'/key/'input.cfg', packed/'input.cfg')
         shutil.copy2(data/'multiwell/summary.json', packed/'summary.json')
-        for source in (Path(wells.__file__), Path(wells.ct.__file__), (DES_ROOT/'benchmarks/poromechanics/theis_reference.py')):
-            shutil.copy2(source, packed/source.name)
         records.append(dict(key='theis_wells', theme='groundwater', title='Several wells: pumping, injection and recovery',
             problem='Two wells extract water and one injects it into a confined slab; all stop after 40 s and the pressure recovers.',
             result=f"Maximum pressure error: {100*fine['max_error_over_scale']:.3f}% of $C_\\Sigma$; independent fluid-budget error below {max(c['max_volume_error_m3'] for c in multi['cases'].values()):.2e} m³.",
@@ -147,8 +145,6 @@ def build(data, output=None, record_source=None):
         packed = output/'data/open_flow'; packed.mkdir(parents=True, exist_ok=True)
         shutil.copy2(folder/'pulse.cfg', packed/'input.cfg')
         shutil.copy2(data/'open-flow/summary.json', packed/'summary.json')
-        for source in (Path(pulse.__file__), Path(pulse.ct.__file__)):
-            shutil.copy2(source, packed/source.name)
         records.append(dict(key='open_flow', theme='groundwater', title='Open boundaries: a draining pressure pulse',
             problem='A smooth pressure pulse drains through two zero-pressure ends while the side faces remain sealed.',
             result=f"Maximum pressure error: {100*fine['max_pressure_error_over_amplitude']:.4f}% of the initial amplitude; storage error {100*fine['max_storage_error_over_initial']:.4f}%. Stored fluid plus outflow equals the initial volume within {fine['max_global_budget_error_m3']:.2e} m³ (independent integration).",

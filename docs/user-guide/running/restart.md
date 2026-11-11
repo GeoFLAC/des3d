@@ -74,7 +74,10 @@ for what changed in MMG remeshing itself.
 The optional finite-density hydraulic model also saves the physical
 inventories, numerical split buffer, EOS temperature origin and pending
 thermal/pressure increments. Accepted shear heat is saved as energy, so a
-changed timestep must not reinterpret an old power as a new energy. These
+changed timestep must not reinterpret an old power as a new energy.
+The current shear-heating checkpoint stores its version, pending extensive
+energy and accepted power together; missing members or an unsupported
+version are rejected. A power-only intermediate checkpoint is not converted. These
 model-specific guards apply in addition to the file-format revision. See
 [Poromechanics](../../theory/poromechanics.md#finite-density-water-and-sensible-heat).
 

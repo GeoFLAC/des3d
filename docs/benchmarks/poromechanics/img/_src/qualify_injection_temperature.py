@@ -81,9 +81,6 @@ def build(avdonin, output, record_source, coarse, steps, doublet, sanity=()):
     for name, root in [('summary-avdonin.json', avdonin), ('summary-avdonin-coarse.json', coarse),
                        ('summary-doublet.json', doublet)] + [(f'summary-steps{s["steps"]}.json', p) for s, p in zip(timing, steps)]:
         shutil.copy2(root/'summary.json', data/name)
-    shutil.copy2(avdonin/'runner.py', data/'check_injection_temperature.py')
-    shutil.copy2(doublet/'runner.py', data/'check_injection_energy.py')
-    shutil.copy2((DES_ROOT/'benchmarks/poromechanics/avdonin_reference.py'), data/'avdonin_reference.py')
 
     ref = hot.REF
     with pf.plt.rc_context(ds.FIGURE_RC):

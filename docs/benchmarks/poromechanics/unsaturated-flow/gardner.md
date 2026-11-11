@@ -61,26 +61,13 @@ dynearthsol3d input.cfg
 
 ## Output
 
-DES writes `column.info` (one line per saved frame: frame, step, time in seconds), `column.save.NNNNNN` (the fields of each saved frame) and `column.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
 | `pore pressure` | converted to K/K_s = exp(α_p p) at every node and compared with the series solution |
 | `coordinate` | the height of each node above the base |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('column')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'pore pressure')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" column`.
 
 ## Result: DES and the analytical solution
 
@@ -147,7 +134,3 @@ Srivastava and Yeh (1991), homogeneous-column solution; evaluated in unsaturated
 ## Validity and limits
 
 This exact series solves ideal Gardner Richards flow with retention storage only. DES also retains elastic/compressible storage, so it is a reference-limit comparison, not an exact solution of every active DES term. The displayed error includes that model difference. It does not validate ponding or a seepage-face switch.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

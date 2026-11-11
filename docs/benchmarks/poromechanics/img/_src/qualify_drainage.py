@@ -1,7 +1,7 @@
 """Validate the recorded DES coupled-drainage study (unsaturated level U9) and plot it.
 
 Interface as qualify_theis: build(study, output, record_source, steps, sanity)
-replays the finest PT run against an independently recomputed reference,
+replays the finest PT run against the saved independent reference,
 writes figures/drainage.* and data/drainage/, and returns the review record.
 steps is the finer-step study on the finest mesh; sanity the 3D check.
 """
@@ -29,16 +29,20 @@ def _folder(root, case):
 def build(study, output, record_source, steps, sanity=None, explicit_study=None):
     summary, fine = (pf.load_study(s, record_source) for s in (study, steps))
     s3d = pf.load_study(sanity, record_source) if sanity else None
-    reference = cd.REF.solve(summary['reference_grid'], cd.TIMES)
-    control_grid = 2*summary['reference_grid']
-    control = cd.REF.solve(control_grid, cd.TIMES)
+    path = study/'reference.npz'
+    if not path.is_file():
+        raise FileNotFoundError(f'{path}: supply the archived reference; plotting does not integrate it')
+    record_source(path)
+    if 'reference_sha256' in summary:
+        assert cd.digest(path) == summary['reference_sha256']
+    with np.load(path, allow_pickle=False) as saved:
+        np.testing.assert_array_equal(saved['time'], cd.TIMES)
+        assert len(saved['z']) == summary['reference_grid'] + 1
+        reference = [dict(time=float(t), z=saved['z'].copy(), p=saved['p'][i].copy(),
+                          saturation=saved['saturation'][i].copy(), settlement=float(saved['settlement'][i]))
+                     for i, t in enumerate(saved['time'])]
     scale = cd.RHO*cd.G*cd.PROPS['height']
-    # Estimate reference uncertainty from its observed second-order spatial
-    # convergence and the existing BDF absolute tolerances. This replay
-    # allowance is not a rigorous bound on accumulated ODE integration error.
-    reference_uncertainty = [
-        4/3*float(abs(r['p']-np.interp(r['z'], c['z'], c['p'])).max())/scale
-        + 2*cd.REF.pressure_atol_ratio for r, c in zip(reference, control)]
+    reference_uncertainty = [2*cd.REF.pressure_atol_ratio]*len(reference)
     for r, kept in zip(reference, summary['reference']):
         np.testing.assert_allclose(r['settlement'], kept['settlement'], rtol=1e-6)
     pt = sorted((c for c in summary['cases'] if c['mode'] == 'PT'), key=lambda c: -c['spacing_m'])
@@ -61,8 +65,6 @@ def build(study, output, record_source, steps, sanity=None, explicit_study=None)
     shutil.copy2(_folder(study, finest)/'drain.cfg', data/'input.cfg')
     for name, root in (('summary.json', study), ('summary-steps.json', steps), ('summary-3d.json', sanity)):
         if root: shutil.copy2(root/'summary.json', data/name)
-    shutil.copy2(study/'runner.py', data/'check_unsaturated_drainage.py')
-    shutil.copy2((DES_ROOT/'benchmarks/poromechanics/drainage_reference.py'), data/'drainage_reference.py')
 
     height, scale = cd.PROPS['height'], cd.RHO*cd.G*cd.PROPS['height']
     with pf.plt.rc_context(ds.FIGURE_RC):
@@ -86,9 +88,9 @@ def build(study, output, record_source, steps, sanity=None, explicit_study=None)
         ax.legend(handles, labels + ['reference (numerical)', 'DES'], loc='upper right', fontsize=10)
 
         ax = axes[1]
-        dense = np.concatenate([np.geomspace(5, 7200, 40)])
-        curve = cd.REF.solve(100, dense)
-        ds.analytical(ax, dense/60, [-1e3*r['settlement'] for r in curve], label='reference (numerical)')
+        dense = np.array([r['time'] for r in reference])
+        curve = reference
+        ds.analytical(ax, dense/60, [-1e3*r['settlement'] for r in curve], label='reference (stored samples)')
         t, s = [], []
         for row in rows[1:]:
             e = cd.layer_strain(coord, model.read_field(0, 'connectivity'),
@@ -143,6 +145,5 @@ def build(study, output, record_source, steps, sanity=None, explicit_study=None)
                                  reference=summary['reference'], cases=pt, refined=refined, explicit=explicit,
                                  sanity_3d=s3,
                                  reference_pressure_atol_ratio=cd.REF.pressure_atol_ratio,
-                                 reference_control_grid=control_grid,
                                  reference_metric_replay_budget=reference_uncertainty,
                                  reference_replay_metric_difference=replay_difference), indent=1))

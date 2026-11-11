@@ -61,25 +61,12 @@ dynearthsol2d input.cfg
 
 ## Output
 
-DES writes `box.info` (one line per saved frame: frame, step, time in seconds), `box.save.NNNNNN` (the fields of each saved frame) and `box.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
 | `temperature` | nodal temperature; its departure from the conductive profile, projected on cos(πx/W) sin(πz/H), is the mode amplitude in panel (b), and is mapped in panel (c) |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('box')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'temperature')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" box`.
 
 ## Result: DES and the analytical solution
 
@@ -143,7 +130,3 @@ Horton and Rogers (1945); Lapwood (1948); Nield and Bejan, Convection in Porous 
 ## Validity and limits
 
 Linear stability of the incompressible Boussinesq limit: small disturbances, constant properties, and a rigid matrix without pore-pressure feedback. DES keeps a small water storage; pressure diffuses about $10^3$ times faster than heat, so the incompressible reference applies. 3D cells, temperature-dependent viscosity and the Elder transient-plume problem are not yet verified.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

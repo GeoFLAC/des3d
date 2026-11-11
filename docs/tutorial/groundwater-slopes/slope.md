@@ -65,9 +65,7 @@ dynearthsol2d input.cfg
 
 ## Output
 
-DES writes `slope.info` (one line per saved frame: frame, step, time in seconds), `slope.save.NNNNNN` (the fields of each saved frame) and `slope.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../../benchmarks/poromechanics/running.md) before using the Python reader or converter.
+See [Running the examples](../../benchmarks/poromechanics/running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -75,17 +73,6 @@ Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../../b
 | `pore pressure` | averaged over the bedrock nodes in the middle third: the base pressure on the horizontal axis of (b) and the vertical axis of (c) |
 | `velocity` | downslope velocity of the surface in the middle third, recorded in summary.json to show the slip accelerating |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('slope')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'plastic strain')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" -g slope`.
 
 ## Result: DES and the analytical solution
 
@@ -143,7 +130,3 @@ Drescher and Detournay (1993), Géotechnique 43(3), 443–456 (limit load of tra
 ## Validity and limits
 
 No exact solution: an application compared with engineering estimates. The slip curve converges with mesh and step; the pressure at the last time step for which PT still finds equilibrium does not, so it is not read as a collapse pressure. There is no dynamic run-out. 2D, saturated, zero dilation. For the classic embankment by strength reduction see the embankment page.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../../benchmarks/poromechanics/running.md).

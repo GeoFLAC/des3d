@@ -61,9 +61,7 @@ dynearthsol2d input.cfg
 
 ## Output
 
-DES writes `mandel.info` (one line per saved frame: frame, step, time in seconds), `mandel.save.NNNNNN` (the fields of each saved frame) and `mandel.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -71,17 +69,6 @@ Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../runn
 | `strain` | element strain; the vertical component averaged over the quarter gives the plate settlement, whose error is in panel (c) |
 | `velocity` | nodal velocity; the vertical velocity of the top row should be the same at every node under the rigid platen |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('mandel')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'pore pressure')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" mandel`.
 
 ## Result: DES and the analytical solution
 
@@ -151,7 +138,3 @@ Mandel (1953); Abousleiman et al. (1996), Mandel’s problem revisited. Evaluate
 ## Validity and limits
 
 Plane strain, small strain, linear isotropic poroelasticity with constant properties; ideal rigid frictionless plates. DES couples pressure and mechanics sequentially; the early-time error is the one-step lag of that split and falls with the time step. No gravity.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

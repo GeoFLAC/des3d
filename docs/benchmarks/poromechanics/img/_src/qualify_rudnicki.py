@@ -66,8 +66,6 @@ def build(study, output, record_source, space, times=()):
 
     data = output/'data'/KEY; data.mkdir(parents=True, exist_ok=True)
     shutil.copy2(folder/'rudnicki.cfg', data/'input.cfg'); shutil.copy2(study/'summary.json', data/'summary.json')
-    shutil.copy2(study/'runner.py', data/'check_rudnicki.py')
-    shutil.copy2((DES_ROOT/'benchmarks/poromechanics/rudnicki_reference.py'), data/'rudnicki_reference.py')
 
     model = cr.Dynearthsol(str(folder/'rudnicki')); rows = cr.scan_frames(str(folder/'rudnicki'))
     coord = model.read_field(0, 'coordinate'); conn = model.read_field(0, 'connectivity')

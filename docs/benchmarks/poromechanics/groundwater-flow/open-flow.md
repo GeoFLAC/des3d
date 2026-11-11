@@ -61,9 +61,7 @@ dynearthsol3d input.cfg
 
 ## Output
 
-DES writes `pulse.info` (one line per saved frame: frame, step, time in seconds), `pulse.save.NNNNNN` (the fields of each saved frame) and `pulse.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -71,17 +69,6 @@ Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../runn
 | `coordinate` | x position of each node and element volumes for the stored fluid |
 | `fluid balance` | five numbers per frame for the last step, in m³: storage, mechanics, wells, boundary exchange and residual; the boundary entry, summed over steps, is the outflow in (b) |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('pulse')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'pore pressure')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" -g pulse`.
 
 ## Result: DES and the analytical solution
 
@@ -154,7 +141,3 @@ Separation-of-variables solution of the stated diffusion problem; pressure, stor
 ## Validity and limits
 
 Constant-capacity saturated flow on a fixed mesh. Variable storage, unsaturated coupling, deforming volume and remapping need separate open-system fluid budgets.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

@@ -34,7 +34,7 @@ def build(study, output, record_source, space, before, restart):
         record_source(restart/state/'restart.json')
         assert checks[state]['same_step_different_payloads'] == 0
     data = output/'data'/KEY; data.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(study/'summary.json', data/'summary.json'); shutil.copy2(study/'runner.py', data/'check_bishop_cell.py')
+    shutil.copy2(study/'summary.json', data/'summary.json')
     for name, s in (('summary-3d.json', space), ('summary-before.json', before)):
         shutil.copy2(s/'summary.json', data/name)
     # The page selects the finest moderate-suction PT case from this study.
@@ -47,8 +47,10 @@ def build(study, output, record_source, space, before, restart):
         fig, axes = ds.result_figure(3)
         for ax, letter, state in zip(axes[:2], 'ab', cc.STATES):
             p0 = cc.STATES[state][0]
-            eps = np.linspace(0, cc.STRAIN, 200)
-            ds.analytical(ax, -1e3*eps, cc.exact(state, eps) - p0, color=ds.INK, label='exact rate equation')
+            saved = _cases(summary, state)[-1]['frames']
+            eps = np.array([0.] + [f['strain'] for f in saved])
+            pressure = np.array([p0] + [f['pressure_ref'] for f in saved])
+            ds.analytical(ax, -1e3*eps, pressure - p0, color=ds.INK, label='rate equation (stored samples)')
             for color, cases, label in ((ds.HOT, _cases(summary, state), 'corrected'), (ds.MUTED, _cases(old, state), 'before correction')):
                 c = cases[-1]                                    # the finest step of each build
                 ax.plot([-1e3*f['strain'] for f in c['frames']], [f['pressure_mean'] - p0 for f in c['frames']], 'o',

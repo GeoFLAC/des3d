@@ -46,8 +46,6 @@ def build(study, output, record_source):
     data = output/'data/kirsch'; data.mkdir(parents=True, exist_ok=True)
     for name in ('input.cfg', 'annulus.poly'): shutil.copy2(folder/name, data/name)
     shutil.copy2(study/'qualification.json', data/'qualification.json')
-    shutil.copy2(Path(ck.__file__), data/'check_kirsch.py')
-    shutil.copy2((DES_ROOT/'benchmarks/poromechanics/kirsch_reference.py'), data/'kirsch_reference.py')
     model = ck.Dynearthsol(str(folder/'kirsch'))
     x = model.read_field(0, 'coordinate'); conn = model.read_field(0, 'connectivity')
     centre = x[conn].mean(axis=1); r = np.linalg.norm(centre, axis=1)
@@ -105,7 +103,7 @@ if __name__ == '__main__':
     result = build(args.study.resolve(), args.output.resolve(), lambda p:None)
     target = args.output/'fig/kirsch'; target.mkdir(parents=True, exist_ok=True)
     schematic('kirsch', target)
-    for extension in ('png', 'svg', 'pdf'):
+    for extension in ('png',):
         (args.output/'figures'/f'kirsch.{extension}').replace(target/f'result.{extension}')
     if not any((args.output/'figures').iterdir()): (args.output/'figures').rmdir()
     print(json.dumps(result, indent=2))

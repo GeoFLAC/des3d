@@ -63,26 +63,13 @@ dynearthsol2d continuation.cfg
 
 ## Output
 
-DES writes `first.info` (one line per saved frame: frame, step, time in seconds), `first.save.NNNNNN` (the fields of each saved frame) and `first.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
 | `pore pressure` | pressure along mid-depth, compared with the two-mode solution; the two mode amplitudes are projected from it |
 | `coordinate` | node positions for the mid-depth profile |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('first')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'pore pressure')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" -g first`.
 
 ## Result: DES and the analytical solution
 
@@ -155,7 +142,3 @@ Separation of variables for the stated linear diffusion equation; the independen
 ## Validity and limits
 
 Prescribed, homogeneous, axis-aligned tensors; fixed storage and geometry. Mechanical pressure feedback is off, so deformation does not change the pressure; pressure still loads the solid, so the time step must stay within the elastic stability limit. This tests the flow equation, not coupled deformation or a general fluid-content budget.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

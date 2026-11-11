@@ -63,9 +63,7 @@ dynearthsol2d input.cfg
 
 ## Output
 
-DES writes `slope.info` (one line per saved frame: frame, step, time in seconds), `slope.save.NNNNNN` (the fields of each saved frame) and `slope.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../../benchmarks/poromechanics/running.md) before using the Python reader or converter.
+See [Running the examples](../../benchmarks/poromechanics/running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -73,17 +71,6 @@ Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../../b
 | `plastic strain` | mean over the basal 0.6 m in the middle third of the slope: the slip measure of (b) and the onset and failure times |
 | `velocity` | downslope surface velocity in the middle third, recorded in summary.json |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('slope')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'pore pressure')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" -g slope`.
 
 ## Result: DES and the analytical solution
 
@@ -135,7 +122,3 @@ Infinite-slope stability under rainfall, as in Iverson (2000), Water Resources R
 ## Validity and limits
 
 No exact solution: an application. DES has no runoff or ponding, so the rain rate is chosen to keep the surface unsaturated, and the surface pore pressure is checked to stay negative throughout. Failure is read at a fixed basal slip: the slip curve converges with mesh, while the pressure at the last time step for which PT still finds equilibrium does not. 2D only.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../../benchmarks/poromechanics/running.md).

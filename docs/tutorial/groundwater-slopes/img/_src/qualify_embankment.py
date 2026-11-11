@@ -64,8 +64,7 @@ def build(study, output, record_source):
     data = output/'data'/KEY; data.mkdir(parents=True, exist_ok=True)
     shutil.copy2(folder/f'{show}.cfg', data/'input.cfg')
     for name in ('seed.cfg', 'gravity.cfg', 'slope.poly'): shutil.copy2(folder/name, data/name)
-    shutil.copy2(study/'summary.json', data/'summary.json'); shutil.copy2(study/'runner.py', data/'strength_reduction_slope.py')
-    shutil.copy2(Path(br.__file__), data/'bishop_reference.py')
+    shutil.copy2(study/'summary.json', data/'summary.json')
 
     with pf.plt.rc_context(ds.FIGURE_RC):
         fig, axes = ds.result_figure(3)

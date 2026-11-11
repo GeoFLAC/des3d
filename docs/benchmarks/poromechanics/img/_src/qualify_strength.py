@@ -62,8 +62,6 @@ def build(study, output, record_source=None):
         shutil.copy2(folder/'input.cfg', data/'input.cfg')
         shutil.copy2(study/'qualification.json', data/'qualification.json')
         record_source(study/'qualification.json')
-        for source in (Path(strength.__file__), Path(strength.cell.__file__), (DES_ROOT/'benchmarks/poromechanics/unsaturated_reference.py')):
-            shutil.copy2(source, data/source.name)
     (data/'replay.json').write_text(json.dumps(dict(passed=True, cases=metrics), indent=2)+'\n')
 
     return dict(key='strength', theme='mechanics', title='Pore pressure and material strength',

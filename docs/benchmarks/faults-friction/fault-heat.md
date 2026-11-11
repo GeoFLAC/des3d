@@ -59,9 +59,7 @@ dynearthsol2d input.cfg
 
 ## Output
 
-DES writes `cell.info` (one line per saved frame: frame, step, time in seconds), `cell.save.NNNNNN` (the fields of each saved frame) and `cell.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../poromechanics/running.md) before using the Python reader or converter.
+See [Running the examples](../poromechanics/running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -72,17 +70,6 @@ Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../poro
 | `pending shear heat` | accepted heat awaiting its thermal update, J/m per element in 2D |
 | `strain` | trace gives the normal volume change in the fluid-content ledger |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('cell')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'stress')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" cell`.
 
 ## Result: DES and the analytical solution
 
@@ -168,7 +155,3 @@ Independent differential Mohr–Coulomb/Jaumann and sealed fluid/energy solution
 ## Validity and limits
 
 A uniform two-triangle local patch with one normal mechanical mode, constant friction and fixed capacity. Saved-frame stress errors do not bound every wave peak. Fast GVS controls all reach the speed cap; they do not prove arbitrary scaling independence. Manual slow-to-fast restart does not establish automatic events, long tectonic clock handling, a spatial rupture or a full earthquake cycle.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../poromechanics/running.md).

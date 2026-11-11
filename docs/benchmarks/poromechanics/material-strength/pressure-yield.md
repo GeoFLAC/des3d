@@ -63,9 +63,7 @@ dynearthsol2d input.cfg
 
 ## Output
 
-DES writes `layer.info` (one line per saved frame: frame, step, time in seconds), `layer.save.NNNNNN` (the fields of each saved frame) and `layer.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -73,17 +71,6 @@ Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../runn
 | `plastic strain` | marks the first saved step at which an element has yielded |
 | `stress` | element total stress; with the pore pressure it gives the effective-stress paths in panel (b) |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('layer')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'pore pressure')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" layer`.
 
 ## Result: DES and the analytical solution
 
@@ -138,7 +125,3 @@ Terzaghi effective stress with Mohr–Coulomb yield; the uniaxial-strain stress 
 ## Validity and limits
 
 Uniaxial strain, a uniform pressure rise, no dilation, fully saturated. The test stops short of the apex, beyond which no equilibrium exists. 3D is checked only to onset; an inclined (infinite-slope) version needs an initial-stress option DES does not have.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

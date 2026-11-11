@@ -65,9 +65,7 @@ dynearthsol2d step.cfg
 
 ## Output
 
-DES writes `cell.info` (one line per saved frame: frame, step, time in seconds), `cell.save.NNNNNN` (the fields of each saved frame) and `cell.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../poromechanics/running.md) before using the Python reader or converter.
+See [Running the examples](../poromechanics/running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -75,17 +73,6 @@ Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../poro
 | `friction state variable` | element state θ; compared with the exact forward-Euler recursion at every step |
 | `stress` | element total stress; half the principal-stress difference is the shear stress at yield in panel (b) |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('cell')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'dynamic friction coefficient')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" cell`.
 
 ## Result: DES and the analytical solution
 
@@ -136,7 +123,3 @@ Dieterich (1979), Journal of Geophysical Research 84(B5), 2161–2168; Ruina (19
 ## Validity and limits
 
 Aging law and the total-strain-rate slip projection only; constant pore pressure; no dilation, no elastic interaction (every node prescribed), so stick–slip instability is not tested.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../poromechanics/running.md).

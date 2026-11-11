@@ -38,8 +38,6 @@ def build(study, output, record_source, space, times):
 
     data = output/'data'/KEY; data.mkdir(parents=True, exist_ok=True)
     shutil.copy2(folder/'mandel.cfg', data/'input.cfg'); shutil.copy2(study/'summary.json', data/'summary.json')
-    shutil.copy2(study/'runner.py', data/'check_mandel.py')
-    shutil.copy2((DES_ROOT/'benchmarks/poromechanics/mandel_reference.py'), data/'mandel_reference.py')
 
     with pf.plt.rc_context(ds.FIGURE_RC):
         fig, axes = ds.result_figure(3)

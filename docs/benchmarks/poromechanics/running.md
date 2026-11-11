@@ -44,6 +44,8 @@ Each page lists the settings that define its example.
 DES names its output after `sim.modelname`: `<model>.info` lists the saved
 frames (frame, step, time in seconds), `<model>.save.NNNNNN` holds the
 fields of each frame and `<model>.chkpt.NNNNNN` the restart checkpoints.
+`sim.output_step_interval` and `sim.output_time_interval_in_yr` control the
+saved-frame cadence. HDF5 builds use the `.vtkhdf` suffix.
 
 ```python
 import sys; sys.path.append('/path/to/DynEarthSol')
@@ -56,6 +58,10 @@ p = model.read_field(model.frames[-1], 'pore pressure')
 run that restarted from another, to include the frames before the restart.
 
 ## Reproduce a figure
+
+The ZIPs link Python runners and references in the complete DES checkout at
+the stated revision. They contain inputs and dependencies, without source
+code copies.
 
 Each page names the script that ran the whole study behind its figure (all
 meshes and time steps). The scripts are in `benchmarks/poromechanics/` and

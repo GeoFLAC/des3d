@@ -61,9 +61,7 @@ dynearthsol2d input.cfg
 
 ## Output
 
-DES writes `cell.info` (one line per saved frame: frame, step, time in seconds), `cell.save.NNNNNN` (the fields of each saved frame) and `cell.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -71,17 +69,6 @@ Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../runn
 | `strain` | vertical strain averaged over the cell, the path along which the exact equation is integrated |
 | `coordinate` | identifies the vertical axis |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('cell')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'pore pressure')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" cell`.
 
 ## Result: DES and the analytical solution
 
@@ -158,7 +145,3 @@ Bishop (1959); Lu, Godt and Wu (2010). The rate equation is integrated with a hi
 ## Validity and limits
 
 Sealed and homogeneous, so flow and spatial accuracy are not tested; the column pages cover them. The remaining PT error is the one-step lag $L(D-\Delta p)$, first order in the step and weighted by the soft skeleton’s large $L$. Small strain, linear elasticity, no hysteresis.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

@@ -102,9 +102,7 @@ Repeat factors to bracket rest and sliding. Frames 104, 112, 124, 148 and
 
 ## Output
 
-DES writes `drawdown.info` (one line per saved frame: frame, step, time in seconds), `drawdown.save.NNNNNN` (the fields of each saved frame) and `drawdown.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../../benchmarks/poromechanics/running.md) before using the Python reader or converter.
+See [Running the examples](../../benchmarks/poromechanics/running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -112,17 +110,6 @@ Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../../b
 | `velocity` | in a trial, integrated in time it gives the displacement of the mechanism in panel (c); its peak over the mesh decides rest or sliding |
 | `coordinate` | node positions of the fixed mesh, for the maps and for interpolating the pore pressure on Bishop's slices |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('drawdown')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'pore pressure')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" -g drawdown`.
 
 ## Result: DES and the limit-equilibrium reference
 
@@ -187,7 +174,3 @@ Morgenstern (1963), Géotechnique 13(2), 121–131 (stability charts for rapid d
 ## Validity and limits
 
 No exact solution: Bishop’s method needs the pore pressure as an input, here taken from DES, so the comparison checks the mechanics given the hydraulics. The 0.05 trial-factor spacing and small conservative discrepancies remain part of this result. 2D, small strain; drawdown is instantaneous; the earliest comparison is a few hundred seconds after drawdown, once the mass-scaled mechanics has settled.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../../benchmarks/poromechanics/running.md).

@@ -61,9 +61,7 @@ dynearthsol3d input.cfg
 
 ## Output
 
-DES writes `slab.info` (one line per saved frame: frame, step, time in seconds), `slab.save.NNNNNN` (the fields of each saved frame) and `slab.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -71,17 +69,6 @@ Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../runn
 | `strain` | element strain tensor: the areal strain is the xx + yy components and the vertical strain the zz component; panel (b) and the strain errors |
 | `coordinate` | node positions, used for the radius of nodes and element centres from the well |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('slab')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'pore pressure')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" slab`.
 
 ## Result: DES and the analytical solution
 
@@ -117,42 +104,81 @@ $$
 U_r=-\frac{\alpha C_QDt}{(\lambda+G)r}[uE_1(u)-e^{-u}+1]
 $$
 
-$p$ is the pressure change (negative during extraction), $S_a$ is pressure storage in $\mathrm{Pa^{-1}}$, $S_0=\phi/K_f+(\alpha-\phi)/K_s$, $e_h=\epsilon_{xx}+\epsilon_{yy}$ is areal strain, and $\delta$ is positive downward subsidence. The plotted reference is the infinite-domain line-well limit. The full finite-annulus Laplace solution, which includes an additional spatially uniform strain function $h(t)$, is derived below and in the theory appendix.
+$p$ is the pressure change (negative during extraction), $S_a$ is pressure storage in $\mathrm{Pa^{-1}}$, $S_0=\phi/K_f+(\alpha-\phi)/K_s$, $e_h=\epsilon_{xx}+\epsilon_{yy}$ is areal strain, and $\delta$ is positive downward subsidence. The plotted reference is the infinite-domain line-well limit. The full finite-annulus Laplace solution, which includes an additional spatially uniform strain function $h(t)$, is derived below.
 
-### Derivation
+### Finite-annulus derivation
 
-Zero incremental vertical stress gives $\varepsilon_{zz}$. Eliminating it from the horizontal stresses and integrating radial equilibrium gives $e_h=\alpha p/[2(\lambda+G)]+h(t)$. Substitution into $\zeta=\alpha(e_h+\varepsilon_{zz})+S_0p$ gives the storage and $h$ coupling in the equations below.
-
-$$
-\epsilon_v=\alpha p/(\lambda+G)+2Gh/(\lambda+2G),\quad \zeta=S_ap+ch
-$$
-
-Two hydraulic conditions and the outer radial mechanical condition determine the Laplace-space constants $A$, $B_0$ and $\hat h$ (defined in the theory note) after the inner mechanical boundary eliminates $C_w$. The illustrated fixed inner face sets $C_w=0$; a traction-free inner face instead sets $C_w=r_w^2(\lambda_*+2G)h/(2G)$. At $R$ choose either $U_r=0$ or $\sigma_{rr}=0$.
+Thickness averaging assumes zero incremental vertical stress and negligible
+vertical shear. Eliminating vertical strain gives the plane-stress Lamé
+coefficient and uniform radial equilibrium function $h(t)$:
 
 $$
-2\pi r_wB(\kappa/\mu)\widehat p_r(r_w)=Q/s,\quad \widehat p(R)=0,\quad \widehat U_r(R)=0
+\lambda_*=\frac{2G\lambda}{\lambda+2G},\qquad
+\varepsilon_{zz}=\frac{\alpha p-\lambda e_h}{\lambda+2G},
 $$
 
-For the optional traction boundaries, $\lambda_*$ is the plane-stress Lamé coefficient. The integral $J$ of the theory note is evaluated analytically from the Bessel basis. This specifies the small linear system before numerical inverse transformation.
-
 $$
-\lambda^*=2G\lambda/(\lambda+2G),\quad \sigma_{rr}=(\lambda^*+2G)h-2GU_r/r
-$$
-
-In the infinite-domain line-well limit $h=0$. With $C_Q=Q\mu/(4\pi\kappa B)$ and $u=r^2/(4Dt)$, pressure and displacement reduce to closed forms. This retains fluid/grain compressibility; the published incompressible-grain formulas of Bear and Corapcioglu are a further limit of these.
-
-$$
-p=-C_QE_1(u),\quad e_h=\epsilon_{zz}=\frac{\alpha p}{2(\lambda+G)},\quad U_r=-\frac{\alpha C_QDt}{(\lambda+G)r}[uE_1(u)-e^{-u}+1]
+e_h=\frac{\alpha p}{2(\lambda+G)}+h(t),\qquad
+\varepsilon_v=\frac{\alpha p}{\lambda+G}+\frac{2Gh}{\lambda+2G}.
 $$
 
-Rederived thickness-averaged Biot extension of Bear and Corapcioglu (1981); averaged_aquifer_reference.py. Independent checks cover radial finite-volume comparison, sealed balance, boundary conditions and limiting closed forms. The full theory note is bundled separately.
+Integrating areal strain and substituting fluid content give
 
-Full finite-annulus theory note.
+$$
+rU_r=C_w+\frac{\alpha}{2(\lambda+G)}
+\int_{r_w}^{r}\rho p(\rho,t)\,d\rho+\frac{h}{2}(r^2-r_w^2),
+$$
+
+$$
+\zeta=S_ap+ch,\qquad c=\frac{2G\alpha}{\lambda+2G},
+$$
+
+$$
+S_a\dot p+c\dot h=(\kappa/\mu)\nabla_r^2p.
+$$
+
+The well has finite radius $r_w$, with prescribed total extraction rate
+$2\pi r_wB(\kappa/\mu)p_r(r_w)=Q$. The outer hydraulic boundary is
+$p(R)=0$ or no flow. Either radial mechanical boundary can fix $U_r=0$
+or set $\sigma_{rr}=0$, where
+
+$$
+\sigma_{rr}=(\lambda_*+2G)h-2GU_r/r.
+$$
+
+For the fixed inner boundary $C_w=0$; for a traction-free inner boundary
+$C_w=r_w^2(\lambda_*+2G)h/(2G)$. In Laplace space,
+
+$$
+\widehat p=A I_0(qr)+B_0K_0(qr)-(c/S_a)\widehat h,
+\qquad q^2=sS_a\mu/\kappa.
+$$
+
+The two hydraulic conditions and outer mechanical condition form a
+$3\times3$ system for $A,B_0,\widehat h$. The Bessel integral in $U_r$ is
+analytic. Exponentially scaled bases avoid overflow; a fixed 32-node
+Talbot inversion returns the time solution. This is the implementation in
+`averaged_aquifer_reference.py`, independent of DES's discretization.
+In an infinite domain $h=0$, recovering the closed forms above. A distant
+fixed boundary generally gives nonzero $h$ before the pressure front
+reaches it, and its strain feeds back into storage. A finite-domain
+pressure therefore need not be Theis.
+
+Independent reference checks cover radial finite volumes, sealed fluid
+balance, the hydraulic/mechanical boundaries, kinematics, the line-well
+limit and steady Thiem flow:
+
+```bash
+python3 tests/functional/hydromechanics/check_averaged_aquifer_reference.py -v
+```
+
+The zero-horizontal-strain alternative has storage
+$S_0+\alpha^2/(\lambda+2G)$ and vertical strain
+$\alpha p/(\lambda+2G)$. It is a different mechanical constraint. For a
+common pressure change, the plane-stress subsidence is $(1-\nu)$ times
+that value; with matching $\alpha$ and $S_0$ and both models calibrated to the same
+storativity, the ratio is one half.
 
 ## Validity and limits
 
-Linear poroelasticity with constant properties; the thin-slab geometry approaches the averaged model only up to $O((B/r)^2)$, so a small model difference remains at the finest mesh. Two-way coupling with PT; no gravity.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).
+Linear poroelasticity with constant properties; the thin-slab geometry approaches the averaged model only up to $O((B/r)^2)$, so a small model difference remains at the finest mesh. Two-way coupling with PT; no gravity. Near-well, early-time 3D pressure rises (the Noordbergum effect) are outside the averaged model. A vertical 2D slice cannot represent radial groundwater flow together with subsidence.

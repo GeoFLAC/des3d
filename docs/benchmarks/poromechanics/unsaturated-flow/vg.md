@@ -61,26 +61,13 @@ dynearthsol2d input.cfg
 
 ## Output
 
-DES writes `column.info` (one line per saved frame: frame, step, time in seconds), `column.save.NNNNNN` (the fields of each saved frame) and `column.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
 | `pore pressure` | the steady pressure profile at the last frame, compared with the reference |
 | `coordinate` | the height of each node above the base |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('column')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'pore pressure')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" column`.
 
 ## Result: DES and the analytical solution
 
@@ -133,7 +120,3 @@ The implicit relation is derived from steady Darcy flow; evaluated by DOP853 (rt
 ## Validity and limits
 
 Homogeneous, steady one-dimensional flow, constant gravity and prescribed flux. This is not a closed-form pressure profile. Storage drops out of the steady equation; the deliberately reduced fluid modulus shortens the run (a larger stable flow step) and does not test transient storage.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

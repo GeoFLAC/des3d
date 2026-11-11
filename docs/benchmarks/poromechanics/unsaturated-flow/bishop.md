@@ -61,9 +61,7 @@ dynearthsol2d input.cfg
 
 ## Output
 
-DES writes `bishop.info` (one line per saved frame: frame, step, time in seconds), `bishop.save.NNNNNN` (the fields of each saved frame) and `bishop.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -72,17 +70,6 @@ Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../runn
 | `coordinate` | node heights for the profiles |
 | `connectivity` | assigns element strains to the layers of the column |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('bishop')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'strain')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" bishop`.
 
 ## Result: DES and the analytical solution
 
@@ -158,7 +145,3 @@ Bishop (1959); Lu, Godt and Wu (2010), $\chi=S_e$. Evaluated in unsaturated_refe
 ## Validity and limits
 
 Both states are drained and at rest, so storage and permeability do not enter; the pore fluid is made compressible only to allow a larger stable flow step, which shortens the drainage run. This checks the Bishop stress and the partly saturated weight, not the transient; the transient coupling is checked separately by a sealed cell against its exact ordinary differential equation. Small strain, linear elasticity, no hysteresis.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

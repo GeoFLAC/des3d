@@ -60,9 +60,7 @@ dynearthsol2d input.cfg
 
 ## Output
 
-DES writes `cell.info` (one line per saved frame: frame, step, time in seconds), `cell.save.NNNNNN` (the fields of each saved frame) and `cell.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -73,17 +71,6 @@ Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../runn
 | `pending shear heat` | accepted energy awaiting the next thermal update, J/m per element in 2D |
 | `friction state variable` | aging state θ, advanced once per physical step |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('cell')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'temperature')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" cell`.
 
 ## Result: DES and the analytical solution
 
@@ -93,7 +80,7 @@ View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" cell`.
 
 This checks plastic earthquake heating, including evolving EP-RSF strength, without introducing inertia or a rupture-front error. The plotted temperature and pressure are the physical fields; the pending numerical reservoirs are accounted for separately.
 
-Implementation and energy ownership
+See [accepted work and pending heat](../../../theory/thermalevolution.md#heat-sources) for implementation ownership across PT trials, restart and changed timesteps.
 
 [Every-step history and reference](/downloads/poromechanics/plastic-heat/history.csv) · `Time convergence`
 
@@ -163,7 +150,3 @@ Direct boundary-work/elastic-storage identity and analytical aging law, evaluate
 ## Validity and limits
 
 A material-level earthquake-heating qualification with constant effective confinement. It does not demonstrate thermal weakening at fixed total normal stress, a propagating rupture, general enthalpy conservation with changing storage, or a complete earthquake cycle.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

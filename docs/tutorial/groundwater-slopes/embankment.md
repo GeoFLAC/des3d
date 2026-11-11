@@ -71,9 +71,7 @@ dynearthsol2d srf1.300.cfg
 
 ## Output
 
-DES writes `srf1.360.info` (one line per saved frame: frame, step, time in seconds), `srf1.360.save.NNNNNN` (the fields of each saved frame) and `srf1.360.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../../benchmarks/poromechanics/running.md) before using the Python reader or converter.
+See [Running the examples](../../benchmarks/poromechanics/running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -81,17 +79,6 @@ Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../../b
 | `plastic strain` | shows the shear band of the mechanism and how much of the slope yields |
 | `coordinate` | node positions of the fixed mesh, for plotting the mechanism |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('srf1.360')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'velocity')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" -g srf1.360`.
 
 ## Result: DES and the analytical solution
 
@@ -143,7 +130,3 @@ Bishop (1955), Géotechnique 5(1), 7–17; strength reduction as in Griffiths an
 ## Validity and limits
 
 Bishop’s method satisfies moment equilibrium of a circular mechanism, so it is an engineering reference, not an exact solution; strength reduction finds the mechanism itself. Non-associated flow ($\psi=0$) and a finite mesh both shift the DES value. 2D, dry, small strain; on a moving mesh a failing slope slides, flattens and stops, which is a run-out question, not a factor of safety.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../../benchmarks/poromechanics/running.md).

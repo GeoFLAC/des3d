@@ -61,9 +61,7 @@ dynearthsol3d input.cfg
 
 ## Output
 
-DES writes `multiwell.info` (one line per saved frame: frame, step, time in seconds), `multiwell.save.NNNNNN` (the fields of each saved frame) and `multiwell.chkpt.NNNNNN` (checkpoints to restart from). `sim.output_step_interval` and `sim.output_time_interval_in_yr` set how often a frame is saved.
-
-Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../running.md) before using the Python reader or converter.
+See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -71,17 +69,6 @@ Set `DES_SOURCE` and `PYTHONPATH` as described in [Running the examples](../runn
 | `coordinate` | node positions, for the distance to each well and the y = 80 m profile |
 | `connectivity` | with the coordinates, gives element volumes for the stored-fluid budget |
 
-Read a frame in Python:
-
-```python
-from Dynearthsol import Dynearthsol      # in the DES source folder
-model = Dynearthsol('multiwell')
-frame = model.frames[-1]                 # model.time[i] is the time of frame i, in seconds
-x = model.read_field(frame, 'coordinate')
-value = model.read_field(frame, 'pore pressure')
-```
-
-View it in ParaView after `python3 "$DES_SOURCE/2vtk.py" multiwell`.
 
 ## Result: DES and the analytical solution
 
@@ -144,7 +131,3 @@ Theis superposition, evaluated in theis_reference.py and check_theis_wells.py; t
 ## Validity and limits
 
 Infinite-aquifer reference, compared inside a sealed finite slab before its walls matter. Linear storage and constant properties; this does not establish superposition for nonlinear or evolving-property flow.
-
-## Reproduction
-
-[Commands, solver hashes and portable inputs](../running.md).

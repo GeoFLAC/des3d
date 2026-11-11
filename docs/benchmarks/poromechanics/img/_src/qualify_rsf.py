@@ -41,7 +41,7 @@ def build(study, output, record_source):
     data = output/'data'/KEY; data.mkdir(parents=True, exist_ok=True)
     shutil.copy2(folder/'cell.cfg', data/'input.cfg')
     shutil.copy2(folder/'step.cfg', data/'step.cfg')
-    shutil.copy2(study/'summary.json', data/'summary.json'); shutil.copy2(study/'runner.py', data/'check_rsf_step.py')
+    shutil.copy2(study/'summary.json', data/'summary.json')
 
     with pf.plt.rc_context(ds.FIGURE_RC):
         fig, axes = ds.result_figure(3)

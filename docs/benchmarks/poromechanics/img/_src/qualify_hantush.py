@@ -43,8 +43,6 @@ def build(study, output, record_source):
 
     data = output/'data'/KEY; data.mkdir(parents=True, exist_ok=True)
     shutil.copy2(folder/'hantush.cfg', data/'input.cfg'); shutil.copy2(study/'summary.json', data/'summary.json')
-    shutil.copy2(study/'runner.py', data/'check_hantush.py')
-    shutil.copy2((DES_ROOT/'benchmarks/poromechanics/hantush_reference.py'), data/'hantush_reference.py')
 
     with pf.plt.rc_context(ds.FIGURE_RC):
         fig, axes = ds.result_figure(3)
