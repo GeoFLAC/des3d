@@ -1,0 +1,9 @@
+{
+  "label": "Geodynamics and tectonics",
+  "position": 1,
+  "link": {
+    "type": "generated-index",
+    "slug": "/category/benchmarks-geodynamics",
+    "description": "Tectonic deformation compared with theory: shear-band orientation"
+  }
+}

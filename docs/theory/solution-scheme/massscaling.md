@@ -19,8 +19,10 @@ steps for 1 Myrs of model time).
 To overcome this drawback, a mass scaling technique is applied. We
 adjust each nodal mass (density) to achieve a stable time step size
 which is orders of magnitude larger than the one allowed by the physical
-density, while the fictitious increase in mass keeps the inertial forces
-small compared with the other forces at play in these simulations. The
+density. Increasing mass also increases inertia at a given acceleration;
+the approximation is useful only when the resulting inertial forces remain
+small relative to the mechanical loads. Check that separation for the
+chosen loading path. The
 time step size increases when the elastic wave speed, $u_{elastic}$, is
 made comparable to the tectonic speed, $u_{tectonic}$, ($\sim10^{-9}$
 m/s). We achieve this time-step size increase by scaling the density as
@@ -42,17 +44,17 @@ relax the stress back to quasi-equilibrium, therefore the kinetic energy
 becomes too large, breaking the assumption of the quasi-static
 state. When the density scaling is insufficient
 (i.e., $c_{1}$ is too large), the simulation becomes too time consuming.
-As $c_{1}$ approaches $10^{12},$ the fictitious density approaches the
-material (true) density. 
+The density approaches its physical value when
+$c_1 u_{\text{tectonic}}$ approaches the bulk-based speed
+$\sqrt{K_s/\rho}$. There is no universal value of $c_1$ for this transition.
 
-The optimal value of $c_{1}$ depends on the
-rheology parameters, resolution, and domain size. We find that $c_{1}$
-in the range of **$10^{4}$** to **$10^{8}$** is adequate for our simulation
-targets. 
-
-Unfortunately, the choice of $c_{1}$ is currently empirical. We
-are working to devise a consistent way of finding the optimal value of
-$c_{1}$.
+`control.inertial_scaling` sets $c_1$ when `control.is_quasi_static = yes`
+with ordinary explicit/GVS mechanics. The coupled-method comparisons
+include $10^4$, $10^5$ and $10^6$; no single value establishes equilibrium
+for every load, material or mesh. Compare physical-step refinement, force
+residuals and observables, especially for sudden traction. With
+`is_quasi_static = no`, the inertial mass is physical and this scaling
+parameter has no effect. PT has a separate pseudo-time relaxation.
 
 ## Reference speed for global velocity scaling
 
@@ -63,7 +65,7 @@ that ceiling:
 
 | Value | Ceiling | Notes |
 |-------|---------|-------|
-| `shear` (default) | $G/\rho$ | Historical behavior. |
-| `bulk` | $K_s/\rho$ | Uses the bulk modulus instead. |
+| `shear` (default) | $\sqrt{G/\rho}$ | Historical behavior. |
+| `bulk` | $\sqrt{K_s/\rho}$ | Uses the bulk modulus instead. |
 
 Leaving the option at its default reproduces earlier results.

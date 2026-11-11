@@ -70,7 +70,7 @@ boost directory.
 | `useexo`       | `0`, `1`        | Disable (`0`) or enable (`1`) import of an .exo mesh, usually created with the meshing software, CUBIT. Note: Only a 3D mesh can be imported currently.|
 | `use_gpu_knn`  | `0`, `1`        | Enable GPU-accelerated k-nearest-neighbour search via BVH (requires `openacc = 1`). Reduces remeshing time by ~61 % on GPU. Requires the `knn-bvh` submodule. |
 | `SOA`          | `0`, `1`        | Enable Structure-of-Arrays memory layout for `Array2D`. Improves remeshing speed by >2× on CPU and is beneficial on GPU (H100). Default off. |
-| `hdf5`         | `0`, `1`        | Enable HDF5-based VTKHDF output (see [Visualizing outputs](./visualize)). Paths are auto-detected on Linux and macOS via `pkg-config` and the usual install layouts; override with `HDF5_INCLUDE_DIR` / `HDF5_LIB_DIR` if the wrong install is picked up or the build stops with install advice. |
+| `hdf5`         | `0`, `1`        | Enable HDF5-based VTKHDF output (see [Visualizing outputs](./visualize.md)). Paths are auto-detected on Linux and macOS via `pkg-config` and the usual install layouts; override with `HDF5_INCLUDE_DIR` / `HDF5_LIB_DIR` if the wrong install is picked up or the build stops with install advice. |
 
 ### Optional external libraries
 
@@ -99,7 +99,7 @@ often ~50% smaller, and viewable directly in ParaView without conversion):
   `pkg-config` and standard install layouts; set `HDF5_INCLUDE_DIR` and
   `HDF5_LIB_DIR` to override.
 
-See [Visualizing outputs](./visualize) for the VTKHDF file format and the
+See [Visualizing outputs](./visualize.md) for the VTKHDF file format and the
 `2vtk.py --update-vtkhdf` workflow.
 
 ## Building

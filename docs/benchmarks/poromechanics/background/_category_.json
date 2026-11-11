@@ -1,0 +1,9 @@
+{
+  "label": "Reference solutions",
+  "position": 10,
+  "link": {
+    "type": "generated-index",
+    "slug": "/category/poromechanics-background",
+    "description": "The analytical solutions the examples are compared with"
+  }
+}

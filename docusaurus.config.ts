@@ -7,13 +7,14 @@ import rehypeKatex from 'rehype-katex';
 // Maintainer sync record: general baseline DynEarthSol #114 (2026-10-31);
 // PT mechanics #106, build requirements #122/#125, and the macOS GoSPL
 // build fix #121 are also documented.
+// RSF theory and tutorials cover #91; tutorial figures come from master 68cc2a0.
 
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-  title: 'DES3D User Manual',
-  tagline: 'Essential information for using DES3D',
+  title: 'DynEarthSol Documentation',
+  tagline: 'Using DynEarthSol (DES2D and DES3D) for geodynamics, earthquake cycles and surface processes',
   favicon: 'img/favicon.png',
 
   // Set the production url of your site here
@@ -21,23 +22,19 @@ const config: Config = {
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/des3d/',
-  projectName: 'geoflac.github.io',
-  organizationName: 'geoflac',
   trailingSlash: false,
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  // organizationName: 'https://geoflac.github.io/', // Usually your GitHub org/user name.
-  // projectName: 'des3d/', // Usually your repo name.
   organizationName: 'geoflac', // Usually your GitHub org/user name.
   projectName: 'des3d', // Usually your repo name.
   deploymentBranch: 'main',
 
-  onBrokenLinks: 'ignore', //throw',
-  // onBrokenMarkdownLinks: 'warn',
+  onBrokenLinks: 'throw',
+  onBrokenAnchors: 'throw',
   markdown: {
     hooks: {
-      onBrokenMarkdownLinks: 'warn', // or 'throw' if you want strict checking
+      onBrokenMarkdownLinks: 'throw',
     },
   },
 
@@ -91,6 +88,19 @@ const config: Config = {
     ],
   ],
 
+  plugins: [
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        // Category pages renamed in the 2026 reorganization.
+        redirects: [
+          {from: '/docs/category/usage', to: '/docs/category/user-guide'},
+          {from: '/docs/category/tutorials', to: '/docs/category/fundamental-mechanics'},
+        ],
+      },
+    ],
+  ],
+
   themes: [
     [
       require.resolve('@easyops-cn/docusaurus-search-local'),
@@ -114,26 +124,12 @@ const config: Config = {
         src: 'img/logo.svg',
       },
       items: [
-        {
-          to: '/docs/intro',
-          position: 'left',
-          label: 'Introduction',
-        },
-        {
-          to: '/docs/usage',
-          position: 'left',
-          label: 'Usage',
-        },
-        {
-          to: '/docs/category/tutorial',
-          position: 'left',
-          label: 'Tutorial',
-        },
-        {
-          to: '/docs/category/theory',
-          position: 'left',
-          label: 'Theory',
-        },
+        {to: '/docs/intro', position: 'left', label: 'Overview'},
+        {to: '/docs/category/getting-started', position: 'left', label: 'Getting started'},
+        {to: '/docs/category/user-guide', position: 'left', label: 'User guide'},
+        {to: '/docs/category/tutorial', position: 'left', label: 'Tutorials'},
+        {to: '/docs/category/theory', position: 'left', label: 'Theory'},
+        {to: '/docs/category/reference', position: 'left', label: 'Reference'},
         {
           type: 'docsVersionDropdown',
           position: 'right',
@@ -150,24 +146,15 @@ const config: Config = {
       style: 'dark',
       links: [
         {
-          title: 'DES3D Documentation',
+          title: 'Documentation',
           items: [
-            {
-              label: 'Introduction',
-              to: '/docs/intro',
-            },
-            {
-              label: 'Usage',
-              to: '/docs/usage',
-            },
-            {
-              label: 'Tutorial',
-              to: '/docs/category/tutorial',
-            },
-            {
-              label: 'Theory',
-              to: '/docs/category/theory',
-            },
+            {label: 'Overview', to: '/docs/intro'},
+            {label: 'Getting started', to: '/docs/category/getting-started'},
+            {label: 'User guide', to: '/docs/category/user-guide'},
+            {label: 'Tutorials', to: '/docs/category/tutorial'},
+            {label: 'Theory', to: '/docs/category/theory'},
+            {label: 'Reference', to: '/docs/category/reference'},
+            {label: 'Developer guide', to: '/docs/category/developer-guide'},
           ],
         },
         {
@@ -187,7 +174,7 @@ const config: Config = {
             //   to: '/blog',
             // },
             {
-              label: 'DES3D on GitHub',
+              label: 'DynEarthSol on GitHub',
               href: 'https://github.com/GeoFLAC/DynEarthSol/',
             },
             {

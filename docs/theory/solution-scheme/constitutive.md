@@ -32,17 +32,28 @@ $\boldsymbol{\sigma}_{ve}^{t+\Delta t}-\boldsymbol{\sigma}^{t}$, and
 $\boldsymbol{\sigma}_{ve}$ with $(\boldsymbol{\sigma}_{ve}^{t+\Delta
   t}+\boldsymbol{\sigma}^{t})/2$, the equation above is reduced to:
 
+Writing $\mathbf{s}=\operatorname{dev}\boldsymbol\sigma$ and
+$\Delta\boldsymbol\epsilon=\boldsymbol\epsilon^{t+\Delta t}-\boldsymbol\epsilon^t$,
+
 $$
-\textrm{dev}(\boldsymbol{\sigma}_{ve}^{t+\Delta t})=\dfrac{\left(1-\frac{G\Delta t}{2\eta}\right)\textrm{dev}(\boldsymbol{\sigma}^{t})+2G\textrm{dev}(\boldsymbol{\epsilon}^{t+\Delta t}-\boldsymbol{\epsilon}^{t})}{1+\frac{G\Delta t}{2\eta}}
+r=\frac{G\Delta t}{2\eta},
+\qquad
+\mathbf{s}^{t+\Delta t}
+=\frac{(1-r)\mathbf{s}^{t}+2G\operatorname{dev}(\Delta\boldsymbol\epsilon)}{1+r}.
 $$
 
 The isotropic stress components are updated based on the volume change.
 As a result, the visco-elastic stress is:
 
 $$
-\boldsymbol{\sigma}_{ve}^{t+\Delta
-    t}=\textrm{dev}(\boldsymbol{\sigma}_{ve}^{t+\Delta t})+\Delta t \ K_{s}\textrm{tr}(\boldsymbol{\dot{\epsilon}}^{t+\Delta t})\mathbf{I}.
+\boldsymbol\sigma_{ve}^{t+\Delta t}
+=\mathbf{s}^{t+\Delta t}+(\sigma_m^t+K_s\Delta\varepsilon_v)\mathbf I.
 $$
+
+Here $\Delta\varepsilon_v=\Delta t\,\operatorname{tr}\dot{\boldsymbol\epsilon}$
+and $\sigma_m^t$ is the old mean normal stress, using the same normal
+components as the deviatoric projection. Without a volumetric strain
+increment, the mean stress is retained.
 
 The elasto-plastic stress $\boldsymbol{\sigma}_{ep}$ is computed using
 linear elasticity and the Mohr-Coulomb (MC) failure criterion with a
@@ -58,10 +69,10 @@ $$
 $$
 
 If the elastic trial stress, $\boldsymbol{\sigma}_{\text{el}}^{t+\Delta
-  t}$, is on or within a yield surface, that is,
-$f\left(\boldsymbol{\sigma}_{\text{el}}^{t+\Delta t}\right)\geq0,$ where
-$f$ is the yield function, then the stress does not need a plastic
-correction. So, $\boldsymbol{\sigma}^{t+\Delta t}_{ep}$ is set to be
+  t}$, is inside or on both yield surfaces, the stress does not need a plastic
+correction. With the signs defined below, the admissible conditions are
+$f_s \geq 0$ for shear and $f_t \leq 0$ for tension. So,
+$\boldsymbol{\sigma}^{t+\Delta t}_{ep}$ is set to be
 equal to $\boldsymbol{\sigma}_{\text{el}}^{t+\Delta t}$. However, if
 $\boldsymbol{\sigma}_{\text{el}}^{t+\Delta t}$ is outside the yield
 surface, we project it onto the yield surface using a return-mapping
@@ -93,8 +104,8 @@ $\sigma_{t}$. This comparison is required because the theoretical limit
 is not constant in the strain weakening case, where the material
 cohesion, $C$, and the friction angle $\phi$ may change.
 
-To guarantee a unique decision on the mode of yielding (shear versus
-tensile), we define an additional function,
+The classic two-principal-stress construction selects between shear and
+tensile return with the auxiliary function
 $f_{h}(\sigma_{1},\sigma_{3})$, which bisects the obtuse angle made by
 two yield functions on the $\sigma_1$-$\sigma_3$ plane, as
 
@@ -106,11 +117,18 @@ $$
 \end{aligned}
 $$
 
-Once yielding is identified, that is, $f_{s}( \sigma_{el,1},
+In that construction, once yielding is identified, that is, $f_{s}( \sigma_{el,1},
 \sigma_{el,3})<0$ or $f_{t}(\sigma_{el,3})>0$, the mode of failure
 (shear or tensile) is decided based on the value of $f_{h}$, in other
 words, shear failure occurs if $f_{h}(\sigma_{el,1},\sigma_{el,3})<0$,
 tensile failure occurs otherwise.
+
+The current 3D and full plane-strain routines also check principal-stress
+ordering, the tensile cap and Mohr–Coulomb edges. An elastic trial stress
+above the tensile cap can still admit a pure shear return below that cap;
+it does not by itself establish tensile plastic flow. The equations below
+describe a smooth yield face; edge returns require the additional active
+constraints. See the [Salençon benchmark](../../benchmarks/poromechanics/circular-openings/salencon.md).
 
 The flow rule for frictional materials is in general non-associative,
 that is, the direction of plastic flow in the principal stress space
@@ -261,18 +279,9 @@ depending on which has a lower value of $J_2$.
 
 ## Rate-and-state friction controls
 
-For models that use rate-and-state friction (RSF), three options control how
-the slip rate is measured and how the state variable limits the time step:
-
-| Parameter | Default | Meaning |
-|-----------|---------|---------|
-| `rsf_slip_rate_projection_option` | `0` | `0`: slip rate from the maximum-shear projection (historical behavior). `1`: slip rate from the total-strain invariant of the element strain-rate tensor. |
-| `rsf_dtheta_max` | `0` | Upper bound on the aging-law state change per step, used to limit the time step with option `1`. `0` disables the constraint. |
-
-The rate used by the friction, aging-law and slip-law calculations has a floor
-of $10^{-16}$ m/s. With the default settings, results differ from earlier
-versions only below that threshold.
-
-The strain-invariant rate (option `1`) is rebuilt after a restart and follows
-the current boundary motion and mesh geometry. Output and checkpoint layouts
-are the same for both options.
+The `elasto-plastic-rsf` and `elasto-visco-plastic-rsf` rheologies use the
+update above with a Mohr–Coulomb friction angle set by rate-and-state
+friction. The friction law, the slip-rate measures
+(`control.rsf_slip_rate_projection_option`) and the state-change time-step
+limit (`control.rsf_dtheta_max`) are described in
+[Rate-and-state friction](../rate-state-friction.md).
