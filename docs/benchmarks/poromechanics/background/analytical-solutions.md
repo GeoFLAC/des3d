@@ -126,11 +126,11 @@ title: "Reference solutions"
 
 <a id="kirsch"></a>
 
-[Elastic circular opening: Kirsch limit](../circular-openings/kirsch.md).
+[Elastic circular opening: Kirsch limit](../../mechanics/kirsch.md).
 
 <a id="salencon"></a>
 
-[Plastic tunnel: Salençon solution](../circular-openings/salencon.md).
+[Plastic tunnel: Salençon solution](../../mechanics/salencon.md).
 
 <a id="borehole"></a>
 

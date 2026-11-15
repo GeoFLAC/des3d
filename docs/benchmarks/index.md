@@ -24,6 +24,8 @@ listed below.
 | [Checking the friction law in simple shear](./faults-friction/simple-shear.md) | Closed-form stresses for static friction and steady-state and aging-law RSF | `benchmarks/faults-friction/simple_shear_rsf/` |
 | [Elastoplastic oedometer test](./mechanics/oedometer.md) | Closed-form Mohr–Coulomb stress path under uniaxial strain | `benchmarks/mechanics/oedometer/oedometer-2d.cfg` |
 | [Maxwell stress build-up in pure shear](./mechanics/maxwell.md) | Maxwell response at a constant strain rate | `benchmarks/mechanics/maxwell/maxwell.cfg` |
+| [Elastic circular opening: Kirsch limit](./mechanics/kirsch.md) | Kirsch stresses and displacement around an unlined opening | `benchmarks/poromechanics/` |
+| [Plastic tunnel: Salençon solution](./mechanics/salencon.md) | Salençon stresses, plastic radius and wall convergence for perfect Mohr–Coulomb plasticity | `benchmarks/poromechanics/` |
 | [Cooling of a half-space](./heat/half-space-cooling.md) | Error-function profile in 2D and 3D | `benchmarks/heat/half-space-cooling/diffusion.cfg` |
 | [Rate-and-state friction under a velocity step](./faults-friction/rsf-velocity-step.md) | Closed-form RSF response to a step in slip rate | `benchmarks/poromechanics/` |
 | [Fault-zone heating at fixed normal traction](./faults-friction/fault-heat.md) | Thermal weakening by shear heating: shear resistance, temperature and pore pressure against a differential reference | `benchmarks/poromechanics/` |

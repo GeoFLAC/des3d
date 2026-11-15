@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 4
 title: "Plastic tunnel: Salençon solution"
 ---
 # Plastic tunnel: Salençon solution
@@ -21,7 +21,7 @@ A circular tunnel is excavated in rock under uniform in-situ stress: the support
 
 ## Problem setup
 
-![Setup](../img/salencon/setup.png)
+![Setup](./img/salencon/setup.png)
 
 **Geometry and load.** A quarter annulus with opening radius $a=1$ m and outer radius $R=20a$, in plane strain. The rock starts under uniform compression $P=500$ kPa in all three directions. The support pressure on the opening wall is lowered from $P$ to zero in 16 equal steps, while the outer boundary keeps the pressure $P$.
 
@@ -67,7 +67,7 @@ dynearthsol2d salencon.cfg
 
 ## Output
 
-See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
+See [Running the examples](../poromechanics/running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -80,7 +80,7 @@ See [Running the examples](../running.md) for output files, the Python reader an
 
 ## Result: DES and the analytical solution
 
-![Result](../img/salencon/result.png)
+![Result](./img/salencon/result.png)
 
 (a) Radial, hoop and out-of-plane stress against $r/a$ after the support is removed, finest mesh: DES at element centres (dots) and Salençon (lines); the dashed line marks the analytical plastic radius. (b) Inward radial displacement of the nodes, scaled by the analytical wall convergence, with the analytical curve. (c) RMS errors of hoop stress, displacement and radial strain over $1.05a\le r\le5a$ against the inner mesh spacing.
 

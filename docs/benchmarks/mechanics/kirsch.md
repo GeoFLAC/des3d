@@ -1,5 +1,5 @@
 ---
-sidebar_position: 1
+sidebar_position: 3
 title: "Elastic circular opening: Kirsch limit"
 ---
 # Elastic circular opening: Kirsch limit
@@ -21,7 +21,7 @@ A circular opening concentrates stress in an elastic solid under isotropic compr
 
 ## Problem setup
 
-![Setup](../img/kirsch/setup.png)
+![Setup](./img/kirsch/setup.png)
 
 **Geometry and load.** A quarter annulus has opening radius a = 1 m and outer radius R = 20a. The opening is free; the outer curved face carries isotropic compressive traction P = 100 kPa.
 
@@ -61,7 +61,7 @@ dynearthsol2d input.cfg
 
 ## Output
 
-See [Running the examples](../running.md) for output files, the Python reader and ParaView conversion.
+See [Running the examples](../poromechanics/running.md) for output files, the Python reader and ParaView conversion.
 
 | Field | What to look at |
 | --- | --- |
@@ -71,7 +71,7 @@ See [Running the examples](../running.md) for output files, the Python reader an
 
 ## Result: DES and the analytical solution
 
-![Result](../img/kirsch/result.png)
+![Result](./img/kirsch/result.png)
 
 (a) Radial and hoop compression, scaled by P, against distance from the opening centre: lines, the finite-annulus solution; symbols, DES elements (thinned for display). (b) Radial and hoop elastic strain, scaled by P/G. (c) RMS stress error, scaled by P, against the inner mesh spacing.
 

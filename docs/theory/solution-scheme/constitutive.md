@@ -128,7 +128,7 @@ ordering, the tensile cap and Mohr–Coulomb edges. An elastic trial stress
 above the tensile cap can still admit a pure shear return below that cap;
 it does not by itself establish tensile plastic flow. The equations below
 describe a smooth yield face; edge returns require the additional active
-constraints. See the [Salençon benchmark](../../benchmarks/poromechanics/circular-openings/salencon.md).
+constraints. See the [Salençon benchmark](../../benchmarks/mechanics/salencon.md).
 
 The flow rule for frictional materials is in general non-associative,
 that is, the direction of plastic flow in the principal stress space
