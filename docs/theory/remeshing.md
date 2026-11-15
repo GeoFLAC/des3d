@@ -82,7 +82,7 @@ element currently is:
   | `mesh.remesh_deborah_max` | `100.0` | De at or above which the remeshed stress is purely the NN-remapped stress. |
 
   `remesh_deborah_min` must be positive and less than `remesh_deborah_max`,
-  or the run exits with a config error (see [Exit codes](../usage/run#exit-codes)).
+  or the run exits with a config error (see [Exit codes](../user-guide/running/diagnostics.md#exit-codes)).
   Widen the gap to blend more of the domain; narrow it to make the switch
   sharper.
 - The free surface is pinned to its exact physical condition (zero normal

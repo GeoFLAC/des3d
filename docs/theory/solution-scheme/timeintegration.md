@@ -18,5 +18,8 @@ $$
 \mathbf{x}_{a}^{t+\Delta t}=\mathbf{x}_{a}^{t}+\Delta t \, \mathbf{u}_{a}^{t+\Delta t}.
 $$
 
-Since the mesh is changed, the shape function derivates $N_{a}^{e}$ and
-the element volume $\Omega_{e}$ are updated every time step.
+When `control.has_moving_mesh = yes`, node motion changes the mesh, so
+the shape-function derivatives and element volumes are refreshed. With a
+fixed mesh, coordinates and these geometric quantities stay fixed.
+For the coupled transport and mechanics order, see
+[Source layout](../../developer/source-layout.md#one-time-step).

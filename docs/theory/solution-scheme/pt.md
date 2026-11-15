@@ -11,7 +11,7 @@ equilibrium within a physical timestep. The finite-element force assembly
 uses the [spatial discretization](./index.md#discretization) shared with the
 explicit momentum path. PT adds an inner relaxation loop whose candidates
 all refer to the same physical increment. Configuration and diagnostic
-details are in [Choosing a mechanical solver](../../usage/pt.md).
+details are in [Choosing a mechanical solver](../../user-guide/numerical-controls/solver.md).
 
 ## One physical increment, many trials
 
@@ -30,10 +30,13 @@ Consequently, $k$ trials do not represent $k\Delta t$ of aging or viscous
 relaxation. Mixed stress correction is applied before candidate force
 evaluation. Acceptance commits the full constitutive candidate.
 
-Thermal diffusion advances temperature once before a physical PT solve,
-and temperature remains fixed during its trials. Hydraulic transport,
-mesh motion, stress rotation and remeshing follow accepted mechanics outside
-the loop. Gradients, volumes, facet areas and normals remain on the reference
+With the default hydraulic content model, temperature advances once before
+a physical PT solve and remains fixed during its trials. The optional
+finite-density model instead advances its heat and water inventories after
+accepted mechanics. Hydraulic transport, mesh motion, stress rotation and
+remeshing remain outside the trial loop; see
+[Poromechanics](../poromechanics.md#coupling-in-time). Gradients, volumes,
+facet areas and normals remain on the reference
 mesh during mechanics. For moving-mesh physical steps, height-dependent
 foundation, water and side-support pressures include the candidate vertical
 displacement in their height argument. This is an incremental pressure-load
@@ -69,7 +72,7 @@ arbitrary contradictory prescriptions are not simultaneously enforced.
 The default acceptance threshold uses an absolute tolerance plus a relative
 tolerance times the first warm candidate's residual. The alternative
 running-scale criterion and its limitations are given in the
-[convergence reference](../../usage/pt.md#understand-convergence).
+[convergence reference](../../user-guide/numerical-controls/solver.md#understand-convergence).
 
 ## Starting candidates
 
@@ -84,7 +87,7 @@ could apply the same compression again. Zero free motion can represent its
 equilibrium. For a Maxwell material, however, zero velocity still permits
 constitutive relaxation over $\Delta t$ and need not satisfy the imposed
 traction. A new equilibrium velocity must then produce continued creep.
-The [elastic](../../tutorial/pt/elastic.md) and [Maxwell](../../tutorial/pt/maxwell.md)
+The [elastic](../../tutorial/fundamentals/elastic.md) and [Maxwell](../../tutorial/fundamentals/maxwell.md)
 tutorials demonstrate the distinction.
 
 ## Relaxation schemes
@@ -124,7 +127,7 @@ advanced. The report's `stage=before_physical_updates` refers to the later
 updates, not the preceding thermal stage. A force reconstructed from
 saved post-rotation stress can differ slightly, even on a fixed mesh.
 Remeshing invalidates this diagnostic until another solve is accepted.
-See [PT force output](../../usage/visualize.md#pt-force-output).
+See [PT force output](../../getting-started/visualize.md#pt-force-output).
 
 Neither relaxation scheme can produce a stable quasi-static equilibrium
 where the model has none. Strain softening can introduce negative stiffness;

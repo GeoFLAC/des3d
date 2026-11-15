@@ -1,0 +1,9 @@
+{
+  "label": "Model setup",
+  "position": 1,
+  "link": {
+    "type": "generated-index",
+    "slug": "/category/model-setup",
+    "description": "Geometry and meshes, initial and boundary conditions, and weak zones"
+  }
+}

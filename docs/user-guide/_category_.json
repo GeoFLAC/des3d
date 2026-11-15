@@ -1,0 +1,9 @@
+{
+  "label": "User guide",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "slug": "/category/user-guide",
+    "description": "How to set up, control and run DynEarthSol models, one feature at a time"
+  }
+}

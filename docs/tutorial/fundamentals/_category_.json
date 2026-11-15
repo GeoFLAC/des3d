@@ -1,0 +1,9 @@
+{
+  "label": "Fundamental mechanics",
+  "position": 1,
+  "link": {
+    "type": "generated-index",
+    "slug": "/category/fundamental-mechanics",
+    "description": "Apply a load, hold elastic equilibrium, then explore continued Maxwell creep with pseudo-transient mechanics"
+  }
+}

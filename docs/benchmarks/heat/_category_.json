@@ -1,0 +1,9 @@
+{
+  "label": "Heat transport",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "slug": "/category/benchmarks-heat",
+    "description": "Conduction compared with analytical solutions"
+  }
+}

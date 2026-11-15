@@ -13,31 +13,33 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'What is DES3D?',
+    title: 'What is DynEarthSol?',
     Svg: require('@site/static/img/card-intro-mesh.svg').default,
     description: (
       <>
-        Lagrangian finite element code for tectonic modeling.
+        Explicit Lagrangian finite element code for tectonics, earthquake
+        cycles and surface processes.
       </>
     ),
     link: '/docs/intro',
   },
   {
-    title: 'Quickstart',
+    title: 'Getting started',
     Svg: require('@site/static/img/card-quickstart-terminal.svg').default,
     description: (
       <>
-        Get started with DES3D with a quick read about configuring and building it.
+        Install DynEarthSol, run a first model and look at the results.
       </>
     ),
-    link: '/docs/usage',
+    link: '/docs/category/getting-started',
   },
   {
     title: 'Tutorials',
     Svg: require('@site/static/img/card-tutorials-book.svg').default,
     description: (
       <>
-        Detailed description of some non-trivial examples that come with DES3D.
+        Reproducible worked examples, from basic mechanics to tectonic and
+        earthquake-cycle models.
       </>
     ),
     link: '/docs/category/tutorial',
