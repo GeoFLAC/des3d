@@ -13,7 +13,7 @@ A reservoir stands at the crest of the embankment and the slope is saturated. Wh
 | | |
 | --- | --- |
 | Dimension | 2D |
-| Build | `make ndims=2` from the poromechanics source |
+| Build | `make ndims=2` from the poromechanics source (not yet merged; [DynEarthSol #134](https://github.com/GeoFLAC/DynEarthSol/pull/134)) |
 | Inputs | [drawdown.zip](/downloads/poromechanics/drawdown.zip) |
 | Reproduce with | DynEarthSol [`3774df0`](https://github.com/GeoFLAC/DynEarthSol/tree/3774df00ba1708a4f70a836d2073f845653aac64) |
 

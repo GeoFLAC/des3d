@@ -24,7 +24,7 @@ form, DES grows more of them and its heat content is up to 14 % higher.**
 | | |
 | --- | --- |
 | Dimension | 2D |
-| Build | `make ndims=2` from the poromechanics source |
+| Build | `make ndims=2` from the poromechanics source (not yet merged; [DynEarthSol #134](https://github.com/GeoFLAC/DynEarthSol/pull/134)) |
 | Inputs | [elder.zip](/downloads/poromechanics/elder.zip); reference `benchmarks/poromechanics/elder_reference.py` |
 | Run time | 33 s, 6 min and 1 h 45 min on 8 threads for the three meshes |
 | Reproduce with | DynEarthSol [`3774df0`](https://github.com/GeoFLAC/DynEarthSol/tree/3774df00ba1708a4f70a836d2073f845653aac64) |

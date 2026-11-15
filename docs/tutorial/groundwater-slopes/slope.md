@@ -13,7 +13,7 @@ A 2 m soil layer on 20° bedrock is loaded by its own weight and then by pore pr
 | | |
 | --- | --- |
 | Dimension | 2D |
-| Build | `make ndims=2` from the poromechanics source |
+| Build | `make ndims=2` from the poromechanics source (not yet merged; [DynEarthSol #134](https://github.com/GeoFLAC/DynEarthSol/pull/134)) |
 | Inputs | [slope.zip](/downloads/poromechanics/slope.zip) |
 | Reproduce with | DynEarthSol [`3774df0`](https://github.com/GeoFLAC/DynEarthSol/tree/3774df00ba1708a4f70a836d2073f845653aac64) |
 

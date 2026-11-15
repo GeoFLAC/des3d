@@ -13,7 +13,7 @@ A well pumps a thin poroelastic aquifer. The drawdown spreads radially and the l
 | | |
 | --- | --- |
 | Dimension | 3D |
-| Build | `make ndims=3` from the poromechanics source |
+| Build | `make ndims=3` from the poromechanics source (not yet merged; [DynEarthSol #134](https://github.com/GeoFLAC/DynEarthSol/pull/134)) |
 | Inputs | [aquifer.zip](/downloads/poromechanics/aquifer.zip) |
 | Reproduce with | DynEarthSol [`3774df0`](https://github.com/GeoFLAC/DynEarthSol/tree/3774df00ba1708a4f70a836d2073f845653aac64) |
 
