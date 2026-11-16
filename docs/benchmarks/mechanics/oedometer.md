@@ -21,7 +21,7 @@ on that path.
 | Build | `make ndims=2` |
 | Run time | about 1 s |
 | Inputs | `benchmarks/mechanics/oedometer/oedometer-2d.cfg` in the DynEarthSol repository |
-| Checked with | DynEarthSol `68cc2a0` |
+| Checked with | DynEarthSol `cd1042c` |
 
 :::
 
@@ -54,9 +54,9 @@ $$
 r = \frac{E_1 - E_2 N_\phi}{(E_1 + E_2) N_\phi N_\psi - 2E_2(N_\phi + N_\psi) + 2E_1}.
 $$
 
-The reference integrates both branches in true-strain increments,
-$\Delta\varepsilon = v\,\Delta t/(1 - u)$ for shortening $u$, because DES
-updates the cell's geometry every step.
+The reference evaluates this path at the true strain DES applies,
+$\varepsilon = \sum v\,\Delta t/(1 - u)$ with $u$ the shortening at the start
+of each step, because DES updates the cell's geometry every step.
 
 ## Input and how to run
 
@@ -67,8 +67,10 @@ cd benchmarks/mechanics/oedometer
 
 The run writes 51 frames, `result.save.*`, one every 40 steps.
 `benchmarks/mechanics/oedometer/oedometer-2d-plot.py` plots the shortening of the right side
-against $\sigma_{xx}$ with the reference path; it was written for an older
-Matplotlib and needs small changes to run with a current one.
+against $\sigma_{xx}$ with a reference path; it was written for an older
+Matplotlib and needs small changes to run with a current one. Its path takes
+each step's strain at the end-of-step shortening and changes slope only at a
+whole step, which puts its final stress 0.03 % above the closed form.
 
 ## What to look for
 
@@ -76,9 +78,9 @@ Matplotlib and needs small changes to run with a current one.
 
 | | DES | Reference |
 | --- | ---: | ---: |
-| Axial stress after 20 mm | 7.0868 MPa | 7.0887 MPa |
-| Largest relative difference, elastic branch | 0.057 % | |
-| Largest relative difference, plastic branch | 0.058 % | |
+| Axial stress after 20 mm | 7.0868 MPa | 7.0864 MPa |
+| Largest relative difference, elastic branch | 0.017 % | |
+| Largest relative difference, plastic branch | 0.014 % | |
 
 DES follows the path on both branches. The two elements carry the same
 stress, so the cell deforms uniformly, as the reference assumes.
