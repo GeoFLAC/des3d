@@ -2,7 +2,9 @@
 
 This is the [Docusaurus](https://docusaurus.io) site for
 [GeoFLAC/DynEarthSol](https://github.com/GeoFLAC/DynEarthSol) (DES3D),
-deployed to **https://geoflac.github.io/des3d/**.
+published at **https://geoflac.github.io/DynEarthSol/**, where its homepage is
+also the project landing page. The old address, https://geoflac.github.io/des3d/,
+redirects there.
 
 It documents how to build, configure and run DES3D, it is not the
 simulation code itself, that lives in the
@@ -15,7 +17,7 @@ Yarn.
 
 ```console
 yarn install
-yarn start      # dev server at http://localhost:3000/des3d/, hot-reloads on save
+yarn start      # dev server at http://localhost:3000/DynEarthSol/, hot-reloads on save
 ```
 
 Before opening a PR, confirm the production build also succeeds (the dev

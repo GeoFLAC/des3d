@@ -1,6 +1,15 @@
 # des3d — DynEarthSol user documentation site
 
-Docusaurus site for [GeoFLAC/DynEarthSol](https://github.com/GeoFLAC/DynEarthSol) (DES3D), deployed to GitHub Pages at https://geoflac.github.io/des3d/.
+Docusaurus site for [GeoFLAC/DynEarthSol](https://github.com/GeoFLAC/DynEarthSol) (DES3D), published at https://geoflac.github.io/DynEarthSol/. Its homepage (`src/pages/index.tsx`) is also the DynEarthSol project landing page.
+
+## Deployment
+
+`.github/workflows/deploy.yml` builds the site on every push to `main` and then:
+
+- pushes `build/` to the `gh-pages` branch of GeoFLAC/DynEarthSol, which GitHub Pages serves at `/DynEarthSol/` (a Pages site is always served under its own repository's name). It authenticates with the write deploy key whose private half is the `DYNEARTHSOL_DEPLOY_KEY` secret here;
+- deploys a redirect-only site, made by `scripts/make_redirect_site.py`, to this repository's own Pages, so every old `https://geoflac.github.io/des3d/...` URL forwards to the same path under `/DynEarthSol/`. `downloads/` and `tutorial/` are copied there verbatim so direct file links keep working.
+
+Never edit DynEarthSol's `gh-pages` branch by hand: each deploy replaces its contents.
 
 ## Recurring task: sync docs with upstream DynEarthSol PRs
 

@@ -9,7 +9,10 @@ description: How this site is organized, built, checked and kept in step with Dy
 
 This manual is a [Docusaurus](https://docusaurus.io) site in the
 [GeoFLAC/des3d](https://github.com/GeoFLAC/des3d) repository, published at
-https://geoflac.github.io/des3d/ when changes are merged to `main`.
+https://geoflac.github.io/DynEarthSol/ when changes are merged to `main`.
+The deploy workflow pushes the build to the `gh-pages` branch of
+GeoFLAC/DynEarthSol, and the old address https://geoflac.github.io/des3d/
+redirects every page to the new one.
 
 ## Structure
 
@@ -35,7 +38,7 @@ Docusaurus needs Node 20 or later.
 ```console
 yarn install
 yarn build      # fails on any broken link, anchor or image
-yarn start      # local preview at http://localhost:3000/des3d/
+yarn start      # local preview at http://localhost:3000/DynEarthSol/
 ```
 
 ## The parameter reference

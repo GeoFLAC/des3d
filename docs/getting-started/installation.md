@@ -90,7 +90,7 @@ installation or path configuration is needed. To enable it:
 
 - set `usemmg = 1` (both `ndims=2` and `ndims=3` are supported).
 
-For further information, see [Adaptive mesh refinement with MMG](https://geoflac.github.io/des3d/docs/tutorial/usingmmg).
+For further information, see [Adaptive mesh refinement with MMG](../user-guide/numerical-controls/mmg.md).
 
 #### `Geodynamic World Builder`
 To set the initial temperature, marker materials or weak zone from a

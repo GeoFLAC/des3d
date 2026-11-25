@@ -24,3 +24,8 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Test build website
         run: yarn build
+      - name: Test redirect site for the old /des3d/ address
+        run: >-
+          python3 scripts/make_redirect_site.py build redirect-site
+          --new-base https://geoflac.github.io/DynEarthSol/
+          --old-base /des3d/ --copy downloads --copy tutorial

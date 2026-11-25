@@ -2,8 +2,8 @@ DES3D pseudo-transient mechanics tutorials
 ========================================
 
 Manual pages:
-https://geoflac.github.io/des3d/docs/tutorial/pt-elastic
-https://geoflac.github.io/des3d/docs/tutorial/pt-maxwell
+https://geoflac.github.io/DynEarthSol/docs/tutorial/pt-elastic
+https://geoflac.github.io/DynEarthSol/docs/tutorial/pt-maxwell
 
 Reference source: GeoFLAC/DynEarthSol
 Version for reproducing the figures: 707e481fea957971d5cb6ca67d8d24bd689a3467
