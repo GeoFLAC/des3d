@@ -134,6 +134,11 @@ const config: Config = {
           type: 'docsVersionDropdown',
           position: 'right',
         },
+        {
+          href: 'https://github.com/GeoFLAC/DynEarthSol',
+          label: 'GitHub',
+          position: 'right',
+        },
         // {to: '/blog', label: 'Blog', position: 'left'},
         // {
         //   href: 'https://github.com/facebook/docusaurus',
