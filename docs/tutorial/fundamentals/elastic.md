@@ -69,7 +69,7 @@ from zipfile import ZipFile
 
 destination = Path("pt-tutorial")
 destination.mkdir()  # Use a new directory for a fresh exercise.
-urlretrieve("https://geoflac.github.io/des3d/tutorial/pt/pt-tutorial.zip",
+urlretrieve("https://geoflac.github.io/DynEarthSol/tutorial/pt/pt-tutorial.zip",
             destination / "pt-tutorial.zip")
 with ZipFile(destination / "pt-tutorial.zip") as archive:
     archive.extractall(destination)

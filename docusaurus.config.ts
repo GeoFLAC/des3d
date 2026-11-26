@@ -12,6 +12,11 @@ import rehypeKatex from 'rehype-katex';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
+// Published at https://geoflac.github.io/DynEarthSol/ by pushing the build to
+// the gh-pages branch of GeoFLAC/DynEarthSol (.github/workflows/deploy.yml).
+// The old address, https://geoflac.github.io/des3d/, serves redirects.
+const BASE_URL = '/DynEarthSol/';
+
 const config: Config = {
   title: 'DynEarthSol Documentation',
   tagline: 'Using DynEarthSol (DES2D and DES3D) for geodynamics, earthquake cycles and surface processes',
@@ -21,13 +26,13 @@ const config: Config = {
   url: 'https://geoflac.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/des3d/',
+  baseUrl: BASE_URL,
   trailingSlash: false,
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'geoflac', // Usually your GitHub org/user name.
-  projectName: 'des3d', // Usually your repo name.
+  projectName: 'DynEarthSol', // The repository whose Pages site serves it.
   deploymentBranch: 'main',
 
   onBrokenLinks: 'throw',
@@ -192,7 +197,7 @@ const config: Config = {
       copyright: `Copyright © ${new Date().getFullYear()} Team GeoFLAC. Built with Docusaurus. Supported by the National Science Foundation Award 2104002.
   <br/>
   <a href="https://www.nsf.gov/" target="_blank" rel="noopener noreferrer">
-    <img src="/des3d/img/nsf-logo.png" alt="NSF Logo" style="height:40px; margin-top:8px;"/>
+    <img src="${BASE_URL}img/nsf-logo.png" alt="NSF Logo" style="height:40px; margin-top:8px;"/>
   </a>`,
     },
     prism: {

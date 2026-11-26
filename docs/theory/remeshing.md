@@ -39,7 +39,7 @@ applies when no area constraint is active, so initial meshing is unaffected.
 
 ## Mesh optimization
 
-As described in https://geoflac.github.io/des3d/docs/tutorial/usingmmg, a user can choose link 
+As described in [Adaptive mesh refinement with MMG](../user-guide/numerical-controls/mmg.md), a user can choose link 
 [MMG](https://mmgtools.org) when building DES. MMG performs mesh optimization allowing a metric-based 
 element size variation and the metric itself can be defined in terms of one of the physical variables 
 like accumulated plastic strain.
