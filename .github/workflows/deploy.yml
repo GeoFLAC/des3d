@@ -98,7 +98,9 @@ jobs:
 
   deploy:
     name: Deploy redirects to des3d Pages
-    needs: build
+    # Only after the push to gh-pages succeeds; otherwise the redirects would
+    # point at manual pages that do not exist at the new address.
+    needs: [build, publish]
 
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
